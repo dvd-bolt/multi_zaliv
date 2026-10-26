@@ -1,0 +1,11 @@
+{
+  "job_id": "723943db6d6d41739ed9e4ccb9e8d9e8",
+  "status": "waiting_auth",
+  "error": "TikTok не подтвердил нужный аккаунт. Переподключите его через расширение Chrome.",
+  "approved": false,
+  "external_id": null,
+  "url": null,
+  "connected": false,
+  "publish_clicked": false,
+  "file_transferred": false
+}

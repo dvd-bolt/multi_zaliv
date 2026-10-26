@@ -1,0 +1,60 @@
+{
+  "checks": [
+    {
+      "name": "checks-before",
+      "top": 58.515625,
+      "bottom": 541.484375,
+      "scroll": false
+    },
+    {
+      "name": "banner",
+      "top": 108.609375,
+      "bottom": 491.375,
+      "scroll": false
+    },
+    {
+      "name": "manual-review",
+      "top": 127.109375,
+      "bottom": 472.890625,
+      "scroll": false
+    },
+    {
+      "name": "checks-ready",
+      "top": 58.515625,
+      "bottom": 541.484375,
+      "scroll": false
+    },
+    {
+      "name": "job-rules",
+      "top": 136.5,
+      "bottom": 463.484375,
+      "scroll": false
+    },
+    {
+      "name": "comments-unchecked",
+      "top": 108.109375,
+      "bottom": 491.890625,
+      "scroll": false
+    },
+    {
+      "name": "payout",
+      "top": 98.71875,
+      "bottom": 501.265625,
+      "scroll": false
+    },
+    {
+      "name": "comments-partial",
+      "top": 91.3125,
+      "bottom": 508.6875,
+      "scroll": false
+    }
+  ],
+  "geometry": {
+    "area": 25.99744496855346,
+    "centerX": 0.5,
+    "centerY": 0.5
+  },
+  "errors": [],
+  "synthetic": true,
+  "noRealUploads": true
+}

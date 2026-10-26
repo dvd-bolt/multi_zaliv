@@ -1,0 +1,15 @@
+{
+  "bounds": {
+    "top": 100.40625,
+    "bottom": 499.578125,
+    "scroll": false
+  },
+  "actions": [
+    {
+      "action": "test_upload"
+    }
+  ],
+  "errors": [],
+  "simulatedSubmit": true,
+  "noRealPublication": true
+}

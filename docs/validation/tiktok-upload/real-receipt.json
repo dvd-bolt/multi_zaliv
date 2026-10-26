@@ -1,0 +1,19 @@
+{
+  "job_id": "939162d336c846a1a2feaf46e2b16af2",
+  "status": "published",
+  "external_id": "7701010935195962646",
+  "url": "https://www.tiktok.com/@labsclode/video/7701010935195962646",
+  "error": null,
+  "studio_match": {
+    "caption": "#бубавпн",
+    "duration_ms": 109718,
+    "create_time": 1793031338
+  },
+  "logged_out_check": {
+    "statusCode": 0,
+    "author": "labsclode",
+    "privateItem": false,
+    "playAddr_present": true
+  },
+  "duplicate_publish_attempt_after_uncertainty": false
+}

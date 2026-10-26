@@ -1,0 +1,8 @@
+{
+  "batchDialog": "passed",
+  "pagination": "passed",
+  "explicitApprovalUnchanged": "passed",
+  "mp4RangeResponse": "passed",
+  "mp4Playback": "passed",
+  "errors": []
+}

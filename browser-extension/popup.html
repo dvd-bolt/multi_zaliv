@@ -1,0 +1,8 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>SurvivalFlow — TikTok</title><link rel="stylesheet" href="popup.css"></head><body>
+<header><img src="icon.png" alt=""><div><strong>SurvivalFlow</strong><span>Подключение TikTok</span></div></header>
+<p>Откройте свой профиль TikTok в текущей вкладке Chrome. Вставьте код из SurvivalFlow.</p>
+<label for="code">Код подключения</label><input id="code" autocomplete="off" spellcheck="false" placeholder="Вставьте код из программы">
+<p class="muted">По нажатию передаст только сессию TikTok в приложение на этом компьютере. Пароли и аккаунты Google недоступны расширению.</p>
+<button id="connect">Подключить этот TikTok</button><p id="status" role="status" aria-live="polite"></p>
+<details><summary>Адрес локальной программы</summary><input id="port" type="number" min="1024" max="65535" value="8765" aria-label="Порт SurvivalFlow"></details>
+<script type="module" src="popup.js"></script></body></html>

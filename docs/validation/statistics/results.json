@@ -1,0 +1,56 @@
+{
+  "checks": [
+    {
+      "platform": "youtube",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflow": false
+    },
+    {
+      "platform": "youtube",
+      "width": 1366,
+      "height": 600,
+      "scrollWidth": 1366,
+      "scrollHeight": 600,
+      "overflow": false
+    },
+    {
+      "platform": "tiktok",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflow": false
+    },
+    {
+      "platform": "tiktok",
+      "width": 1366,
+      "height": 600,
+      "scrollWidth": 1366,
+      "scrollHeight": 600,
+      "overflow": false
+    },
+    {
+      "platform": "all",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflow": false
+    },
+    {
+      "platform": "all",
+      "width": 1366,
+      "height": 600,
+      "scrollWidth": 1366,
+      "scrollHeight": 600,
+      "overflow": false
+    }
+  ],
+  "errors": [],
+  "correctLatest": true,
+  "zeroAndMissing": true,
+  "isolated": true
+}

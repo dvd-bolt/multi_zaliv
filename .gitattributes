@@ -1,0 +1,2 @@
+# Preserve the frozen design reference byte-for-byte (manifest checksums).
+docs/design/assets/design-v1/** -text

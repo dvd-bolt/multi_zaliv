@@ -1,0 +1,1 @@
+"""SurvivalFlow local application."""

@@ -1,0 +1,80 @@
+{
+  "version": "1.0",
+  "frozenOn": "2026-10-23",
+  "timezone": "Europe/Moscow",
+  "layout": "Classic compact Montage",
+  "demoData": true,
+  "files": [
+    {
+      "file": "banner-dialog.png",
+      "sha256": "0d8836eea56116c72d2f4104611bb75dd8a2e60d6a895657ccaf421855b8dbe0",
+      "bytes": 76712,
+      "width": 1024,
+      "height": 600
+    },
+    {
+      "file": "channels.png",
+      "sha256": "cdc08a6816e1d742b8f19b4508bd5818535714b267336b28afa052a6abe2cec0",
+      "bytes": 56353,
+      "width": 1024,
+      "height": 600
+    },
+    {
+      "file": "classic-compact.html",
+      "sha256": "3bdf0867b92f796244cbef977353d593f18b3eebc0c7a6c8bb887c6e6b279279",
+      "bytes": 73683
+    },
+    {
+      "file": "design-tokens.json",
+      "sha256": "20d721bc471f9c81cf88089c43e58532b12161439d808cda02118e8a571a6d48",
+      "bytes": 797
+    },
+    {
+      "file": "editor-banner.png",
+      "sha256": "a84823dd33a99c360b40201c6c9da126a7c9f34f92f8187aa3e488b891d82328",
+      "bytes": 111910,
+      "width": 1024,
+      "height": 600
+    },
+    {
+      "file": "editor-filters.png",
+      "sha256": "435f885c360badd2cd1b7a5e28e0146c55014790a3ccd9aee15f2922f224928e",
+      "bytes": 109246,
+      "width": 1024,
+      "height": 600
+    },
+    {
+      "file": "editor-publish.png",
+      "sha256": "e622ba9182c3c43cc485107f13bbffa02fe7d942dd73ff94bc449abb112dcffd",
+      "bytes": 111285,
+      "width": 1024,
+      "height": 600
+    },
+    {
+      "file": "preview.html",
+      "sha256": "607a603538b08b9d761e115ce3658f3f9140f8fddd9924c2043e1a97a0f710f4",
+      "bytes": 170106
+    },
+    {
+      "file": "queue.png",
+      "sha256": "e833963e78240180f7cb8eb879cccad70713c070ba9fd6cec17a82b3b9b8fd17",
+      "bytes": 61788,
+      "width": 1024,
+      "height": 600
+    },
+    {
+      "file": "settings.png",
+      "sha256": "bd210198dca7e77f205ed1460072c19baf860eb6788d0bc42b6d1663acb210da",
+      "bytes": 49246,
+      "width": 1024,
+      "height": 600
+    },
+    {
+      "file": "stats.png",
+      "sha256": "5874a6d99011f8e838205ff5bcc5540fe032b0da85f38976782699ce0eae737b",
+      "bytes": 45880,
+      "width": 1024,
+      "height": 600
+    }
+  ]
+}

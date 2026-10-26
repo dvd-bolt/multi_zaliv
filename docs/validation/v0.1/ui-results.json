@@ -1,0 +1,184 @@
+{
+  "base": "http://127.0.0.1:8767",
+  "checks": [
+    {
+      "name": "empty-editor",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "channels",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "editor-banner",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "banner-dialog",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "editor-filters",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "editor-publish",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "queue",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "queue-page-2",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "stats",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "stats-import-dialog",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "stats-imported",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "stats-history",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "settings",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "layout-1366-banner",
+      "width": 1366,
+      "height": 600,
+      "scrollWidth": 1366,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "layout-1366-filters",
+      "width": 1366,
+      "height": 600,
+      "scrollWidth": 1366,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "layout-1366-publish",
+      "width": 1366,
+      "height": 600,
+      "scrollWidth": 1366,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "layout-1280-banner",
+      "width": 1280,
+      "height": 600,
+      "scrollWidth": 1280,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "layout-1280-filters",
+      "width": 1280,
+      "height": 600,
+      "scrollWidth": 1280,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "layout-1280-publish",
+      "width": 1280,
+      "height": 600,
+      "scrollWidth": 1280,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "layout-1024-banner",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "layout-1024-filters",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflows": []
+    },
+    {
+      "name": "layout-1024-publish",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflows": []
+    }
+  ],
+  "errors": [],
+  "queueStarted": true,
+  "closedBeforeRendering": true
+}

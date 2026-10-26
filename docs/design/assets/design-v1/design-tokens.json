@@ -1,0 +1,40 @@
+{
+  "version": "1.0",
+  "date": "2026-10-23",
+  "layout": "classic",
+  "theme": "dark",
+  "colors": {
+    "bg": "#14171b",
+    "surface": "#1d2229",
+    "raised": "#29313a",
+    "line": "#343e49",
+    "text": "#edf0f4",
+    "muted": "#a4aebb",
+    "accent": "#f5a064",
+    "on": "#24180f",
+    "good": "#a1cfb3",
+    "bad": "#f3a19a"
+  },
+  "radiusPx": 6,
+  "layoutPx": {
+    "referenceWidth": 1024,
+    "referenceHeight": 600,
+    "header": 48,
+    "footer": 26,
+    "navigation": 59,
+    "sources": 137,
+    "inspector": 290,
+    "timelineHeight": 99,
+    "previewMaxHeight": 320
+  },
+  "fonts": {
+    "ui": "Manrope",
+    "numeric": "IBM Plex Mono"
+  },
+  "pagination": {
+    "sources": 3,
+    "jobs": 4,
+    "channels": 6,
+    "statisticsRows": 6
+  }
+}

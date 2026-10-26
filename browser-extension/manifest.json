@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "SurvivalFlow — подключение TikTok",
+  "description": "Передаёт сессию выбранного TikTok в локальный SurvivalFlow только по вашему нажатию.",
+  "version": "0.1.0",
+  "permissions": ["cookies", "scripting"],
+  "host_permissions": ["https://*.tiktok.com/*", "http://127.0.0.1/*"],
+  "action": {"default_title": "Подключить TikTok к SurvivalFlow", "default_popup": "popup.html", "default_icon": "icon.png"},
+  "icons": {"128": "icon.png"},
+  "content_security_policy": {"extension_pages": "script-src 'self'; object-src 'none'; connect-src http://127.0.0.1:*"}
+}

@@ -1,0 +1,2985 @@
+<!doctype html>
+<html lang="en" data-visualize-standalone>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; style-src 'unsafe-inline' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; img-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; font-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; media-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; worker-src blob:; connect-src blob: data:; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Classic Compact</title>
+<style>:root{color-scheme:light dark;background:light-dark(rgb(255 255 255), rgb(24 24 24))}html,body{margin:0}body{box-sizing:border-box;padding:1rem;background:inherit}iframe{display:block;width:100%;height:calc(100vh - 2rem);margin:0 auto;border:0}</style>
+
+</head>
+<body>
+<iframe id="codex-visualization" sandbox="allow-scripts" referrerpolicy="no-referrer" title="Classic Compact" data-srcdoc="&lt;!doctype html&gt;
+&lt;html lang=&quot;en&quot; data-visualize-standalone&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;meta name=&quot;referrer&quot; content=&quot;no-referrer&quot;&gt;
+&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src &#x27;none&#x27;; script-src &#x27;unsafe-inline&#x27; &#x27;unsafe-eval&#x27; &#x27;wasm-unsafe-eval&#x27; blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; style-src &#x27;unsafe-inline&#x27; blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; img-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; font-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; media-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; worker-src blob:; connect-src blob: data:; frame-src &#x27;none&#x27;; object-src &#x27;none&#x27;; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;&quot;&gt;
+&lt;title&gt;Classic Compact&lt;/title&gt;
+&lt;style&gt;:root {
+  color-scheme: light dark;
+  background-color: var(
+    --background,
+    var(--color-background-primary, light-dark(rgb(255 255 255), rgb(24 24 24)))
+  ) !important;
+
+  /* Agent-facing contract; keep in sync with SKILL.md. */
+  --background: var(
+    --color-background-primary,
+    light-dark(rgb(255 255 255), rgb(24 24 24))
+  );
+  --foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --card: color-mix(in oklab, var(--foreground) 5%, var(--background));
+  --card-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --popover: var(
+    --color-background-secondary,
+    light-dark(rgb(255 255 255), rgb(45 45 45))
+  );
+  --popover-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --primary: var(
+    --color-text-info,
+    light-dark(rgb(51 156 255), rgb(131 195 255))
+  );
+  --primary-foreground: var(
+    --color-text-inverse,
+    light-dark(rgb(255 255 255), rgb(13 13 13))
+  );
+  --secondary: var(
+    --color-background-secondary,
+    light-dark(rgb(255 255 255 / 96%), rgb(54 54 54 / 96%))
+  );
+  --secondary-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --muted: color-mix(in srgb, var(--foreground) 10%, transparent);
+  --muted-foreground: var(
+    --color-text-secondary,
+    light-dark(rgb(26 28 31 / 49.4%), rgb(255 255 255 / 49.8%))
+  );
+  --accent: var(
+    --color-background-info,
+    light-dark(rgb(229 242 255), rgb(13 39 63))
+  );
+  --accent-foreground: var(
+    --color-text-info,
+    light-dark(rgb(51 156 255), rgb(131 195 255))
+  );
+  --destructive: var(
+    --color-text-warning,
+    light-dark(rgb(226 85 7), rgb(255 133 73))
+  );
+  --border: var(
+    --color-border-secondary,
+    light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%))
+  );
+  --input: var(
+    --color-border-primary,
+    light-dark(
+      rgb(26 28 31 / 11.8%),
+      color-mix(in oklab, rgb(0 0 0) 10%, transparent)
+    )
+  );
+  --ring: var(
+    --color-ring-primary,
+    light-dark(rgb(51 156 255), rgb(131 195 255 / 76%))
+  );
+  --font-size-base: var(--font-text-md-size, 16px);
+  --blue: light-dark(rgb(51 156 255), rgb(51 156 255));
+  --orange: light-dark(rgb(226 85 7), rgb(251 106 34));
+  --green: light-dark(rgb(0 162 64), rgb(64 201 119));
+  --red: light-dark(rgb(224 46 42), rgb(255 103 100));
+  --purple: light-dark(rgb(146 79 247), rgb(173 123 249));
+  --yellow: light-dark(rgb(255 195 0), rgb(255 210 64));
+  --viz-series-1: var(--primary);
+  --viz-series-2: light-dark(rgb(243 136 59), rgb(245 154 86));
+  --viz-series-3: light-dark(rgb(93 201 119), rgb(116 213 139));
+  --viz-series-4: light-dark(rgb(235 119 177), rgb(240 143 192));
+  --viz-series-5: light-dark(rgb(155 121 236), rgb(170 145 239));
+  --viz-series-6: light-dark(rgb(58 185 177), rgb(90 203 194));
+
+  /* Internal implementation variables; not part of the agent contract. */
+  --font-sans:
+    -apple-system-body, ui-sans-serif, -apple-system, system-ui, &quot;Segoe UI&quot;,
+    Helvetica, &quot;Apple Color Emoji&quot;, Arial, sans-serif, &quot;Segoe UI Emoji&quot;,
+    &quot;Segoe UI Symbol&quot;;
+  --font-mono:
+    ui-monospace, SFMono-Regular, &quot;SF Mono&quot;, Menlo, Consolas, &quot;Liberation Mono&quot;,
+    monospace;
+  --font-size-normal: max(11px, var(--font-size-base));
+  --font-size-tooltip: calc(var(--font-size-base) - 1px);
+  --font-size-small: max(11px, calc(var(--font-size-base) - 2px));
+  --font-size-h1: calc(var(--font-size-normal) * 1.7142857143);
+  --font-size-h2: calc(var(--font-size-normal) * 1.4285714286);
+  --font-size-h3: calc(var(--font-size-normal) * 1.2857142857);
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --icon-size: 16px;
+  --line-height-normal: calc(var(--font-size-normal) * 1.5);
+  --line-height-tooltip: calc(var(--font-size-tooltip) * 1.4285714286);
+  --line-height-small: calc(var(--font-size-small) + 4px);
+  --corner-shape: round;
+  --radius: var(--border-radius-lg, 8px);
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-2xl: calc(var(--radius) * 2);
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px -1px rgb(0 0 0 / 8%);
+  --checkmark-image: url(&quot;data:image/svg+xml,%3Csvg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; viewBox=&#x27;0 0 17 17&#x27;%3E%3Cpath d=&#x27;M12.8961 3.64101C13.1297 3.41418 13.4984 3.37523 13.7779 3.56581C14.0571 3.75635 14.1554 4.11331 14.0299 4.41347L13.9615 4.53847L7.71151 13.7045C7.59411 13.8767 7.4063 13.9877 7.19881 14.0072C6.99136 14.0267 6.78564 13.9533 6.63826 13.806L2.88826 10.056L2.79842 9.9457C2.6192 9.67407 2.64927 9.30496 2.88826 9.06581C3.12738 8.82669 3.49647 8.79676 3.76815 8.97597L3.8785 9.06581L7.03084 12.2182L12.8053 3.74941L12.8961 3.64101Z&#x27;/%3E%3C/svg%3E&quot;);
+
+  /* Legacy aliases; not part of the current agent contract. */
+  --viz-bg: transparent;
+  --viz-panel: var(--card);
+  --viz-border: var(--border);
+  --viz-text: var(--foreground);
+  --viz-muted: var(--muted-foreground);
+  --viz-accent: var(--primary);
+  --viz-accent-text: var(--primary-foreground);
+  --viz-accent-bg: var(--accent);
+  --viz-font-size: var(--font-size-base);
+  --viz-warning: var(--destructive);
+}
+
+:root[data-theme=&quot;light&quot;] {
+  color-scheme: light;
+}
+
+:root[data-theme=&quot;dark&quot;] {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html &gt; body {
+  /* Preserve MCP aliases for older inline renderers without creating :root cycles. */
+  --color-background-primary: var(
+    --background,
+    light-dark(rgb(255 255 255), rgb(24 24 24))
+  );
+  --color-text-primary: var(
+    --foreground,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --color-border-secondary: var(
+    --border,
+    light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%))
+  );
+
+  margin: 0;
+  padding: var(--visualize-paint-gutter, 0px);
+  color: var(--foreground);
+  background: transparent !important;
+  font-family: var(--font-sans) !important;
+  -webkit-font-smoothing: antialiased;
+  font-size: var(--font-size-base);
+  line-height: calc(var(--font-size-base) * 1.625);
+  font-weight: var(--font-weight-normal);
+}
+
+.cursor-interaction {
+  cursor: var(--cursor-interaction, pointer);
+}
+
+a {
+  color: color-mix(in srgb, var(--viz-accent) 80%, var(--viz-text) 20%);
+  cursor: var(--cursor-interaction, pointer);
+  text-decoration: none;
+  text-underline-offset: 2px;
+  font-weight: inherit;
+}
+
+a:is(:hover, :focus-visible) {
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  text-decoration-thickness: 0.5px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin-block: 0;
+}
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+li,
+.table {
+  font-family: var(--font-sans);
+}
+
+h1 {
+  font-size: calc(var(--font-size-base) * 1.5);
+  line-height: 1.3333333333;
+}
+
+h2 {
+  font-size: calc(var(--font-size-base) * 1.25);
+  line-height: 1.4;
+}
+h3 {
+  font-size: calc(var(--font-size-base) * 1.125);
+  line-height: 1.5555555556;
+}
+h4 {
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+}
+h5,
+h6 {
+  font-size: var(--font-size-base);
+  line-height: calc(var(--font-size-base) * 1.625);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+b,
+strong,
+th {
+  font-weight: 600;
+}
+
+code:not(pre code) {
+  display: inline;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  corner-shape: var(--corner-shape);
+  background: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  overflow-wrap: anywhere;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  word-break: break-word;
+}
+pre,
+pre code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.table {
+  width: 100%;
+  color: var(--foreground);
+  font: inherit;
+  text-align: start;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: calc(var(--font-size-base) * 0.875);
+  line-height: calc(var(--font-size-base) * 1.625);
+  font-family: var(--font-sans);
+}
+
+.table :is(th, td) {
+  padding-block: 10px;
+  padding-inline: 0 24px;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid var(--border);
+  text-align: start;
+  vertical-align: top;
+  border-bottom-color: color-mix(in srgb, var(--foreground) 5%, transparent);
+}
+.table :is(th, td):not(:last-child) {
+  padding-inline-end: calc(var(--font-size-base) * 1.5);
+}
+
+.table-responsive &gt; .table :is(th, td) {
+  overflow-wrap: break-word;
+}
+
+.table :is(th, td):last-child {
+  padding-inline-end: 0;
+}
+
+.table :is(caption, thead th) {
+  font-weight: 600;
+}
+
+.table thead :is(th, td) {
+  border-bottom-color: var(--border-strong, var(--input));
+  padding-block: calc(var(--font-size-base) / 2);
+  line-height: var(--font-size-base);
+}
+
+.table tbody tr:last-child :is(th, td) {
+  border-bottom: 0;
+}
+.table tbody :is(th, td) {
+  padding-block: calc(var(--font-size-base) * 0.625);
+}
+
+.table.table-sm :is(th, td) {
+  padding-block: 8px;
+}
+
+.table.table-sm :is(th, td):not(:last-child) {
+  padding-inline-end: 16px;
+}
+
+.table :is(.text-end, [align=&quot;right&quot;]) {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.table :is(.text-center, [align=&quot;center&quot;]) {
+  text-align: center;
+}
+
+.table .text-nowrap {
+  white-space: nowrap;
+}
+
+#widget {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  background: transparent !important;
+}
+
+.card {
+  min-width: 0;
+  padding: 12px;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  border-radius: var(--radius-2xl);
+  corner-shape: var(--corner-shape);
+  color: var(--card-foreground);
+  background: var(--card);
+}
+
+.widget {
+  min-width: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-lg);
+  corner-shape: var(--corner-shape);
+  box-shadow: 0 0 0 0.5px var(--border-strong, var(--border));
+  color: var(--foreground);
+  background: var(--background);
+}
+
+#widget &gt; :not(.card, .widget, .progress) {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.tooltip {
+  position: fixed;
+  z-index: 50;
+  top: 0;
+  left: 0;
+  width: max-content;
+  max-width: min(
+    20rem,
+    var(--tooltip-available-width, calc(100vw - 10px)),
+    calc(100vw - 10px)
+  );
+  max-height: min(
+    var(--tooltip-available-height, calc(100vh - 10px)),
+    calc(100vh - 10px)
+  );
+  border: 1px solid var(--border);
+  corner-shape: var(--corner-shape);
+  overflow-wrap: break-word;
+  white-space: normal;
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--font-sans);
+  padding: 5px 12px;
+  border-color: color-mix(
+    in oklab,
+    light-dark(var(--primary-foreground), var(--foreground)) 5%,
+    transparent
+  );
+  border-radius: var(--radius-2xl);
+  color: light-dark(var(--primary-foreground), var(--foreground));
+  background: light-dark(var(--foreground), var(--popover));
+  box-shadow: 0 8px 18px rgb(15 23 42 / 20%);
+  letter-spacing: -0.15px;
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+
+.viz-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(max(180px, 24%), 1fr));
+  gap: 10px;
+}
+
+.viz-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.viz-stat-value {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+}
+
+.viz-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+hr {
+  width: 100%;
+  height: 1px;
+  margin-block: 6px;
+  border: 0;
+  background: var(--border);
+}
+
+.nav {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 4px;
+}
+
+.progress {
+  display: flex;
+  height: 8px;
+  margin-block: calc((var(--line-height-normal, 1.5em) - 8px) / 2);
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+}
+
+.progress-bar:only-child {
+  border-radius: var(--radius-full);
+}
+
+.progress-bar {
+  height: 100%;
+  flex-shrink: 0;
+  border: 0;
+  background: var(--viz-series-1);
+}
+
+.viz-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  color: color-mix(in srgb, var(--foreground) 40%, var(--muted-foreground));
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  font-family: var(--font-sans);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 1;
+}
+
+small,
+.text-small {
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.text-muted {
+  color: var(--muted-foreground);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.viz-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.viz-controls &gt; .form-label {
+  display: grid;
+  min-width: min(100%, 260px);
+  flex: 1 1 280px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 2px 12px;
+  margin-bottom: 0;
+}
+
+.viz-controls &gt; .form-label &gt; :is(.form-control, .form-range, .form-select) {
+  grid-column: 1 / -1;
+}
+
+.btn,
+.nav-link,
+.form-check-input,
+.form-control,
+.form-range,
+.form-select {
+  font: inherit;
+}
+
+/* Match inline alignment without overriding a containing flex or grid layout. */
+.btn,
+.nav-link,
+.form-control,
+.form-select,
+.form-range,
+.form-check {
+  vertical-align: middle;
+}
+
+.btn,
+.nav-link {
+  appearance: button;
+  display: inline-flex;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0 8px;
+  -webkit-app-region: no-drag;
+  border: 1px solid var(--input);
+  corner-shape: var(--corner-shape);
+  cursor: var(--cursor-interaction, pointer);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-font-smoothing: inherit;
+  font-family: var(--font-sans);
+  height: fit-content;
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  padding-inline: var(--control-spacing, 12px);
+  border-color: transparent;
+  border-radius: var(--radius-full);
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 18px;
+}
+
+.btn {
+  border-color: var(--border);
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+}
+
+.btn:is(.btn-block, .viz-tile) {
+  inline-size: 100%;
+}
+
+.btn.viz-tile {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+a.btn {
+  cursor: var(--cursor-interaction, pointer);
+  text-decoration: none;
+}
+
+.btn:not(:disabled):hover {
+  background: light-dark(
+    color-mix(in srgb, var(--foreground) 5.5%, transparent),
+    color-mix(in srgb, var(--foreground) 8%, transparent)
+  );
+}
+
+.nav-link:not(:disabled):not([aria-disabled=&quot;true&quot;]):hover {
+  background: color-mix(in srgb, var(--foreground) 10%, transparent);
+}
+
+.btn-primary {
+  border-color: var(--border);
+  color: var(--primary-foreground);
+  background: var(--foreground);
+  background-clip: border-box;
+}
+
+.btn-primary .text-muted {
+  color: color-mix(in srgb, var(--primary-foreground) 50%, transparent);
+}
+
+.btn-primary:not(:disabled):hover {
+  background: color-mix(in srgb, var(--foreground) 80%, transparent);
+  background-clip: border-box;
+}
+
+.btn-ghost {
+  border-color: transparent;
+  color: var(--muted-foreground);
+  background: transparent;
+}
+
+.btn-ghost:not(:disabled):hover {
+  color: var(--muted-foreground);
+  background: light-dark(
+    color-mix(in srgb, var(--foreground) 5.5%, transparent),
+    color-mix(in srgb, var(--foreground) 8%, transparent)
+  );
+}
+
+.nav-pills .nav-link {
+  min-width: 0;
+  border-color: transparent;
+  color: var(--muted-foreground);
+  background: transparent;
+}
+
+.nav-justified .nav-link {
+  flex: 1 1 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.nav-pills .nav-link.active {
+  color: var(--foreground);
+  background: var(--muted);
+}
+
+/* Shared preview chrome; product styles stay inside each variant. */
+.viz-dotted-background {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--foreground) 14%, transparent) 0.8px,
+    transparent 0.8px
+  );
+  background-position: center;
+  background-size: 16px 16px;
+}
+
+.viz-carousel {
+  position: relative;
+  min-width: 0;
+}
+
+.viz-carousel:has(&gt; .viz-carousel-controls) {
+  min-height: calc(60px + var(--viz-carousel-picker-height, 0px));
+  padding-bottom: 60px;
+}
+
+.viz-carousel &gt; [data-variant][hidden] {
+  display: none !important;
+}
+
+.viz-carousel &gt; [data-variant] {
+  isolation: isolate;
+}
+
+.viz-carousel-controls {
+  --viz-carousel-hover: light-dark(
+    color-mix(in srgb, var(--foreground) 5.4%, transparent),
+    color-mix(in srgb, var(--foreground) 7.8%, transparent)
+  );
+  position: absolute;
+  z-index: 2;
+  bottom: 8px;
+  left: 50%;
+  display: flex;
+  width: max-content;
+  /* Leave room for the host&#x27;s design-controls launcher at the trailing edge. */
+  max-width: calc(100% - 96px);
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-sans);
+  /* Match the settings dropdown chrome independently of the content font size. */
+  font-size: 13px;
+  font-weight: var(--font-weight-normal);
+  line-height: 18px;
+  transform: translateX(-50%);
+  user-select: none;
+}
+
+/* Keep authored mockup button styles out of the shared carousel chrome. */
+.viz-carousel-controls button,
+.viz-carousel-picker &gt; summary {
+  display: flex !important;
+  height: auto !important;
+  min-height: 30px;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px;
+  padding: 0 6px !important;
+  -webkit-app-region: no-drag;
+  border: 0 !important;
+  border-radius: 14px !important;
+  color: inherit !important;
+  background: transparent !important;
+  font: inherit !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.viz-carousel-controls &gt; button,
+.viz-carousel-picker &gt; summary {
+  position: relative;
+  isolation: isolate;
+}
+
+.viz-carousel-controls &gt; button {
+  --icon-size: 16px;
+  width: 30px !important;
+  padding: 0 !important;
+}
+
+.viz-carousel-picker &gt; summary {
+  padding-inline: 12px !important;
+}
+
+.viz-carousel-controls .viz-carousel-caret {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  margin: 0;
+  color: inherit;
+  transform: rotate(180deg);
+}
+
+.viz-carousel-controls &gt; button &gt; svg,
+.viz-carousel-controls .viz-carousel-caret,
+.viz-carousel-count {
+  opacity: 0.5;
+}
+
+.viz-carousel-controls &gt; button::before,
+.viz-carousel-picker &gt; summary::before {
+  position: absolute;
+  z-index: -1;
+  inset: 3px;
+  border-radius: 12px;
+  content: &quot;&quot;;
+  pointer-events: none;
+}
+
+.viz-carousel-controls &gt; button:hover::before,
+.viz-carousel-picker &gt; summary:hover::before {
+  background: var(--viz-carousel-hover);
+}
+
+.viz-carousel-controls &gt; button,
+.viz-carousel-controls [data-lucide],
+.viz-carousel-controls .lucide {
+  flex-shrink: 0;
+}
+
+.viz-carousel-picker {
+  min-width: 0;
+}
+
+.viz-carousel-picker &gt; summary {
+  min-width: 0;
+  list-style: none;
+}
+
+.viz-carousel-picker &gt; summary::-webkit-details-marker {
+  display: none;
+}
+
+.viz-carousel-count {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.viz-carousel-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viz-carousel-options {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 4px);
+  left: 0;
+  display: flex;
+  max-height: 240px;
+  flex-direction: column;
+  gap: 2px;
+  overflow: auto;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--background);
+  box-shadow: 0 4px 12px light-dark(rgb(0 0 0 / 6%), rgb(0 0 0 / 25%));
+}
+
+.viz-carousel-options &gt; button {
+  border-radius: max(0px, calc(var(--radius-lg) - 5px)) !important;
+  width: 100% !important;
+  min-height: 28px;
+  justify-content: flex-start !important;
+  padding: 4px 8px !important;
+  font-size: var(--font-size-small) !important;
+  text-align: start;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.viz-carousel-options &gt; [aria-current=&quot;true&quot;],
+.viz-carousel-options &gt; button:hover {
+  background: var(--viz-carousel-hover) !important;
+}
+
+.btn:disabled,
+.nav-link:disabled,
+.nav-link[aria-disabled=&quot;true&quot;] {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+[data-lucide] {
+  stroke-width: 1.6;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--foreground);
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0 8px;
+  outline: none;
+  border: 1px solid var(--input);
+  corner-shape: var(--corner-shape);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  padding-inline: calc(4px + var(--control-spacing, 12px) / 2);
+  border-color: var(--input);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--popover) 96%, transparent);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.4285714286;
+}
+.form-control:is(
+  [type=&quot;file&quot;],
+  [type=&quot;date&quot;],
+  [type=&quot;datetime-local&quot;],
+  [type=&quot;month&quot;],
+  [type=&quot;week&quot;],
+  [type=&quot;color&quot;]
+) {
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  line-height: 18px;
+}
+.form-control:is(
+  [type=&quot;date&quot;],
+  [type=&quot;datetime-local&quot;],
+  [type=&quot;month&quot;],
+  [type=&quot;week&quot;]
+) {
+  padding-inline: var(--control-spacing, 12px);
+}
+
+.form-control::placeholder {
+  color: var(--muted-foreground);
+}
+
+.form-control[type=&quot;file&quot;] {
+  overflow: hidden;
+  cursor: var(--cursor-interaction, pointer);
+  padding: 0;
+}
+
+.form-control[type=&quot;file&quot;]::file-selector-button {
+  padding: 0 8px;
+  border: 0;
+  border-right: 1px solid var(--input);
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+  cursor: inherit;
+  font: inherit;
+  min-height: calc(10px + 2 * var(--control-spacing, 12px));
+  padding-inline: var(--control-spacing, 12px);
+  margin-inline-end: var(--control-spacing, 12px);
+}
+
+.form-control[type=&quot;file&quot;]:not(:disabled):hover::file-selector-button {
+  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.form-control-color[type=&quot;color&quot;] {
+  width: 40px;
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  padding: 3px;
+  cursor: var(--cursor-interaction, pointer);
+}
+
+.form-control-color[type=&quot;color&quot;]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.form-control-color[type=&quot;color&quot;]::-webkit-color-swatch {
+  border: 0;
+  border-radius: calc(var(--radius-lg) - 4px);
+  corner-shape: var(--corner-shape);
+}
+
+textarea.form-control {
+  height: auto;
+  resize: vertical;
+  min-height: 96px;
+  padding: 8px 10px;
+}
+
+.form-control:focus-visible {
+  border-color: var(--ring);
+  box-shadow: none;
+}
+.form-control:disabled {
+  color: var(--muted-foreground);
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  opacity: 1;
+}
+.form-control[aria-invalid=&quot;true&quot;] {
+  border-color: var(--red);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--red) 20%, transparent);
+}
+
+.form-control:disabled,
+.form-select:disabled {
+  cursor: not-allowed;
+}
+
+.form-select {
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: fit-content;
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  margin: 0;
+  /* The secondary icon role is 14px at compact density and 16px at web density. */
+  --icon-size: calc(10px + var(--control-spacing, 12px) / 2);
+  /* Settings dropdowns retain a 12px inset and a 4px text-to-chevron gap. */
+  padding: 0 calc(16px + var(--icon-size)) 0 12px;
+  outline: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  corner-shape: var(--corner-shape);
+  color: var(--foreground);
+  background-color: var(--secondary);
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent calc(50% - 0.6px),
+      var(--muted-foreground) calc(50% - 0.6px) calc(50% + 0.6px),
+      transparent calc(50% + 0.6px)
+    ),
+    linear-gradient(
+      135deg,
+      transparent calc(50% - 0.6px),
+      var(--muted-foreground) calc(50% - 0.6px) calc(50% + 0.6px),
+      transparent calc(50% + 0.6px)
+    );
+  background-position:
+    calc(100% - 12px - var(--icon-size) / 2) 50%,
+    calc(100% - 12px - var(--icon-size) * 0.18) 50%;
+  background-repeat: no-repeat;
+  background-size: calc(var(--icon-size) * 0.32) calc(var(--icon-size) * 0.32);
+  cursor: var(--cursor-interaction, default);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 18px;
+}
+
+.form-select option {
+  color: var(--popover-foreground);
+  background-color: var(--popover);
+}
+
+.form-select:not(:disabled):hover {
+  background-color: light-dark(
+    color-mix(in srgb, var(--foreground) 5.5%, transparent),
+    color-mix(in srgb, var(--foreground) 8%, transparent)
+  );
+}
+
+.form-select:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring);
+}
+.form-select:disabled {
+  opacity: 0.4;
+}
+
+.form-check {
+  display: flex;
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  align-items: center;
+  gap: 6px;
+}
+
+.form-check-input {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  margin: 0;
+  border: 1px solid var(--input);
+  color: var(--primary-foreground);
+  background-color: transparent;
+  cursor: var(--cursor-interaction, default);
+  transition:
+    background-color 150ms,
+    border-color 150ms,
+    box-shadow 150ms;
+}
+
+.form-check:not(.form-switch) .form-check-input[type=&quot;checkbox&quot;] {
+  corner-shape: round;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  width: calc(10px + var(--control-spacing, 12px) / 2);
+  height: calc(10px + var(--control-spacing, 12px) / 2);
+  border-color: var(--border-strong, var(--input));
+  border-radius: calc(var(--radius-sm) / 2);
+  background-color: transparent;
+  color: var(--foreground);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input:not(:disabled):not(:checked):hover {
+  background-color: var(--card);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input[type=&quot;checkbox&quot;]:is(:checked, :indeterminate) {
+  border-color: var(--border-strong, var(--input));
+  background-color: color-mix(in srgb, var(--popover) 96%, transparent);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input[type=&quot;checkbox&quot;]:checked::before {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--primary-foreground);
+  content: &quot;&quot;;
+  mask: var(--checkmark-image) center / 12px 12px no-repeat;
+  background-color: var(--foreground);
+}
+.form-check:not(.form-switch)
+  .form-check-input[type=&quot;checkbox&quot;]:indeterminate::before {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 65%;
+  height: 6.65%;
+  margin: auto;
+  border-radius: var(--radius-full);
+  background: var(--foreground);
+  mask: none;
+  content: &quot;&quot;;
+}
+
+.form-check-input[type=&quot;radio&quot;] {
+  border-radius: var(--radius-full);
+  width: 16px;
+  height: 16px;
+  border: 0;
+  box-shadow: inset 0 0 0 1px var(--input);
+}
+
+.form-check-input[type=&quot;radio&quot;]:checked {
+  border: 0;
+  background: radial-gradient(
+    circle,
+    var(--primary-foreground) 0 3px,
+    var(--foreground) 3px
+  );
+  box-shadow: none;
+}
+
+.form-check:not(.form-switch) .form-check-input:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.form-check:not(.form-switch) .form-check-input[type=&quot;checkbox&quot;]:focus-visible {
+  border-color: var(--ring);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.form-check:not(.form-switch) .form-check-input:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.form-check:not(.form-switch) .form-check-input:disabled + .form-check-label {
+  cursor: not-allowed;
+}
+.form-check:not(.form-switch) .form-check-input[type=&quot;radio&quot;]:disabled,
+.form-check:not(.form-switch)
+  .form-check-input[type=&quot;radio&quot;]:disabled
+  + .form-check-label {
+  opacity: 0.5;
+}
+
+.form-switch .form-check-input:disabled,
+.form-switch .form-check-input:disabled + .form-check-label {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-check-label {
+  color: var(--foreground);
+  cursor: var(--cursor-interaction, default);
+}
+
+.form-switch .form-check-input {
+  position: relative;
+  width: 32px;
+  height: 20px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+  box-shadow: none;
+  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.form-switch .form-check-input::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  border: 1px solid light-dark(var(--primary-foreground), var(--foreground));
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  content: &quot;&quot;;
+  transform: translate(2px, -50%);
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+  border-color: #fff;
+  background: #fff;
+}
+
+.form-switch .form-check-input:checked {
+  background: var(--blue);
+}
+
+.form-switch .form-check-input:checked::before {
+  transform: translate(14px, -50%);
+}
+
+.form-switch .form-check-input:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring);
+  outline: none;
+}
+
+.form-range {
+  appearance: none;
+  display: block;
+  width: 100%;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  accent-color: var(--primary);
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  outline: none;
+  border-radius: var(--radius-full);
+  color: var(--foreground);
+  background: transparent;
+}
+
+.form-range::-webkit-slider-runnable-track {
+  background: var(--form-range-track, var(--border));
+  height: 2px;
+  border-radius: var(--radius-full);
+}
+
+.form-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  margin-top: -9px;
+  border-color: transparent;
+  background: currentColor;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Outline the native track and thumb, preserving the larger input hit area. */
+.form-range:focus-visible::-webkit-slider-runnable-track {
+  outline: 2px auto Highlight;
+  outline-color: -webkit-focus-ring-color;
+}
+
+.form-range::-moz-range-track {
+  background: var(--form-range-track, var(--border));
+  height: 2px;
+  border-radius: var(--radius-full);
+}
+
+.form-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  border-color: transparent;
+  background: currentColor;
+  box-shadow: var(--shadow-sm);
+}
+
+.form-range:focus-visible::-moz-range-thumb {
+  outline: 2px solid Highlight;
+  outline-offset: 2px;
+}
+
+.form-range:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.btn:not(.btn-primary, .viz-tile):is(
+  [aria-pressed=&quot;true&quot;],
+  [aria-selected=&quot;true&quot;],
+  .is-selected
+) {
+  border-color: transparent;
+  color: var(--primary-foreground);
+  background: var(--blue);
+}
+
+.btn.viz-tile:is([aria-pressed=&quot;true&quot;], [aria-selected=&quot;true&quot;], .is-selected) {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.btn:focus-visible,
+.nav-link:focus-visible {
+  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.viz-carousel-controls :is(button, summary):focus-visible {
+  outline: 2px solid var(--ring) !important;
+  outline-offset: 2px !important;
+}
+
+/* Web recipes are the default, including on renderers without inline style queries. */
+@supports (border-radius: if(style(--corner-shape: round): 1px; else: 2px)) {
+  /* Match the host&#x27;s proportional text-sm scale at every text preference. */
+  .tooltip,
+  .viz-badge,
+  .btn,
+  .nav-link,
+  .form-control,
+  .form-select {
+    font-size: if(
+      style(--corner-shape: round): round(
+          nearest,
+          calc(var(--font-size-base) * 14 / 16),
+          1px
+        );
+        else: round(nearest, calc(var(--font-size-base) * 13 / 14), 1px)
+    );
+  }
+
+  .btn,
+  .nav-link,
+  .form-select {
+    border-radius: if(
+      style(--corner-shape: round): var(--radius-full); else: var(--radius-lg)
+    );
+  }
+
+  .form-check:not(.form-switch) .form-check-input[type=&quot;checkbox&quot;] {
+    border-radius: if(
+      style(--corner-shape: round): calc(var(--radius-sm) / 2);
+        else: calc(var(--radius-lg) * 0.4)
+    );
+  }
+
+  .tooltip {
+    font-weight: if(
+      style(--corner-shape: round): 600; else: var(--font-weight-normal)
+    );
+  }
+}
+
+@media (pointer: coarse) {
+  .viz-carousel:has(&gt; .viz-carousel-controls) {
+    min-height: calc(76px + var(--viz-carousel-picker-height, 0px));
+    padding-bottom: 76px;
+  }
+
+  .btn,
+  .nav-link,
+  .viz-carousel-controls button,
+  .viz-carousel-picker &gt; summary,
+  .form-control,
+  .form-select {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Keep small-screen WebKit from zooming when a text field receives focus. */
+  .form-control,
+  .form-select {
+    font-size: max(16px, calc(var(--font-size-base) * 14 / 16));
+    font-size: max(
+      16px,
+      round(nearest, calc(var(--font-size-base) * 14 / 16), 1px)
+    );
+  }
+  .form-control:is(
+    [type=&quot;file&quot;],
+    [type=&quot;date&quot;],
+    [type=&quot;datetime-local&quot;],
+    [type=&quot;month&quot;],
+    [type=&quot;week&quot;],
+    [type=&quot;time&quot;],
+    [type=&quot;color&quot;]
+  ) {
+    height: 44px;
+    min-height: 44px;
+    font-size: max(16px, calc(var(--font-size-base) * 14 / 16));
+    font-size: max(
+      16px,
+      round(nearest, calc(var(--font-size-base) * 14 / 16), 1px)
+    );
+  }
+
+  .form-control[type=&quot;file&quot;]::file-selector-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .form-control-color[type=&quot;color&quot;] {
+    width: 44px;
+    height: 44px;
+  }
+
+  .form-control:is(
+    [type=&quot;date&quot;],
+    [type=&quot;datetime-local&quot;],
+    [type=&quot;month&quot;],
+    [type=&quot;time&quot;],
+    [type=&quot;week&quot;]
+  ) {
+    min-width: 0;
+    max-width: 100%;
+    padding-block: 8px;
+  }
+
+  .form-check {
+    min-height: 44px;
+    padding-inline: 15px;
+  }
+
+  .form-check-input {
+    position: relative;
+  }
+
+  .form-check-input::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    content: &quot;&quot;;
+    transform: translate(-50%, -50%);
+  }
+
+  .form-check-label {
+    display: inline-flex;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+  }
+
+  .form-range {
+    height: 44px;
+    touch-action: pan-y;
+  }
+}
+
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+#widget &gt; svg {
+  width: 100%;
+}
+
+/* Model-authored chart rules can otherwise stretch icons after these styles load. */
+svg.lucide {
+  display: block;
+  width: var(--icon-size) !important;
+  height: var(--icon-size) !important;
+  flex: none;
+  margin: 0 !important;
+  stroke-width: 1.6;
+}
+
+.text-warning,
+.text-destructive {
+  color: var(--destructive);
+}
+
+html&gt;body{padding:0}&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;script type=&quot;application/json&quot; id=&quot;codex-visualization-widget-state&quot;&gt;__CODEX_VISUALIZATION_WIDGET_STATE__&lt;/script&gt;
+&lt;script&gt;(() =&gt; {
+  const root = document.documentElement;
+  const mediaQuery = globalThis.matchMedia(&quot;(prefers-color-scheme: dark)&quot;);
+  const apply = Reflect.apply;
+  const isArray = Array.isArray;
+  const hasOwn = Object.hasOwn;
+  const parentWindow = globalThis.parent;
+  const stringify = JSON.stringify;
+  const parse = JSON.parse;
+  const encode = TextEncoder.prototype.encode.bind(new TextEncoder());
+  const initialStateElement = document.getElementById(
+    &quot;codex-visualization-widget-state&quot;,
+  );
+  const initialGlobals = parse(initialStateElement?.textContent ?? &quot;{}&quot;);
+  initialStateElement?.remove();
+  /** @type {Record&lt;string, unknown&gt; | null} */
+  let state = initialGlobals.widgetState ?? null;
+  const statePersistence = initialGlobals.statePersistence ?? &quot;none&quot;;
+  let nextStateRequestId = 0;
+  /** @type {Map&lt;number, { resolve: () =&gt; void; reject: (error: Error) =&gt; void; timeout: ReturnType&lt;typeof globalThis.setTimeout&gt;; serializedState: string }&gt;} */
+  const pendingStateWrites = new Map();
+  const persistenceError = () =&gt;
+    Object.assign(
+      new Error(&quot;The host could not persist the widget state update&quot;),
+      {
+        code: -32000,
+        data: { code: &quot;widget_state_persistence_failed&quot;, retryable: false },
+      },
+    );
+  /**
+   * @param {object} prototype
+   * @param {string} property
+   */
+  const getPrototypeGetter = (prototype, property) =&gt; {
+    // oxlint-disable-next-line typescript/unbound-method -- invoked through captured Reflect.apply
+    const getter = Object.getOwnPropertyDescriptor(prototype, property)?.get;
+    if (getter == null) {
+      throw new Error(`Missing ${property} getter`);
+    }
+    return getter;
+  };
+  const getMessageData = getPrototypeGetter(MessageEvent.prototype, &quot;data&quot;);
+  const getMessagePorts = getPrototypeGetter(MessageEvent.prototype, &quot;ports&quot;);
+  const getMessageSource = getPrototypeGetter(MessageEvent.prototype, &quot;source&quot;);
+  // oxlint-disable-next-line typescript/unbound-method -- captured before the untrusted fragment runs
+  const addHostMessageListener = MessagePort.prototype.addEventListener;
+  // oxlint-disable-next-line typescript/unbound-method -- captured before the untrusted fragment runs
+  const postHostMessage = MessagePort.prototype.postMessage;
+  // oxlint-disable-next-line typescript/unbound-method -- captured before the untrusted fragment runs
+  const startHostPort = MessagePort.prototype.start;
+  // oxlint-disable-next-line typescript/unbound-method -- captured before the untrusted fragment runs
+  const stopMessagePropagation = Event.prototype.stopImmediatePropagation;
+  /** @type {MessagePort | null} */
+  let hostPort = null;
+  const postToHost = (type, payload) =&gt; {
+    if (hostPort != null) {
+      apply(postHostMessage, hostPort, [{ type, ...payload }]);
+    }
+  };
+  const openExternal = ({ href }) =&gt; {
+    if (globalThis.navigator.userActivation?.isActive === true) {
+      postToHost(&quot;open-external&quot;, { href });
+    }
+  };
+  const sendFollowUpMessage = ({ context, prompt, title }) =&gt; {
+    if (globalThis.navigator.userActivation?.isActive === true) {
+      postToHost(&quot;follow-up&quot;, { context, prompt, title });
+    }
+    return Promise.resolve();
+  };
+  /**
+   * @param {Record&lt;string, unknown&gt; | ((previous: Record&lt;string, unknown&gt; | null) =&gt; Record&lt;string, unknown&gt;)} next
+   * @returns {Promise&lt;void&gt;}
+   */
+  const setWidgetState = async (next) =&gt; {
+    const nextState = typeof next === &quot;function&quot; ? next(state) : next;
+    if (
+      nextState == null ||
+      typeof nextState !== &quot;object&quot; ||
+      isArray(nextState)
+    ) {
+      throw new TypeError(&quot;Widget state must be a JSON object&quot;);
+    }
+    const inputState = stringify(
+      nextState,
+      (_key, /** @type {unknown} */ value) =&gt; {
+        if (
+          typeof value === &quot;undefined&quot; ||
+          typeof value === &quot;function&quot; ||
+          typeof value === &quot;symbol&quot; ||
+          (typeof value === &quot;number&quot; &amp;&amp; !Number.isFinite(value))
+        ) {
+          throw new TypeError(&quot;Widget state must be a JSON object&quot;);
+        }
+        return value;
+      },
+    );
+    const parsedState = parse(inputState);
+    if (
+      parsedState == null ||
+      typeof parsedState !== &quot;object&quot; ||
+      isArray(parsedState)
+    ) {
+      throw new TypeError(&quot;Widget state must be a JSON object&quot;);
+    }
+    const storedState = {
+      modelContent: null,
+      privateContent: null,
+      ...parsedState,
+    };
+    const serializedState = stringify(storedState);
+    if (encode(serializedState).length &gt; 16 * 1024) {
+      throw new TypeError(
+        &quot;Widget state must be a JSON object of at most 16 KiB&quot;,
+      );
+    }
+    if (
+      hasOwn(storedState, &quot;imageIds&quot;) &amp;&amp;
+      (!isArray(storedState.imageIds) ||
+        storedState.imageIds.some(
+          (/** @type {unknown} */ id) =&gt; typeof id !== &quot;string&quot;,
+        ))
+    ) {
+      throw new TypeError(&quot;Widget state imageIds must be an array of strings&quot;);
+    }
+    if (storedState.imageIds?.length &gt; 0) {
+      throw Object.assign(
+        new TypeError(&quot;Visualization state does not support image attachments&quot;),
+        { code: -32602, data: { code: &quot;images_unsupported&quot; } },
+      );
+    }
+    state = storedState;
+    globalThis.openai.widgetState = state;
+    globalThis.dispatchEvent(
+      new CustomEvent(&quot;openai:set_globals&quot;, {
+        detail: { globals: { widgetState: state } },
+      }),
+    );
+    if (statePersistence === &quot;none&quot;) {
+      throw persistenceError();
+    }
+    const id = ++nextStateRequestId;
+    return new Promise((resolve, reject) =&gt; {
+      const timeout = globalThis.setTimeout(() =&gt; {
+        pendingStateWrites.delete(id);
+        reject(persistenceError());
+      }, 30_000);
+      pendingStateWrites.set(id, { resolve, reject, timeout, serializedState });
+      postToHost(&quot;widget-state-write&quot;, { id, state: serializedState });
+    });
+  };
+  const syncTheme = () =&gt; {
+    const theme = mediaQuery.matches ? &quot;dark&quot; : &quot;light&quot;;
+    root.dataset.theme = theme;
+    globalThis.openai = {
+      ...globalThis.openai,
+      openExternal,
+      sendFollowUpMessage,
+      setWidgetState,
+      theme,
+      visualizationStyleVariables: {},
+      visualizationTheme: theme,
+      widgetState: state,
+      statePersistence,
+      stateModelContext: &quot;none&quot;,
+    };
+    globalThis.dispatchEvent(
+      new CustomEvent(&quot;openai:set_globals&quot;, {
+        detail: { globals: globalThis.openai },
+      }),
+    );
+  };
+  const sendHeight = () =&gt; {
+    postToHost(&quot;height&quot;, {
+      height: Math.ceil(
+        Math.max(
+          document.body.scrollHeight,
+          document.body.getBoundingClientRect().height,
+        ),
+      ),
+    });
+  };
+
+  globalThis.addEventListener(
+    &quot;message&quot;,
+    (event) =&gt; {
+      const data = apply(getMessageData, event, []);
+      const ports = apply(getMessagePorts, event, []);
+      const source = apply(getMessageSource, event, []);
+      if (
+        hostPort != null ||
+        source !== parentWindow ||
+        typeof data !== &quot;object&quot; ||
+        data?.type !== &quot;codex-visualization-initialize&quot; ||
+        !isArray(ports) ||
+        ports.length !== 1
+      ) {
+        return;
+      }
+      apply(stopMessagePropagation, event, []);
+      const nextHostPort = ports[0];
+      try {
+        apply(addHostMessageListener, nextHostPort, [
+          &quot;message&quot;,
+          (event) =&gt; {
+            const data = apply(getMessageData, event, []);
+            if (typeof data === &quot;object&quot; &amp;&amp; data?.type === &quot;measure&quot;) {
+              sendHeight();
+            } else if (
+              typeof data === &quot;object&quot; &amp;&amp;
+              data?.type === &quot;widget-state-result&quot;
+            ) {
+              /** @type {unknown} */
+              const id = data.id;
+              if (typeof id !== &quot;number&quot;) {
+                return;
+              }
+              const pending = pendingStateWrites.get(id);
+              if (pending != null) {
+                pendingStateWrites.delete(id);
+                globalThis.clearTimeout(pending.timeout);
+                if (data.ok === true) {
+                  pending.resolve();
+                } else {
+                  pending.reject(persistenceError());
+                }
+              }
+            }
+          },
+        ]);
+        apply(startHostPort, nextHostPort, []);
+      } catch {
+        return;
+      }
+      hostPort = nextHostPort;
+      for (const [id, { serializedState }] of pendingStateWrites) {
+        postToHost(&quot;widget-state-write&quot;, { id, state: serializedState });
+      }
+      sendHeight();
+    },
+    { capture: true },
+  );
+  document.currentScript?.remove();
+  mediaQuery.addEventListener(&quot;change&quot;, syncTheme);
+  globalThis.addEventListener(&quot;click&quot;, (event) =&gt; {
+    if (event.defaultPrevented) {
+      return;
+    }
+    let element = null;
+    if (event.target instanceof globalThis.Element) {
+      element = event.target;
+    } else if (event.target instanceof globalThis.Node) {
+      element = event.target.parentElement;
+    }
+    const link = element?.closest(&quot;a[href]&quot;);
+    const href = link?.getAttribute(&quot;href&quot;);
+    if (href == null) {
+      return;
+    }
+    if (href.startsWith(&quot;#&quot;)) {
+      let id;
+      try {
+        id = decodeURIComponent(href.slice(1));
+      } catch {
+        return;
+      }
+      const target = id.length === 0 ? root : document.getElementById(id);
+      if (
+        target == null ||
+        globalThis.navigator.userActivation?.isActive !== true
+      ) {
+        return;
+      }
+      event.preventDefault();
+      postToHost(&quot;scroll-to&quot;, {
+        top: target.getBoundingClientRect().top + globalThis.scrollY,
+      });
+      return;
+    }
+    event.preventDefault();
+    openExternal({ href });
+  });
+  new ResizeObserver(sendHeight).observe(document.body);
+  syncTheme();
+})();
+&lt;/script&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;amp;family=IBM+Plex+Mono:wght@400;500&amp;amp;display=swap&quot; media=&quot;print&quot; onload=&quot;this.media=&#x27;all&#x27;&quot;&gt;
+&lt;style&gt;
+#sf-editors .ed{--e-bg:#14171b;--e-surface:#1d2229;--e-raised:#29313a;--e-line:#343e49;--e-text:#edf0f4;--e-muted:#a4aebb;--e-accent:#f5a064;--e-on:#24180f;--e-good:#a1cfb3;--e-bad:#f3a19a;--e-radius:6px;box-sizing:border-box;background:var(--e-bg);color:var(--e-text);font:12px/1.4 &#x27;Manrope&#x27;,sans-serif;position:relative;isolation:isolate;height:600px;display:grid;grid-template-rows:48px minmax(0,1fr) 26px}
+#sf-editors .ed *{box-sizing:border-box;min-width:0}
+#sf-editors .ed h1,#sf-editors .ed h2,#sf-editors .ed h3,#sf-editors .ed p{margin:0}
+#sf-editors .ed h1{font-size:21px;line-height:1.2;font-weight:700;letter-spacing:-.035em}
+#sf-editors .ed h2{font-size:16px;font-weight:700;letter-spacing:-.025em}
+#sf-editors .ed h3{font-size:12px;font-weight:700}
+#sf-editors .ed button,#sf-editors .ed input,#sf-editors .ed select,#sf-editors .ed textarea{font:inherit}
+#sf-editors .ed button{cursor:var(--cursor-interaction,pointer);max-width:100%}
+#sf-editors .ed button:disabled{opacity:.4;cursor:not-allowed}
+#sf-editors .ed button:focus-visible,#sf-editors .ed input:focus-visible,#sf-editors .ed select:focus-visible,#sf-editors .ed textarea:focus-visible{outline:2px solid var(--e-accent);outline-offset:2px}
+#sf-editors .ed [hidden]{display:none!important}
+#sf-editors .ed .e-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+#sf-editors .ed .e-between{justify-content:space-between}
+#sf-editors .ed .e-muted{color:var(--e-muted)}
+#sf-editors .ed .e-mono{font:11px/1.4 &#x27;IBM Plex Mono&#x27;,monospace;font-variant-numeric:tabular-nums}
+#sf-editors .ed .e-small{font-size:11px}
+#sf-editors .ed .e-button{border:1px solid var(--e-line);background:var(--e-surface);color:var(--e-text);padding:6px 10px;border-radius:var(--e-radius);display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:11px;min-height:30px;text-align:center}
+#sf-editors .ed .e-button:hover{background:var(--e-raised);border-color:var(--e-muted)}
+#sf-editors .ed .e-button.primary{border-color:var(--e-accent);background:var(--e-accent);color:var(--e-on);font-weight:800}
+#sf-editors .ed .e-button.quiet{background:transparent;border-color:transparent;color:var(--e-muted)}
+#sf-editors .ed .e-button.small{padding:4px 7px;min-height:27px}
+#sf-editors .ed .e-button.danger{color:var(--e-bad)}
+#sf-editors .ed .e-button svg{width:14px;height:14px;flex-shrink:0}
+#sf-editors .ed i[data-lucide]{font-style:normal;display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;flex-shrink:0}
+#sf-editors .ed .e-badge{display:inline-block;border:1px solid var(--e-line);background:var(--e-surface);color:var(--e-muted);border-radius:4px;padding:3px 6px;font:10px/1.3 &#x27;IBM Plex Mono&#x27;,monospace;white-space:nowrap}
+#sf-editors .ed .e-badge.good{color:var(--e-good)}#sf-editors .ed .e-badge.bad{color:var(--e-bad)}
+#sf-editors .ed .e-field{width:100%;padding:6px 8px;background:var(--e-bg);color:var(--e-text);border:1px solid var(--e-line);border-radius:var(--e-radius);min-height:30px}
+#sf-editors .ed .e-field:disabled{opacity:.55}
+#sf-editors .ed .e-field[type=range]{padding:0;min-height:17px;height:17px;border:0;accent-color:var(--e-accent);background:transparent}
+#sf-editors .ed label.e-label{display:block;margin-top:8px;color:var(--e-muted);font-size:11px}
+#sf-editors .ed .e-label&gt;span{display:flex;align-items:center;justify-content:space-between;gap:5px;margin-bottom:4px}
+#sf-editors .ed .e-label output{color:var(--e-text);font:10px &#x27;IBM Plex Mono&#x27;,monospace}
+#sf-editors .ed .e-grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#sf-editors .ed .e-divider{border:0;border-top:1px solid var(--e-line);margin:10px 0}
+#sf-editors .ed .e-check{display:flex;gap:7px;align-items:center;margin:10px 0;color:var(--e-muted);font-size:11px}
+#sf-editors .ed input[type=checkbox]{accent-color:var(--e-accent)}
+#sf-editors .ed .e-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 105px 8px 15px;border-bottom:1px solid var(--e-line)}
+#sf-editors .ed .e-logo{font-size:18px;letter-spacing:-.07em;font-weight:800}
+#sf-editors .ed .e-logo b{color:var(--e-accent)}
+#sf-editors .ed .e-project{border:0;background:transparent;color:var(--e-muted);padding:3px;font-size:11px;max-width:175px;text-align:left;overflow-wrap:anywhere}
+#sf-editors .ed .e-layout{display:grid;grid-template-columns:59px minmax(0,1fr);min-height:0}
+#sf-editors .ed [data-view-root]{min-height:0}
+#sf-editors .ed .e-nav{border-right:1px solid var(--e-line);padding:10px 4px;display:flex;flex-direction:column;gap:8px}
+#sf-editors .ed .e-nav button{display:flex;flex-direction:column;gap:5px;align-items:center;justify-content:center;border:0;background:transparent;color:var(--e-muted);font-size:9px;padding:9px 1px;border-radius:var(--e-radius);position:relative}
+#sf-editors .ed .e-nav button svg{width:17px;height:17px}
+#sf-editors .ed .e-nav button[aria-pressed=true]{background:var(--e-surface);color:var(--e-accent)}
+#sf-editors .ed .e-nav-count{position:absolute;right:3px;top:1px;font-size:9px;color:var(--e-accent)}
+#sf-editors .ed .e-editor{height:100%;display:grid;grid-template-columns:137px minmax(170px,1fr) 290px;grid-template-rows:minmax(0,1fr) 99px;grid-template-areas:&#x27;assets viewer inspector&#x27; &#x27;assets timeline inspector&#x27;}
+#sf-editors .ed .e-assets{grid-area:assets;border-right:1px solid var(--e-line);padding:12px 8px;display:flex;flex-direction:column;gap:8px}
+#sf-editors .ed .e-assets-head{padding:0 3px;font-size:10px}
+#sf-editors .ed .e-source{padding:6px;border:1px solid transparent;border-radius:var(--e-radius);position:relative}
+#sf-editors .ed .e-source.active{background:var(--e-surface);border-color:var(--e-accent)}
+#sf-editors .ed .e-source-select{border:0;color:inherit;background:transparent;width:100%;text-align:left;padding:0}
+#sf-editors .ed .e-thumb{height:48px;background:linear-gradient(110deg,#15272d,#607774 47%,#101e26 48%,#30484f);border-radius:3px;display:flex;align-items:end;justify-content:space-between;color:#edf3f4;padding:5px;font:10px &#x27;IBM Plex Mono&#x27;,monospace;margin-bottom:6px}
+#sf-editors .ed .e-source:nth-child(2n) .e-thumb{background:linear-gradient(150deg,#536367,#1d3039 45%,#0a1a24 46%,#536453)}
+#sf-editors .ed .e-source-title{font-size:11px;display:block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+#sf-editors .ed .e-source-tools{display:flex;justify-content:space-between;margin-top:3px;align-items:center}
+#sf-editors .ed .e-source-tools button{padding:0 3px;min-height:17px;background:transparent;border:0;color:var(--e-muted);font-size:12px}
+#sf-editors .ed .e-source-tools span{font-size:9px}
+#sf-editors .ed .e-add{width:100%;margin-top:auto;font-size:10px}
+#sf-editors .ed .e-source-pages{display:flex;justify-content:space-between;align-items:center;margin-top:1px}
+#sf-editors .ed .e-source-pages .e-button{min-height:22px;padding:2px 5px}
+#sf-editors .ed .e-viewer{grid-area:viewer;padding:9px 12px;display:grid;grid-template-rows:18px minmax(0,1fr) 28px 27px;justify-items:center;gap:6px;background:#0e1217;min-height:0}
+#sf-editors .ed .e-viewer-heading{width:100%;display:flex;justify-content:space-between;gap:6px;align-items:center;color:var(--e-muted);font-size:10px}
+#sf-editors .ed .e-preview{position:relative;height:100%;aspect-ratio:9/16;max-height:320px;max-width:100%;min-height:0;background:#14232b;isolation:isolate;overflow:hidden;border-radius:3px;color:#f1f4ee;touch-action:none;align-self:center}
+#sf-editors .ed .e-scene{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,#d7e9df42,transparent 60%),linear-gradient(155deg,#314a52,#0b141c);transform:scale(var(--video-scale,1));filter:var(--video-filter,none)}
+#sf-editors .ed .e-scene:before{content:&#x27;&#x27;;position:absolute;inset:16% 12% 13%;background:linear-gradient(90deg,#1c3039,#526b73 3%,#20353e 4%,#20343e 48%,#101c24 49%,#758b8b 50%,#243a43 51%,#1c3038 96%,#688082 97%,#12252e 100%);box-shadow:0 0 0 6px #0a151b,0 0 0 7px #6d8284}
+#sf-editors .ed .e-scene:after{content:&#x27;&#x27;;position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 3px,#eaf3f706 3px 4px)}
+#sf-editors .ed .e-number{position:absolute;top:10%;left:40%;background:#0d181d;color:#edb27b;padding:0 6px;font:14px &#x27;IBM Plex Mono&#x27;,monospace}
+#sf-editors .ed .e-scene-title{position:absolute;top:36%;left:5%;right:5%;text-align:center;color:#edf3ee;font-size:19px;line-height:1.15;font-weight:800;text-shadow:0 2px 12px #0006;letter-spacing:-.04em}
+#sf-editors .ed .e-scene-title small{display:block;font-size:8px;line-height:1.5;letter-spacing:.08em;margin-bottom:9px;font-weight:500}
+#sf-editors .ed .e-video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:var(--video-filter,none);transform:scale(var(--video-scale,1))}
+#sf-editors .ed .e-overlay{position:absolute;left:50%;top:77%;width:84%;transform:translate(-50%,-50%);z-index:2;background:var(--e-accent);color:var(--e-on);text-align:center;padding:8px 5px;border-radius:4px;font-size:10px;font-weight:800;cursor:move;user-select:none;touch-action:none;overflow-wrap:anywhere;max-height:85%;overflow:hidden}
+#sf-editors .ed .e-overlay small{display:block;font-size:8px;font-weight:500;margin-top:3px}
+#sf-editors .ed .e-overlay img{display:block;width:100%;height:auto;pointer-events:none;max-height:250px;object-fit:contain}
+#sf-editors .ed .e-overlay.image{padding:0;background:transparent}
+#sf-editors .ed .e-viewer-controls{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap}
+#sf-editors .ed .e-viewer-tools{display:flex;justify-content:space-between;align-items:center;gap:6px;width:100%}
+#sf-editors .ed .e-viewer-tools .e-field{max-width:170px;min-height:27px;font-size:10px;padding:4px 6px}
+#sf-editors .ed .e-timeline{grid-area:timeline;padding:8px 12px;border-top:1px solid var(--e-line);display:grid;grid-template-rows:15px 14px 13px 17px;gap:4px}
+#sf-editors .ed .e-ruler{display:flex;justify-content:space-between;color:var(--e-muted);font:9px &#x27;IBM Plex Mono&#x27;,monospace}
+#sf-editors .ed .e-track{height:14px;background:repeating-linear-gradient(90deg,#30464e 0 27px,#425c61 27px 54px,#273b43 54px 81px);border-radius:2px;position:relative;color:#dfe9eb;font-size:9px}
+#sf-editors .ed .e-track.banner{height:13px;background:var(--e-surface)}
+#sf-editors .ed .e-banner-mark{position:absolute;top:0;bottom:0;background:var(--e-accent);border-radius:2px;min-width:14px;max-width:100%}
+#sf-editors .ed .e-inspector{grid-area:inspector;padding:10px 12px;border-left:1px solid var(--e-line);display:flex;flex-direction:column;gap:9px;min-height:0}
+#sf-editors .ed .e-tabs{display:flex;gap:3px;border-bottom:1px solid var(--e-line);padding-bottom:6px;flex-shrink:0}
+#sf-editors .ed .e-tabs button{border:0;background:transparent;color:var(--e-muted);padding:6px 7px;border-radius:4px;font-size:11px;flex:1}
+#sf-editors .ed .e-tabs button[aria-selected=true]{background:var(--e-raised);color:var(--e-accent)}
+#sf-editors .ed [data-inspector]{flex:1;min-height:0}
+#sf-editors .ed .e-segment{display:flex;border:1px solid var(--e-line);border-radius:var(--e-radius);overflow:hidden;margin-top:8px}
+#sf-editors .ed .e-segment button{flex:1;border:0;background:transparent;color:var(--e-muted);padding:6px 4px;font-size:11px}
+#sf-editors .ed .e-segment button[aria-pressed=true]{background:var(--e-raised);color:var(--e-accent)}
+#sf-editors .ed .e-file-picker{display:grid;grid-template-columns:minmax(0,1fr) 31px;gap:6px;align-items:center}
+#sf-editors .ed .e-file-picker .e-button{padding:5px;min-height:30px}
+#sf-editors .ed .e-inspector textarea{resize:none;height:58px}
+#sf-editors .ed .e-savebar{padding-top:9px;border-top:1px solid var(--e-line);flex-shrink:0}
+#sf-editors .ed .e-targets{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:6px}
+#sf-editors .ed .e-target{padding:5px 3px;border:1px solid var(--e-line);border-radius:4px;background:var(--e-bg);color:var(--e-muted);font:10px &#x27;IBM Plex Mono&#x27;,monospace}
+#sf-editors .ed .e-target[aria-pressed=true]{border-color:var(--e-accent);background:color-mix(in srgb,var(--e-accent) 9%,var(--e-bg));color:var(--e-text)}
+#sf-editors .ed .e-scope{display:block;margin-top:6px;font-size:10px;color:var(--e-muted)}
+#sf-editors .ed .e-primary-action{width:100%;margin-top:7px;min-height:32px}
+#sf-editors .ed .e-bottom{padding:6px 13px;border-top:1px solid var(--e-line);background:var(--e-surface);font-size:10px;color:var(--e-muted);white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+#sf-editors .ed .e-content{padding:16px 20px;height:100%;min-height:0}
+#sf-editors .ed .e-page-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+#sf-editors .ed .e-page-head p{margin-top:5px;font-size:11px;color:var(--e-muted)}
+#sf-editors .ed .e-toolbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:9px 0}
+#sf-editors .ed .e-toolbar select{width:auto;max-width:100%}
+#sf-editors .ed .e-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px}
+#sf-editors .ed .e-stat{border:1px solid var(--e-line);background:var(--e-surface);padding:10px 13px;border-radius:var(--e-radius)}
+#sf-editors .ed .e-stat strong{display:block;font-size:23px;font-weight:600;letter-spacing:-.04em;line-height:1.2;margin-top:3px}
+#sf-editors .ed .e-stat span{font-size:11px;color:var(--e-muted)}
+#sf-editors .ed .e-table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed}
+#sf-editors .ed .e-table th{font-size:10px;color:var(--e-muted);font-weight:500;text-align:left;padding:8px 6px;border-bottom:1px solid var(--e-line)}
+#sf-editors .ed .e-table td{padding:7px 6px;border-bottom:1px solid var(--e-line);overflow-wrap:anywhere;vertical-align:middle}
+#sf-editors .ed .e-table .e-job-title{font-size:11px;font-weight:600;text-align:left;justify-content:flex-start;padding:3px 0}
+#sf-editors .ed .e-table small{font-size:10px;color:var(--e-muted)}
+#sf-editors .ed .e-pager{margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:9px}
+#sf-editors .ed .e-empty{padding:55px 15px;text-align:center;border:1px dashed var(--e-line);border-radius:var(--e-radius);color:var(--e-muted)}
+#sf-editors .ed .e-empty h2{color:var(--e-text);margin-bottom:7px}
+#sf-editors .ed .e-empty button{margin-top:15px}
+#sf-editors .ed .e-channel-list{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#sf-editors .ed .e-channel{background:var(--e-surface);border:1px solid var(--e-line);border-radius:var(--e-radius);padding:12px}
+#sf-editors .ed .e-channel .e-row:last-child{margin-top:12px}
+#sf-editors .ed .e-channel h3{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}
+#sf-editors .ed .e-avatar{width:31px;height:31px;display:flex;align-items:center;justify-content:center;background:var(--e-raised);color:var(--e-accent);border-radius:7px;font:11px &#x27;IBM Plex Mono&#x27;,monospace;flex-shrink:0}
+#sf-editors .ed .e-bars{display:grid;gap:12px;margin-top:16px}
+#sf-editors .ed .e-bar-label{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:5px;font-size:11px}
+#sf-editors .ed .e-bar-track{height:7px;background:var(--e-surface);border-radius:3px}
+#sf-editors .ed .e-bar-track span{display:block;height:100%;background:var(--e-accent);border-radius:3px}
+#sf-editors .ed .e-settings{max-width:720px;display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
+#sf-editors .ed .e-settings&gt;h2,#sf-editors .ed .e-settings&gt;h3,#sf-editors .ed .e-settings&gt;.e-row,#sf-editors .ed .e-settings&gt;.e-divider,#sf-editors .ed .e-settings&gt;p{grid-column:1/-1}
+#sf-editors .ed .e-settings .e-field{background:var(--e-surface)}
+#sf-editors .ed .e-dialog-layer{position:absolute;inset:0;z-index:20;background:#060a10df;display:flex;align-items:flex-start;justify-content:center;padding:38px 15px}
+#sf-editors .ed .e-dialog{width:440px;max-width:100%;background:var(--e-surface);border:1px solid var(--e-line);box-shadow:0 25px 80px #0007;padding:20px;border-radius:10px}
+#sf-editors .ed .e-dialog h2{margin-bottom:10px}
+#sf-editors .ed .e-dialog p{font-size:12px;color:var(--e-muted);margin:10px 0}
+#sf-editors .ed .e-dialog .e-row:last-child{justify-content:flex-end;margin-top:17px}
+#sf-editors .ed .e-modal-error{color:var(--e-bad);font-size:11px;margin-top:8px}
+#sf-editors .ed .e-progress{height:4px;border-radius:2px;background:var(--e-surface);margin-top:6px}
+#sf-editors .ed .e-progress span{display:block;height:100%;background:var(--e-accent)}
+@media(max-width:850px){#sf-editors .ed .e-editor{grid-template-columns:112px minmax(150px,1fr) 270px}#sf-editors .ed .e-head{padding-left:12px}#sf-editors .ed .e-project{max-width:140px}#sf-editors .ed .e-inspector{padding:10px}#sf-editors .ed .e-viewer-tools{justify-content:center}#sf-editors .ed .e-viewer-tools .e-field{max-width:140px}#sf-editors .ed .e-content{padding:13px}#sf-editors .ed .e-channel{padding:10px}}
+@media(max-width:650px){
+ #sf-editors .ed{height:auto;display:block}
+ #sf-editors .ed .e-head{padding:12px 95px 12px 12px;flex-wrap:wrap}
+ #sf-editors .ed .e-head&gt;.e-row:last-child{width:100%}
+ #sf-editors .ed .e-layout{display:block}
+ #sf-editors .ed .e-nav{flex-direction:row;gap:2px;border-right:0;border-bottom:1px solid var(--e-line);padding:5px}
+ #sf-editors .ed .e-nav button{flex:1;font-size:9px}
+ #sf-editors .ed .e-editor{height:auto;grid-template-columns:1fr;grid-template-rows:auto 390px 100px auto;grid-template-areas:&#x27;assets&#x27; &#x27;viewer&#x27; &#x27;timeline&#x27; &#x27;inspector&#x27;}
+ #sf-editors .ed .e-assets{flex-direction:row;align-items:center;border-right:0;border-bottom:1px solid var(--e-line);gap:4px;padding:8px}
+ #sf-editors .ed .e-assets-head,#sf-editors .ed .e-thumb,#sf-editors .ed .e-source-tools{display:none}
+ #sf-editors .ed .e-source{flex:1;padding:5px}
+ #sf-editors .ed .e-source-title{font-size:10px}
+ #sf-editors .ed .e-add{width:30px;margin:0;font-size:0;padding:4px}
+ #sf-editors .ed .e-viewer-tools .e-field{max-width:165px}
+ #sf-editors .ed .e-inspector{border-left:0;border-top:1px solid var(--e-line);padding:14px;gap:14px}
+ #sf-editors .ed [data-inspector]{min-height:290px}
+ #sf-editors .ed .e-content{height:auto;min-height:600px;padding:16px 10px}
+ #sf-editors .ed .e-channel-list{grid-template-columns:1fr}
+ #sf-editors .ed .e-stat{padding:9px 7px}
+ #sf-editors .ed .e-stat strong{font-size:21px}
+ #sf-editors .ed .e-stat span{font-size:10px}
+ #sf-editors .ed .e-table th:nth-child(3),#sf-editors .ed .e-table td:nth-child(3){display:none}
+ #sf-editors .ed .e-table th,#sf-editors .ed .e-table td{padding:7px 3px;font-size:10px}
+ #sf-editors .ed .e-table .e-job-title{font-size:10px}
+ #sf-editors .ed .e-table .e-button{padding:4px;font-size:10px}
+ #sf-editors .ed .e-badge{white-space:normal;font-size:9px}
+ #sf-editors .ed .e-settings{grid-template-columns:1fr}
+ #sf-editors .ed .e-settings&gt;*{grid-column:1!important}
+ #sf-editors .ed .e-bottom{white-space:normal}
+}
+@media(pointer:coarse) and (max-width:650px){#sf-editors .ed button{min-height:40px}#sf-editors .ed input:not([type=range]):not([type=checkbox]),#sf-editors .ed select,#sf-editors .ed textarea{font-size:16px}}
+&lt;/style&gt;
+&lt;div id=&quot;sf-editors&quot; aria-label=&quot;Классическая монтажная на одном экране&quot;&gt;
+ &lt;section data-variant=&quot;Классическая&quot; aria-label=&quot;Классическая монтажная&quot;&gt;&lt;div class=&quot;ed classic&quot; id=&quot;ed-classic&quot; aria-label=&quot;Классическая монтажная&quot;&gt;&lt;header class=&quot;e-head&quot;&gt;&lt;h1&gt;Survivalflow · Монтажная&lt;/h1&gt;&lt;/header&gt;&lt;/div&gt;&lt;/section&gt;
+&lt;/div&gt;
+&lt;!--COMPACT_ENGINE--&gt;
+&lt;script&gt;
+(()=&gt;{
+ const root=document.getElementById(&#x27;sf-editors&#x27;);
+ const escape=value=&gt;String(value??&#x27;&#x27;).replace(/[&amp;&lt;&gt;&quot;&#x27;]/g,c=&gt;({&#x27;&amp;&#x27;:&#x27;&amp;amp;&#x27;,&#x27;&lt;&#x27;:&#x27;&amp;lt;&#x27;,&#x27;&gt;&#x27;:&#x27;&amp;gt;&#x27;,&#x27;&quot;&#x27;:&#x27;&amp;quot;&#x27;,&quot;&#x27;&quot;:&#x27;&amp;#39;&#x27;}[c]));
+ const clock=value=&gt;{const n=Math.max(0,Number(value)||0);return String(Math.floor(n/60)).padStart(2,&#x27;0&#x27;)+&#x27;:&#x27;+String(Math.floor(n%60)).padStart(2,&#x27;0&#x27;);};
+ const fmt=n=&gt;new Intl.NumberFormat(&#x27;ru-RU&#x27;).format(n);
+ const icons={editor:&#x27;sliders-horizontal&#x27;,queue:&#x27;list-video&#x27;,channels:&#x27;radio&#x27;,stats:&#x27;chart-no-axes-combined&#x27;,settings:&#x27;settings-2&#x27;};
+ const names={editor:&#x27;Монтаж&#x27;,queue:&#x27;Очередь&#x27;,channels:&#x27;Каналы&#x27;,stats:&#x27;Статистика&#x27;,settings:&#x27;Настройки&#x27;};
+ const icon=name=&gt;`&lt;i data-lucide=&quot;${name}&quot; aria-hidden=&quot;true&quot;&gt;${({&#x27;sliders-horizontal&#x27;:&#x27;≡&#x27;,&#x27;list-video&#x27;:&#x27;☷&#x27;,radio:&#x27;◉&#x27;,&#x27;chart-no-axes-combined&#x27;:&#x27;↗&#x27;,&#x27;settings-2&#x27;:&#x27;⚙&#x27;,save:&#x27;▣&#x27;,&#x27;chevron-down&#x27;:&#x27;⌄&#x27;,plus:&#x27;+&#x27;,play:&#x27;▶&#x27;,pause:&#x27;Ⅱ&#x27;,&#x27;skip-back&#x27;:&#x27;◀&#x27;,&#x27;skip-forward&#x27;:&#x27;▷&#x27;,upload:&#x27;↑&#x27;,&#x27;arrow-up-right&#x27;:&#x27;↗&#x27;,&#x27;arrow-left&#x27;:&#x27;←&#x27;,&#x27;refresh-cw&#x27;:&#x27;↻&#x27;,eye:&#x27;◉&#x27;,&#x27;eye-off&#x27;:&#x27;⊘&#x27;})[name]||&#x27;·&#x27;}&lt;/i&gt;`;
+ const option=(value,label,current)=&gt;`&lt;option value=&quot;${escape(value)}&quot; ${String(current)===String(value)?&#x27;selected&#x27;:&#x27;&#x27;}&gt;${escape(label)}&lt;/option&gt;`;
+ const button=(label,action,cls=&#x27;&#x27;,extra=&#x27;&#x27;)=&gt;`&lt;button type=&quot;button&quot; class=&quot;e-button ${cls}&quot; data-action=&quot;${action}&quot; ${extra}&gt;${label}&lt;/button&gt;`;
+ const instances=[];
+ const ownSnapshots=new Set();
+ function saveAll(){
+  const privateState=instances.map(a=&gt;({id:a.id,view:a.s.view,tab:a.s.tab,index:a.s.index,config:a.s.sources.filter(x=&gt;!x.url).slice(0,3).map(x=&gt;({id:x.id,c:x.c})),name:a.s.name,settings:a.s.settings}));
+  ownSnapshots.add(JSON.stringify(privateState));
+  if(ownSnapshots.size&gt;100)ownSnapshots.delete(ownSnapshots.values().next().value);
+  window.openai?.setWidgetState?.({modelContent:{project:&#x27;SurvivalFlow&#x27;,direction:&#x27;Монтажная&#x27;,layout:&#x27;Классическая&#x27;,compact:true},privateContent:{editors:privateState}})?.catch(()=&gt;{});
+ }
+ const defaults=i=&gt;({timing:&#x27;middle&#x27;,start:[32,29,36][i%3],duration:2.5,position:&#x27;bottom&#x27;,x:50,y:77,width:84,opacity:100,template:&#x27;offer&#x27;,text:&#x27;А ты знаешь, что делать?&#x27;,brightness:0,contrast:100,saturation:100,warmth:4,zoom:100,mirror:false,targets:[&#x27;t1&#x27;,&#x27;t2&#x27;,&#x27;t3&#x27;,&#x27;y1&#x27;,&#x27;y2&#x27;,&#x27;y3&#x27;],scope:&#x27;all&#x27;,caption:&#x27;Истории, которые пригодятся. Продолжение — в канале. #выживание&#x27;,schedule:&#x27;planned&#x27;,at:&#x27;18:00&#x27;,variant:&#x27;t1&#x27;});
+ function makeSources(){return [{id:&#x27;ep1&#x27;,name:&#x27;elevator_01.mp4&#x27;,title:&#x27;ЛИФТ ОСТАНОВИЛСЯ&#x27;,duration:64,c:defaults(0)},{id:&#x27;ep2&#x27;,name:&#x27;metro_02.mp4&#x27;,title:&#x27;ПОЕЗД НЕ ПРИДЁТ&#x27;,duration:58,c:defaults(1)},{id:&#x27;ep3&#x27;,name:&#x27;shelter_03.mp4&#x27;,title:&#x27;НЕ ОТКРЫВАЙ ДВЕРЬ&#x27;,duration:72,c:defaults(2)}];}
+ class Editor{
+  constructor(el,id){
+   this.el=el;this.id=id;this.s={name:&#x27;Банерка / Пакет 023&#x27;,view:&#x27;editor&#x27;,tab:&#x27;banner&#x27;,index:0,time:32,playing:false,compare:false,hiddenBanner:false,queuePage:0,queueFilter:&#x27;all&#x27;,running:false,jobs:[],sources:makeSources(),settings:{encoder:&#x27;auto&#x27;,quality:&#x27;high&#x27;,interval:30,notifications:true,timezone:&#x27;Europe/Moscow&#x27;},channels:[&#x27;t1&#x27;,&#x27;t2&#x27;,&#x27;t3&#x27;,&#x27;y1&#x27;,&#x27;y2&#x27;,&#x27;y3&#x27;].map((id,i)=&gt;({id,platform:i&lt;3?&#x27;TT&#x27;:&#x27;YT&#x27;,name:&#x27;Survival / 0&#x27;+(i%3+1),connected:true,enabled:true})),statsPlatform:&#x27;all&#x27;,statsPeriod:&#x27;7&#x27;,refresh:0};
+   this.notice=&#x27;Классическая монтажная · Прототип · Публикации не выполняются.&#x27;;
+   this.applySaved(window.openai?.widgetState?.privateContent?.editors?.find(x=&gt;x.id===id));
+   this.timer=null;this.worker=null;this.drag=null;this.importURLs=[];
+   this.build();this.el.addEventListener(&#x27;click&#x27;,e=&gt;this.click(e));this.el.addEventListener(&#x27;input&#x27;,e=&gt;this.input(e));this.el.addEventListener(&#x27;change&#x27;,e=&gt;this.change(e));this.el.addEventListener(&#x27;keydown&#x27;,e=&gt;{if(e.key===&#x27;Escape&#x27;)this.closeDialog();});
+   this.el.addEventListener(&#x27;pointerdown&#x27;,e=&gt;this.pointerDown(e));this.el.addEventListener(&#x27;pointermove&#x27;,e=&gt;this.pointerMove(e));this.el.addEventListener(&#x27;pointerup&#x27;,()=&gt;{if(this.drag){this.drag=null;saveAll();}});this.el.addEventListener(&#x27;pointercancel&#x27;,()=&gt;this.drag=null);
+   this.renderView();
+   if(globalThis.Tweak){const d={accent:getComputedStyle(this.el).getPropertyValue(&#x27;--e-accent&#x27;).trim()||&#x27;#f5a064&#x27;,radius:6};const t=new Tweak({container:this.el,onChange:()=&gt;{this.el.style.setProperty(&#x27;--e-accent&#x27;,d.accent);this.el.style.setProperty(&#x27;--e-radius&#x27;,d.radius+&#x27;px&#x27;);}});t.addColorPicker(d,&#x27;accent&#x27;,{label:&#x27;Акцент монтажной&#x27;,reference:&#x27;--e-accent&#x27;});t.addSlider(d,&#x27;radius&#x27;,{label:&#x27;Скругления&#x27;,min:0,max:12,unit:&#x27;px&#x27;,reference:&#x27;--e-radius&#x27;});}
+  }
+  q(selector){return this.el.querySelector(selector)}
+  qa(selector){return [...this.el.querySelectorAll(selector)]}
+  source(){return this.s.sources[Math.min(this.s.index,this.s.sources.length-1)]}
+  config(){return this.source().c}
+  applySaved(s){if(!s)return;if(names[s.view])this.s.view=s.view;if([&#x27;banner&#x27;,&#x27;filters&#x27;,&#x27;publish&#x27;].includes(s.tab))this.s.tab=s.tab;if(Number.isInteger(s.index)&amp;&amp;s.index&gt;=0&amp;&amp;s.index&lt;3)this.s.index=s.index;if(typeof s.name===&#x27;string&#x27;)this.s.name=s.name.slice(0,80);if(s.settings&amp;&amp;typeof s.settings===&#x27;object&#x27;)Object.assign(this.s.settings,s.settings);if(Array.isArray(s.config))for(const entry of s.config){const source=this.s.sources.find(x=&gt;x.id===entry.id);if(source&amp;&amp;entry.c&amp;&amp;typeof entry.c===&#x27;object&#x27;)source.c={...source.c,...entry.c,targets:Array.isArray(entry.c.targets)?entry.c.targets.filter(x=&gt;this.s.channels.some(a=&gt;a.id===x)):source.c.targets};}}
+  build(){this.el.innerHTML=`&lt;header class=&quot;e-head&quot;&gt;&lt;div class=&quot;e-row&quot;&gt;&lt;div class=&quot;e-logo&quot;&gt;survival&lt;b&gt;flow&lt;/b&gt;&lt;/div&gt;&lt;button type=&quot;button&quot; class=&quot;e-project&quot; data-action=&quot;rename&quot; aria-label=&quot;Переименовать пакет&quot;&gt;${escape(this.s.name)} ${icon(&#x27;chevron-down&#x27;)}&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;e-row&quot;&gt;&lt;span class=&quot;e-badge&quot;&gt;ПРОТОТИП&lt;/span&gt;${button(icon(&#x27;save&#x27;)+&#x27; Сохранить&#x27;,&#x27;save&#x27;,&#x27;small&#x27;)}${button(icon(&#x27;settings-2&#x27;),&#x27;navigate&#x27;,&#x27;small&#x27;,&#x27;data-view=&quot;settings&quot; aria-label=&quot;Настройки&quot;&#x27;)}&lt;/div&gt;&lt;/header&gt;&lt;div class=&quot;e-layout&quot;&gt;&lt;nav class=&quot;e-nav&quot; aria-label=&quot;Разделы монтажной&quot;&gt;${Object.keys(names).map(view=&gt;`&lt;button type=&quot;button&quot; data-action=&quot;navigate&quot; data-view=&quot;${view}&quot; aria-pressed=&quot;${this.s.view===view}&quot;&gt;${icon(icons[view])}&lt;span&gt;${names[view]}&lt;/span&gt;${view===&#x27;queue&#x27;?&#x27;&lt;span class=&quot;e-nav-count&quot; data-queue-count&gt;0&lt;/span&gt;&#x27;:&#x27;&#x27;}&lt;/button&gt;`).join(&#x27;&#x27;)}&lt;/nav&gt;&lt;div data-view-root&gt;&lt;/div&gt;&lt;/div&gt;&lt;footer class=&quot;e-bottom&quot; data-notice aria-live=&quot;polite&quot;&gt;${this.notice}&lt;/footer&gt;&lt;div class=&quot;e-dialog-layer&quot; data-dialog hidden&gt;&lt;/div&gt;&lt;input type=&quot;file&quot; accept=&quot;video/*&quot; multiple data-import=&quot;video&quot; hidden&gt;&lt;input type=&quot;file&quot; accept=&quot;image/png,image/jpeg,image/webp,image/gif&quot; data-import=&quot;banner&quot; hidden&gt;`;this.icons();}
+  icons(){globalThis.lucide?.createIcons({attrs:{width:16,height:16}})}
+  tell(text){this.notice=text;this.q(&#x27;[data-notice]&#x27;).textContent=text;this.q(&#x27;[data-notice]&#x27;).setAttribute(&#x27;data-tooltip&#x27;,text);}
+  stop(){clearInterval(this.timer);this.timer=null;this.s.playing=false;this.q(&#x27;video&#x27;)?.pause();}
+  renderView(){this.stop();const v=this.s.view;this.qa(&#x27;.e-nav button&#x27;).forEach(b=&gt;b.setAttribute(&#x27;aria-pressed&#x27;,String(b.dataset.view===v)));this.q(&#x27;[data-view-root]&#x27;).innerHTML=v===&#x27;editor&#x27;?this.editor():v===&#x27;queue&#x27;?this.queue():v===&#x27;channels&#x27;?this.channels():v===&#x27;stats&#x27;?this.stats():this.settings();this.updateCount();this.icons();if(v===&#x27;editor&#x27;){this.bindVideo();this.updatePreview();this.syncPublish();}}
+  editor(){const src=this.source(),c=src.c;return `&lt;div class=&quot;e-editor&quot;&gt;&lt;aside class=&quot;e-assets&quot;&gt;${this.assets()}&lt;/aside&gt;&lt;main class=&quot;e-viewer&quot;&gt;&lt;div class=&quot;e-viewer-heading&quot;&gt;&lt;span&gt;${escape(src.name)}&lt;/span&gt;&lt;span class=&quot;e-mono&quot;&gt;9:16 · ${clock(src.duration)}&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;e-preview&quot; data-preview aria-label=&quot;Предпросмотр ролика с баннером&quot;&gt;${src.url?`&lt;video class=&quot;e-video&quot; playsinline preload=&quot;metadata&quot; src=&quot;${escape(src.url)}&quot; data-video&gt;&lt;/video&gt;`:`&lt;div class=&quot;e-scene&quot; data-scene&gt;&lt;span class=&quot;e-number&quot;&gt;−03&lt;/span&gt;&lt;div class=&quot;e-scene-title&quot;&gt;&lt;small&gt;ИСТОРИИ ВЫЖИВАНИЯ / ${String(this.s.index+1).padStart(2,&#x27;0&#x27;)}&lt;/small&gt;${escape(src.title)}&lt;/div&gt;&lt;/div&gt;`}&lt;div class=&quot;e-overlay&quot; data-overlay aria-label=&quot;Рекламный баннер, можно перетаскивать&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;e-viewer-controls&quot;&gt;${button(icon(&#x27;skip-back&#x27;),&#x27;start&#x27;,&#x27;small&#x27;,&#x27;aria-label=&quot;В начало ролика&quot;&#x27;)}${button(icon(&#x27;play&#x27;)+&#x27; Смотреть&#x27;,&#x27;play&#x27;,&#x27;small&#x27;)}${button(icon(&#x27;skip-forward&#x27;),&#x27;to-banner&#x27;,&#x27;small&#x27;,&#x27;aria-label=&quot;К баннеру&quot;&#x27;)}&lt;span class=&quot;e-mono&quot;&gt;&lt;span data-clock&gt;${clock(this.s.time)}&lt;/span&gt;&lt;span class=&quot;e-muted&quot;&gt; / ${clock(src.duration)}&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;e-viewer-tools&quot;&gt;&lt;div class=&quot;e-row&quot;&gt;${button(&#x27;До / после&#x27;,&#x27;compare&#x27;,&#x27;small&#x27;,`aria-pressed=&quot;${this.s.compare}&quot;`)}${button(icon(&#x27;eye&#x27;),&#x27;toggle-banner&#x27;,&#x27;small&#x27;,`aria-label=&quot;Скрыть или показать баннер&quot; aria-pressed=&quot;${this.s.hiddenBanner}&quot;`)}&lt;/div&gt;&lt;select class=&quot;e-field&quot; data-control=&quot;variant&quot; aria-label=&quot;Версия канала&quot;&gt;${this.s.channels.map(a=&gt;option(a.id,a.platform+&#x27; / &#x27;+a.name,c.variant)).join(&#x27;&#x27;)}&lt;/select&gt;&lt;/div&gt;&lt;/main&gt;&lt;aside class=&quot;e-inspector&quot;&gt;&lt;div class=&quot;e-tabs&quot; role=&quot;tablist&quot; aria-label=&quot;Настройки ролика&quot;&gt;${[[&#x27;banner&#x27;,&#x27;Баннер&#x27;],[&#x27;filters&#x27;,&#x27;Фильтры&#x27;],[&#x27;publish&#x27;,&#x27;Выпуск&#x27;]].map(([id,label])=&gt;`&lt;button type=&quot;button&quot; role=&quot;tab&quot; id=&quot;${this.id}-tab-${id}&quot; aria-controls=&quot;${this.id}-inspector-panel&quot; aria-selected=&quot;${this.s.tab===id}&quot; data-action=&quot;tab&quot; data-tab=&quot;${id}&quot;&gt;${label}&lt;/button&gt;`).join(&#x27;&#x27;)}&lt;/div&gt;&lt;div data-inspector id=&quot;${this.id}-inspector-panel&quot; role=&quot;tabpanel&quot; aria-labelledby=&quot;${this.id}-tab-${this.s.tab}&quot;&gt;${this.inspector()}&lt;/div&gt;&lt;div class=&quot;e-savebar&quot;&gt;&lt;div class=&quot;e-row e-between&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;e-button quiet small&quot; style=&quot;padding:0;min-height:16px&quot; data-action=&quot;target-dialog&quot;&gt;Каналы назначения ↗&lt;/button&gt;&lt;span class=&quot;e-mono&quot; data-target-count&gt;${c.targets.length}/${this.s.channels.length}&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;e-targets&quot;&gt;${this.targets()}&lt;/div&gt;&lt;label class=&quot;e-scope&quot;&gt;&lt;input type=&quot;checkbox&quot; data-control=&quot;scope&quot; ${c.scope===&#x27;all&#x27;?&#x27;checked&#x27;:&#x27;&#x27;}&gt; Весь пакет · ${this.s.sources.length} ролика&lt;/label&gt;${button(&#x27;В очередь · &lt;span data-version-count&gt;&#x27;+this.plannedCount()+&#x27;&lt;/span&gt; версий &#x27;+icon(&#x27;arrow-up-right&#x27;),&#x27;enqueue&#x27;,&#x27;primary e-primary-action&#x27;)}&lt;/div&gt;&lt;/aside&gt;&lt;section class=&quot;e-timeline&quot;&gt;${this.timeline()}&lt;/section&gt;&lt;/div&gt;`;}
+  assets(){const page=Math.floor(this.s.index/3),pages=Math.ceil(this.s.sources.length/3);return `&lt;div class=&quot;e-assets-head e-row e-between&quot;&gt;&lt;span class=&quot;e-mono e-muted&quot;&gt;ИСХОДНИКИ&lt;/span&gt;&lt;span class=&quot;e-mono&quot;&gt;${String(this.s.sources.length).padStart(2,&#x27;0&#x27;)}&lt;/span&gt;&lt;/div&gt;${this.s.sources.slice(page*3,page*3+3).map((src,j)=&gt;{const i=page*3+j;return `&lt;div class=&quot;e-source ${i===this.s.index?&#x27;active&#x27;:&#x27;&#x27;}&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;e-source-select&quot; data-action=&quot;source&quot; data-index=&quot;${i}&quot; aria-pressed=&quot;${i===this.s.index}&quot;&gt;&lt;span class=&quot;e-thumb&quot;&gt;&lt;span&gt;${String(i+1).padStart(2,&#x27;0&#x27;)}&lt;/span&gt;&lt;span&gt;${clock(src.duration)}&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;e-source-title&quot;&gt;${escape(src.name)}&lt;/span&gt;&lt;/button&gt;&lt;div class=&quot;e-source-tools&quot;&gt;&lt;span class=&quot;e-muted&quot;&gt;${src.url?&#x27;Локальный&#x27;:&#x27;Демо&#x27;}&lt;/span&gt;&lt;button type=&quot;button&quot; data-action=&quot;remove-source&quot; data-index=&quot;${i}&quot; aria-label=&quot;Удалить ${escape(src.name)}&quot;&gt;×&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;`;}).join(&#x27;&#x27;)}${pages&gt;1?`&lt;div class=&quot;e-source-pages&quot;&gt;${button(&#x27;←&#x27;,&#x27;source-page&#x27;,&#x27;small&#x27;,`data-index=&quot;${Math.max(0,(page-1)*3)}&quot; aria-label=&quot;Предыдущие исходники&quot; ${page===0?&#x27;disabled&#x27;:&#x27;&#x27;}`)}&lt;span class=&quot;e-mono e-muted&quot;&gt;${page+1}/${pages}&lt;/span&gt;${button(&#x27;→&#x27;,&#x27;source-page&#x27;,&#x27;small&#x27;,`data-index=&quot;${(page+1)*3}&quot; aria-label=&quot;Следующие исходники&quot; ${page===pages-1?&#x27;disabled&#x27;:&#x27;&#x27;}`)}&lt;/div&gt;`:&#x27;&#x27;}${button(icon(&#x27;plus&#x27;)+&#x27; Видео&#x27;,&#x27;import-video&#x27;,&#x27;e-add&#x27;,&#x27;aria-label=&quot;Добавить видео&quot;&#x27;)}`;}
+  label(text,key,type=&#x27;range&#x27;,attrs=&#x27;&#x27;){const c=this.config();return `&lt;label class=&quot;e-label&quot;&gt;&lt;span&gt;${text}&lt;output data-output=&quot;${key}&quot;&gt;${escape(c[key])}&lt;/output&gt;&lt;/span&gt;&lt;input class=&quot;e-field&quot; type=&quot;${type}&quot; data-control=&quot;${key}&quot; value=&quot;${escape(c[key])}&quot; ${attrs}&gt;&lt;/label&gt;`;}
+  inspector(){const c=this.config(),src=this.source();if(this.s.tab===&#x27;banner&#x27;)return `&lt;div class=&quot;e-file-picker&quot;&gt;&lt;select class=&quot;e-field&quot; data-control=&quot;template&quot; aria-label=&quot;Файл баннера&quot;&gt;${option(&#x27;offer&#x27;,&#x27;tg_offer.png · демо&#x27;,c.template)}${option(&#x27;episode&#x27;,&#x27;Продолжение истории&#x27;,c.template)}${this.bannerURL?option(&#x27;custom&#x27;,this.bannerName,c.template):&#x27;&#x27;}&lt;/select&gt;${button(icon(&#x27;upload&#x27;),&#x27;import-banner&#x27;,&#x27;small&#x27;,&#x27;aria-label=&quot;Загрузить баннер&quot;&#x27;)}&lt;/div&gt;&lt;div class=&quot;e-segment&quot;&gt;&lt;button type=&quot;button&quot; data-action=&quot;timing&quot; data-mode=&quot;manual&quot; aria-pressed=&quot;${c.timing===&#x27;manual&#x27;}&quot;&gt;Свой таймкод&lt;/button&gt;&lt;button type=&quot;button&quot; data-action=&quot;timing&quot; data-mode=&quot;middle&quot; aria-pressed=&quot;${c.timing===&#x27;middle&#x27;}&quot;&gt;Середина&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;e-grid2&quot;&gt;${this.label(&#x27;Начало, сек&#x27;,&#x27;start&#x27;,&#x27;number&#x27;,`min=&quot;0&quot; max=&quot;${src.duration-.1}&quot; step=&quot;0.1&quot; ${c.timing===&#x27;middle&#x27;?&#x27;disabled&#x27;:&#x27;&#x27;}`)}${this.label(&#x27;Показ, сек&#x27;,&#x27;duration&#x27;,&#x27;number&#x27;,`min=&quot;0.1&quot; max=&quot;${src.duration}&quot; step=&quot;0.1&quot;`)}&lt;/div&gt;&lt;label class=&quot;e-label&quot;&gt;&lt;span&gt;Положение&lt;/span&gt;&lt;select class=&quot;e-field&quot; data-control=&quot;position&quot;&gt;${option(&#x27;bottom&#x27;,&#x27;Нижняя часть&#x27;,c.position)}${option(&#x27;center&#x27;,&#x27;По центру&#x27;,c.position)}${option(&#x27;top&#x27;,&#x27;Верхняя часть&#x27;,c.position)}${option(&#x27;custom&#x27;,&#x27;Своя позиция&#x27;,c.position)}&lt;/select&gt;&lt;/label&gt;${this.label(&#x27;Ширина, %&#x27;,&#x27;width&#x27;,&#x27;range&#x27;,&#x27;min=&quot;25&quot; max=&quot;95&quot;&#x27;)}&lt;div class=&quot;e-row e-between&quot; style=&quot;margin-top:9px&quot;&gt;${button(&#x27;Оформление…&#x27;,&#x27;banner-details&#x27;,&#x27;small&#x27;)}${button(&#x27;Сбросить&#x27;,&#x27;reset-banner&#x27;,&#x27;small&#x27;)}&lt;/div&gt;&lt;p class=&quot;e-small e-muted&quot; style=&quot;margin-top:9px&quot;&gt;Баннер можно двигать в предпросмотре.&lt;/p&gt;`;
+   if(this.s.tab===&#x27;filters&#x27;)return `&lt;label class=&quot;e-label&quot; style=&quot;margin-top:0&quot;&gt;&lt;span&gt;Цветовой пресет&lt;/span&gt;&lt;select class=&quot;e-field&quot; data-control=&quot;preset&quot;&gt;&lt;option value=&quot;custom&quot;&gt;Свои настройки&lt;/option&gt;&lt;option value=&quot;warm&quot;&gt;Тёплый&lt;/option&gt;&lt;option value=&quot;cold&quot;&gt;Холодный&lt;/option&gt;&lt;option value=&quot;soft&quot;&gt;Мягкий&lt;/option&gt;&lt;option value=&quot;neutral&quot;&gt;Без фильтра&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;&lt;div class=&quot;e-grid2&quot;&gt;${this.label(&#x27;Яркость&#x27;,&#x27;brightness&#x27;,&#x27;range&#x27;,&#x27;min=&quot;-15&quot; max=&quot;15&quot;&#x27;)}${this.label(&#x27;Контраст, %&#x27;,&#x27;contrast&#x27;,&#x27;range&#x27;,&#x27;min=&quot;80&quot; max=&quot;120&quot;&#x27;)}${this.label(&#x27;Насыщенность, %&#x27;,&#x27;saturation&#x27;,&#x27;range&#x27;,&#x27;min=&quot;70&quot; max=&quot;130&quot;&#x27;)}${this.label(&#x27;Теплота&#x27;,&#x27;warmth&#x27;,&#x27;range&#x27;,&#x27;min=&quot;-15&quot; max=&quot;15&quot;&#x27;)}${this.label(&#x27;Масштаб, %&#x27;,&#x27;zoom&#x27;,&#x27;range&#x27;,&#x27;min=&quot;100&quot; max=&quot;110&quot;&#x27;)}&lt;/div&gt;&lt;label class=&quot;e-check&quot;&gt;&lt;input type=&quot;checkbox&quot; data-control=&quot;mirror&quot; ${c.mirror?&#x27;checked&#x27;:&#x27;&#x27;}&gt; Отразить изображение&lt;/label&gt;${button(&#x27;Сбросить фильтры&#x27;,&#x27;reset-filters&#x27;,&#x27;small&#x27;,&#x27;style=&quot;width:100%&quot;&#x27;)}`;
+   return `&lt;label class=&quot;e-label&quot; style=&quot;margin-top:0&quot;&gt;&lt;span&gt;Описание ролика&lt;/span&gt;&lt;textarea class=&quot;e-field&quot; data-control=&quot;caption&quot; maxlength=&quot;500&quot;&gt;${escape(c.caption)}&lt;/textarea&gt;&lt;/label&gt;&lt;div class=&quot;e-grid2&quot;&gt;&lt;label class=&quot;e-label&quot;&gt;&lt;span&gt;Режим&lt;/span&gt;&lt;select class=&quot;e-field&quot; data-control=&quot;schedule&quot;&gt;${option(&#x27;planned&#x27;,&#x27;Расписание&#x27;,c.schedule)}${option(&#x27;now&#x27;,&#x27;Сразу&#x27;,c.schedule)}&lt;/select&gt;&lt;/label&gt;&lt;label class=&quot;e-label&quot;&gt;&lt;span&gt;Начало · ${this.s.settings.timezone===&#x27;UTC&#x27;?&#x27;UTC&#x27;:&#x27;МСК&#x27;}&lt;/span&gt;&lt;input class=&quot;e-field&quot; type=&quot;time&quot; data-control=&quot;at&quot; value=&quot;${escape(c.at)}&quot; ${c.schedule===&#x27;now&#x27;?&#x27;disabled&#x27;:&#x27;&#x27;}&gt;&lt;/label&gt;&lt;/div&gt;&lt;label class=&quot;e-label&quot;&gt;&lt;span&gt;Экспорт&lt;/span&gt;&lt;select class=&quot;e-field&quot; data-control=&quot;format&quot;&gt;&lt;option&gt;1080 × 1920 · H.264&lt;/option&gt;&lt;option&gt;720 × 1280 · H.264&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;${button(&#x27;Применить ко всем роликам&#x27;,&#x27;apply-all&#x27;,&#x27;small&#x27;,&#x27;style=&quot;margin-top:12px;width:100%&quot;&#x27;)}&lt;p class=&quot;e-small e-muted&quot; style=&quot;margin-top:9px&quot;&gt;${this.s.sources.length} исходника → ${this.plannedCount()} отдельных версий.&lt;/p&gt;`;
+  }
+  targets(all=false){const c=this.config();return this.s.channels.slice(0,all?12:6).map(a=&gt;`&lt;button type=&quot;button&quot; class=&quot;e-target&quot; data-action=&quot;target&quot; data-id=&quot;${a.id}&quot; aria-pressed=&quot;${c.targets.includes(a.id)}&quot; aria-label=&quot;${a.platform} ${escape(a.name)}&quot;&gt;${a.platform} ${String(this.s.channels.filter(x=&gt;x.platform===a.platform).findIndex(x=&gt;x.id===a.id)+1).padStart(2,&#x27;0&#x27;)}${a.connected?&#x27;&#x27;:&#x27; !&#x27;}&lt;/button&gt;`).join(&#x27;&#x27;);}
+  timeline(){const src=this.source();return `&lt;div class=&quot;e-row e-between&quot;&gt;&lt;span class=&quot;e-mono e-muted&quot;&gt;ТАЙМЛАЙН&lt;/span&gt;&lt;span class=&quot;e-mono&quot; data-timing-summary&gt;${clock(src.c.start)} → ${clock(src.c.start+src.c.duration)}&lt;/span&gt;&lt;span data-time-output hidden&gt;${clock(this.s.time)}&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;e-ruler&quot;&gt;${[0,.25,.5,.75,1].map(n=&gt;`&lt;span&gt;${clock(src.duration*n)}&lt;/span&gt;`).join(&#x27;&#x27;)}&lt;/div&gt;&lt;div class=&quot;e-track banner&quot; aria-label=&quot;Отрезок показа баннера&quot;&gt;&lt;span class=&quot;e-banner-mark&quot; data-banner-mark&gt;&lt;/span&gt;&lt;/div&gt;&lt;input class=&quot;e-field&quot; type=&quot;range&quot; min=&quot;0&quot; max=&quot;${src.duration}&quot; step=&quot;0.1&quot; value=&quot;${this.s.time}&quot; data-scrub aria-label=&quot;Позиция просмотра ролика&quot;&gt;`;}
+  updateInspector(){this.q(&#x27;[data-inspector]&#x27;).innerHTML=this.inspector();this.q(&#x27;[data-inspector]&#x27;).setAttribute(&#x27;aria-labelledby&#x27;,`${this.id}-tab-${this.s.tab}`);this.qa(&#x27;.e-tabs button&#x27;).forEach(b=&gt;b.setAttribute(&#x27;aria-selected&#x27;,String(b.dataset.tab===this.s.tab)));this.syncPublish();this.icons();}
+  syncPublish(){const format=this.q(&#x27;[data-control=format]&#x27;);if(format)format.value=this.config().format||&#x27;1080 × 1920 · H.264&#x27;;}
+  plannedCount(){const c=this.config();return c.targets.length*(c.scope===&#x27;all&#x27;?this.s.sources.length:1)}
+  updateCount(){const el=this.q(&#x27;[data-queue-count]&#x27;);if(el)el.textContent=this.s.jobs.filter(j=&gt;j.status!==&#x27;cancelled&#x27;).length;const c=this.q(&#x27;[data-version-count]&#x27;);if(c)c.textContent=this.plannedCount();const n=this.q(&#x27;[data-target-count]&#x27;);if(n)n.textContent=this.config().targets.length+&#x27;/&#x27;+this.s.channels.length;}
+  bindVideo(){const video=this.q(&#x27;[data-video]&#x27;);if(!video)return;video.addEventListener(&#x27;loadedmetadata&#x27;,()=&gt;{if(Number.isFinite(video.duration)){const src=this.source();src.duration=video.duration;if(src.c.timing===&#x27;middle&#x27;)src.c.start=Number((video.duration/2).toFixed(1));this.s.time=Math.min(this.s.time,video.duration);this.q(&#x27;[data-scrub]&#x27;).max=video.duration;video.currentTime=this.s.time;this.updatePreview();}});video.addEventListener(&#x27;timeupdate&#x27;,()=&gt;{if(this.s.playing){this.s.time=video.currentTime;this.updatePreview();}});video.addEventListener(&#x27;ended&#x27;,()=&gt;this.pause());video.addEventListener(&#x27;error&#x27;,()=&gt;this.tell(&#x27;Браузер не смог открыть этот видеоформат. Выбери MP4 с поддерживаемым кодеком.&#x27;));}
+  updatePreview(){if(this.s.view!==&#x27;editor&#x27;)return;const c=this.config(),src=this.source(),overlay=this.q(&#x27;[data-overlay]&#x27;),preview=this.q(&#x27;[data-preview]&#x27;);if(!overlay||!preview)return;const variantIndex=Math.max(0,this.s.channels.findIndex(x=&gt;x.id===c.variant));const delta=variantIndex%3-1;const filter=this.s.compare?&#x27;none&#x27;:`brightness(${1+Number(c.brightness)/100}) contrast(${Number(c.contrast)/100}) saturate(${Number(c.saturation)/100}) sepia(${Math.abs(Number(c.warmth)+delta)/65}) hue-rotate(${-(Number(c.warmth)+delta)*1.4}deg)`;preview.style.setProperty(&#x27;--video-filter&#x27;,filter);preview.style.setProperty(&#x27;--video-scale&#x27;,this.s.compare?&#x27;1&#x27;:String(Number(c.zoom)/100));const scene=this.q(&#x27;[data-scene]&#x27;);if(scene)scene.style.transform=`scale(${this.s.compare?1:Number(c.zoom)/100}) scaleX(${!this.s.compare&amp;&amp;c.mirror?-1:1})`;const video=this.q(&#x27;[data-video]&#x27;);if(video)video.style.transform=`scale(${this.s.compare?1:Number(c.zoom)/100}) scaleX(${!this.s.compare&amp;&amp;c.mirror?-1:1})`;overlay.style.left=c.x+&#x27;%&#x27;;overlay.style.top=c.y+&#x27;%&#x27;;overlay.style.width=c.width+&#x27;%&#x27;;overlay.style.opacity=Number(c.opacity)/100;const active=this.s.time&gt;=Number(c.start)&amp;&amp;this.s.time&lt;=Number(c.start)+Number(c.duration);overlay.hidden=this.s.hiddenBanner||this.s.compare||!active;overlay.classList.toggle(&#x27;image&#x27;,c.template===&#x27;custom&#x27;&amp;&amp;!!this.bannerURL);if(c.template===&#x27;custom&#x27;&amp;&amp;this.bannerURL){if(!overlay.querySelector(&#x27;img&#x27;))overlay.innerHTML=&#x27;&lt;img alt=&quot;Загруженный баннер&quot;&gt;&#x27;;overlay.querySelector(&#x27;img&#x27;).src=this.bannerURL;}else{overlay.replaceChildren();const text=document.createElement(&#x27;div&#x27;);text.textContent=c.template===&#x27;episode&#x27;?&#x27;Продолжение уже в канале&#x27;:c.text;const small=document.createElement(&#x27;small&#x27;);small.textContent=&#x27;Больше историй — в нашем канале ↗&#x27;;overlay.append(text,small);}this.q(&#x27;[data-clock]&#x27;).textContent=clock(this.s.time);this.q(&#x27;[data-time-output]&#x27;).textContent=clock(this.s.time);this.q(&#x27;[data-scrub]&#x27;).value=this.s.time;this.q(&#x27;[data-timing-summary]&#x27;).textContent=clock(c.start)+&#x27; → &#x27;+clock(Number(c.start)+Number(c.duration));const mark=this.q(&#x27;[data-banner-mark]&#x27;);mark.style.left=Math.max(0,Math.min(97,c.start/src.duration*100))+&#x27;%&#x27;;mark.style.width=Math.max(3,Math.min(100-c.start/src.duration*100,c.duration/src.duration*100))+&#x27;%&#x27;;this.qa(&#x27;[data-output]&#x27;).forEach(el=&gt;el.textContent=c[el.dataset.output]);this.qa(&#x27;.e-version-grid button&#x27;).forEach(b=&gt;b.setAttribute(&#x27;aria-pressed&#x27;,String(b.dataset.id===c.variant)));const variant=this.q(&#x27;[data-control=variant]&#x27;);if(variant)variant.value=c.variant;}
+  pause(){this.stop();const b=this.q(&#x27;[data-action=play]&#x27;);if(b){b.innerHTML=icon(&#x27;play&#x27;)+&#x27; Смотреть&#x27;;this.icons();}}
+  play(){if(this.s.playing){this.pause();return;}if(this.s.time&gt;=this.source().duration)this.s.time=0;this.s.playing=true;this.q(&#x27;[data-action=play]&#x27;).innerHTML=icon(&#x27;pause&#x27;)+&#x27; Пауза&#x27;;this.icons();const video=this.q(&#x27;[data-video]&#x27;);if(video){video.currentTime=this.s.time;video.play().catch(()=&gt;{this.pause();this.tell(&#x27;Воспроизведение недоступно для выбранного файла.&#x27;);});}else this.timer=setInterval(()=&gt;{if(this.el.closest(&#x27;[data-variant]&#x27;).hidden){this.pause();return;}this.s.time+=.2;if(this.s.time&gt;=this.source().duration){this.s.time=this.source().duration;this.pause();}this.updatePreview();},200);}
+  pointerDown(e){const target=e.target.closest(&#x27;[data-overlay]&#x27;);if(!target)return;e.preventDefault();this.drag={pointer:e.pointerId};target.setPointerCapture(e.pointerId);}
+  pointerMove(e){if(!this.drag||e.pointerId!==this.drag.pointer)return;const preview=this.q(&#x27;[data-preview]&#x27;);if(!preview)return;const rect=preview.getBoundingClientRect(),c=this.config(),half=Number(c.width)/2;c.x=Math.max(half,Math.min(100-half,(e.clientX-rect.left)/rect.width*100));c.y=Math.max(12,Math.min(88,(e.clientY-rect.top)/rect.height*100));c.position=&#x27;custom&#x27;;this.updatePreview();const p=this.q(&#x27;[data-control=position]&#x27;);if(p)p.value=&#x27;custom&#x27;;}
+  input(e){const target=e.target;if(target.matches(&#x27;[data-scrub]&#x27;)){this.s.time=Number(target.value);const video=this.q(&#x27;[data-video]&#x27;);if(video)video.currentTime=this.s.time;this.updatePreview();return;}const key=target.dataset.control;if(!key||[&#x27;template&#x27;,&#x27;position&#x27;,&#x27;preset&#x27;,&#x27;variant&#x27;,&#x27;schedule&#x27;,&#x27;format&#x27;,&#x27;scope&#x27;].includes(key))return;const c=this.config();c[key]=target.type===&#x27;checkbox&#x27;?target.checked:target.type===&#x27;range&#x27;||target.type===&#x27;number&#x27;?Number(target.value):target.value;if(key===&#x27;start&#x27;){c.start=Math.max(0,Math.min(this.source().duration-.1,c.start));this.s.time=c.start;this.seek();}if(key===&#x27;duration&#x27;)c.duration=Math.max(.1,Math.min(this.source().duration-c.start,c.duration));this.updatePreview();if(key===&#x27;caption&#x27;)this.tell(&#x27;Описание обновлено для выбранного исходника.&#x27;);}
+  change(e){const target=e.target;if(target.dataset.import){this.importFiles(target);return;}if(target.dataset.setting){this.s.settings[target.dataset.setting]=target.type===&#x27;checkbox&#x27;?target.checked:target.type===&#x27;number&#x27;?Math.max(5,Math.min(180,Number(target.value)||30)):target.value;this.tell(&#x27;Настройки изменены. Нажми «Сохранить настройки».&#x27;);return;}if(target.dataset.stat){this.s[target.dataset.stat]=target.value;this.renderView();return;}if(target.matches(&#x27;[data-queue-filter]&#x27;)){this.s.queueFilter=target.value;this.s.queuePage=0;this.renderQueue();return;}const key=target.dataset.control;if(!key)return;const c=this.config();if(key===&#x27;position&#x27;){c.position=target.value;c.x=50;c.y={bottom:77,center:50,top:22,custom:c.y}[target.value];}else if(key===&#x27;preset&#x27;){const presets={warm:{warmth:9,brightness:2,contrast:103,saturation:106},cold:{warmth:-10,brightness:0,contrast:106,saturation:93},soft:{warmth:3,brightness:3,contrast:94,saturation:96},neutral:{warmth:0,brightness:0,contrast:100,saturation:100}};if(presets[target.value])Object.assign(c,presets[target.value]);this.updateInspector();}else if(key===&#x27;scope&#x27;)c.scope=target.checked?&#x27;all&#x27;:&#x27;current&#x27;;else if(key===&#x27;template&#x27;){c.template=target.value;this.s.time=c.start;this.seek();}else if(key===&#x27;schedule&#x27;){c.schedule=target.value;this.updateInspector();}else if(key===&#x27;variant&#x27;)c.variant=target.value;else if(key===&#x27;format&#x27;)c.format=target.value;this.updatePreview();this.updateCount();saveAll();}
+  seek(){const video=this.q(&#x27;[data-video]&#x27;);if(video)video.currentTime=this.s.time;this.updatePreview();const compare=this.q(&#x27;[data-action=compare]&#x27;),banner=this.q(&#x27;[data-action=toggle-banner]&#x27;);if(compare){compare.setAttribute(&#x27;aria-pressed&#x27;,String(this.s.compare));compare.textContent=this.s.compare?&#x27;Оригинал · вернуть&#x27;:&#x27;До / после&#x27;;}if(banner){banner.setAttribute(&#x27;aria-pressed&#x27;,String(this.s.hiddenBanner));banner.innerHTML=icon(this.s.hiddenBanner?&#x27;eye-off&#x27;:&#x27;eye&#x27;);banner.setAttribute(&#x27;aria-label&#x27;,this.s.hiddenBanner?&#x27;Показать баннер&#x27;:&#x27;Скрыть баннер&#x27;);this.icons();}}
+  click(e){const b=e.target.closest(&#x27;button[data-action]&#x27;);if(!b||b.disabled)return;const a=b.dataset.action,c=this.config();switch(a){
+   case&#x27;navigate&#x27;:this.s.view=b.dataset.view;this.renderView();saveAll();break;
+   case&#x27;tab&#x27;:this.s.tab=b.dataset.tab;this.updateInspector();saveAll();break;
+   case&#x27;source-page&#x27;:
+   case&#x27;source&#x27;:this.pause();this.s.index=Number(b.dataset.index);this.s.time=this.config().start;this.s.compare=false;this.renderView();saveAll();break;
+   case&#x27;play&#x27;:this.play();break;
+   case&#x27;start&#x27;:this.s.time=0;this.seek();break;
+   case&#x27;to-banner&#x27;:this.s.time=Number(c.start);this.s.hiddenBanner=false;this.s.compare=false;this.seek();break;
+   case&#x27;compare&#x27;:this.s.compare=!this.s.compare;b.setAttribute(&#x27;aria-pressed&#x27;,String(this.s.compare));b.textContent=this.s.compare?&#x27;Оригинал · вернуть&#x27;:&#x27;До / после&#x27;;this.updatePreview();break;
+   case&#x27;toggle-banner&#x27;:this.s.hiddenBanner=!this.s.hiddenBanner;b.innerHTML=icon(this.s.hiddenBanner?&#x27;eye-off&#x27;:&#x27;eye&#x27;);b.setAttribute(&#x27;aria-label&#x27;,this.s.hiddenBanner?&#x27;Показать баннер&#x27;:&#x27;Скрыть баннер&#x27;);this.icons();b.setAttribute(&#x27;aria-pressed&#x27;,String(this.s.hiddenBanner));this.updatePreview();break;
+   case&#x27;timing&#x27;:c.timing=b.dataset.mode;if(c.timing===&#x27;middle&#x27;)c.start=Number((this.source().duration/2).toFixed(1));this.s.time=c.start;this.updateInspector();this.seek();saveAll();break;
+   case&#x27;target-dialog&#x27;:this.dialog(&#x27;Каналы назначения&#x27;,&#x27;&lt;div class=&quot;e-targets&quot; data-all-targets&gt;&#x27;+this.targets(true)+&#x27;&lt;/div&gt;&#x27;,button(&#x27;Готово&#x27;,&#x27;close-dialog&#x27;,&#x27;primary&#x27;));break;
+   case&#x27;channel-page&#x27;:this.s.channelPage=(this.s.channelPage||0)+Number(b.dataset.delta);this.renderView();break;
+   case&#x27;stats-page&#x27;:this.s.statsPage=(this.s.statsPage||0)+Number(b.dataset.delta);this.renderView();break;
+   case&#x27;target&#x27;:c.targets=c.targets.includes(b.dataset.id)?c.targets.filter(x=&gt;x!==b.dataset.id):[...c.targets,b.dataset.id];this.qa(&#x27;.e-targets&#x27;).forEach(el=&gt;el.innerHTML=this.targets(el.hasAttribute(&#x27;data-all-targets&#x27;)));this.updateCount();saveAll();break;
+   case&#x27;variant&#x27;:c.variant=b.dataset.id;this.updatePreview();saveAll();break;
+   case&#x27;banner-details&#x27;:this.dialog(&#x27;Оформление баннера&#x27;,this.label(&#x27;Непрозрачность, %&#x27;,&#x27;opacity&#x27;,&#x27;range&#x27;,&#x27;min=&quot;10&quot; max=&quot;100&quot;&#x27;)+&#x27;&lt;label class=&quot;e-label&quot;&gt;&lt;span&gt;Текст демобаннера&lt;/span&gt;&lt;input class=&quot;e-field&quot; data-control=&quot;text&quot; maxlength=&quot;90&quot; value=&quot;&#x27;+escape(c.text)+&#x27;&quot;&gt;&lt;/label&gt;&lt;p&gt;Изменения видны сразу в предпросмотре.&lt;/p&gt;&#x27;,button(&#x27;Готово&#x27;,&#x27;close-dialog&#x27;,&#x27;primary&#x27;));break;
+   case&#x27;reset-banner&#x27;:Object.assign(c,{timing:&#x27;middle&#x27;,start:this.source().duration/2,duration:2.5,x:50,y:77,width:84,opacity:100,position:&#x27;bottom&#x27;,template:&#x27;offer&#x27;,text:&#x27;А ты знаешь, что делать?&#x27;});this.s.time=c.start;this.updateInspector();this.seek();saveAll();break;
+   case&#x27;reset-filters&#x27;:Object.assign(c,{brightness:0,contrast:100,saturation:100,warmth:0,zoom:100,mirror:false});this.updateInspector();this.updatePreview();saveAll();break;
+   case&#x27;apply-all&#x27;:{const selected=this.source();this.s.sources.forEach(src=&gt;{if(src===selected)return;src.c={...c,targets:[...c.targets],start:c.timing===&#x27;middle&#x27;?src.duration/2:Math.min(c.start,src.duration-.1)};src.c.duration=Math.min(c.duration,src.duration-src.c.start);});this.tell(&#x27;Настройки и описание применены ко всем исходникам.&#x27;);saveAll();break;}
+   case&#x27;import-video&#x27;:this.q(&#x27;[data-import=video]&#x27;).click();break;
+   case&#x27;import-banner&#x27;:this.q(&#x27;[data-import=banner]&#x27;).click();break;
+   case&#x27;remove-source&#x27;:this.removeSource(Number(b.dataset.index));break;
+   case&#x27;enqueue&#x27;:this.enqueue();break;
+   case&#x27;save&#x27;:saveAll();this.tell(&#x27;Настройки прототипа сохранены. Локальные файлы и очередь хранятся только в текущем просмотре.&#x27;);break;
+   case&#x27;rename&#x27;:this.dialog(&#x27;Название пакета&#x27;,`&lt;label class=&quot;e-label&quot;&gt;&lt;span&gt;Название&lt;/span&gt;&lt;input class=&quot;e-field&quot; data-name value=&quot;${escape(this.s.name)}&quot; maxlength=&quot;80&quot;&gt;&lt;/label&gt;`,button(&#x27;Сохранить&#x27;,&#x27;confirm-name&#x27;,&#x27;primary&#x27;));break;
+   case&#x27;confirm-name&#x27;:{const name=this.q(&#x27;[data-name]&#x27;).value.trim();if(!name){this.modalError(&#x27;Введи название.&#x27;);break;}this.s.name=name;this.q(&#x27;.e-project&#x27;).textContent=name+&#x27; ▾&#x27;;this.closeDialog();saveAll();break;}
+   case&#x27;close-dialog&#x27;:this.closeDialog();break;
+   case&#x27;queue-play&#x27;:this.toggleWorker();break;
+   case&#x27;queue-filter-reset&#x27;:this.s.queueFilter=&#x27;all&#x27;;this.renderQueue();break;
+   case&#x27;queue-demo&#x27;:this.enqueue(true);break;
+   case&#x27;queue-page&#x27;:this.s.queuePage+=Number(b.dataset.delta);this.renderQueue();break;
+   case&#x27;job-delete&#x27;:this.s.jobs=this.s.jobs.filter(j=&gt;j.id!==b.dataset.id);this.renderQueue();this.updateCount();break;
+   case&#x27;job-retry&#x27;:{const j=this.s.jobs.find(x=&gt;x.id===b.dataset.id);if(j){j.status=&#x27;pending&#x27;;j.progress=0;}this.renderQueue();break;}
+   case&#x27;job-detail&#x27;:this.jobDialog(b.dataset.id);break;
+   case&#x27;queue-error&#x27;:{const j=this.s.jobs.find(x=&gt;[&#x27;pending&#x27;,&#x27;rendering&#x27;,&#x27;scheduled&#x27;].includes(x.status));if(j){j.status=&#x27;error&#x27;;j.progress=0;this.renderQueue();this.tell(&#x27;Смоделирована ошибка соединения. Задачу можно повторить.&#x27;);}else this.tell(&#x27;Нет активных задач для проверки ошибки.&#x27;);break;}
+   case&#x27;queue-clear&#x27;:this.dialog(&#x27;Очистить очередь?&#x27;,`&lt;p&gt;Удалить ${this.s.jobs.length} демонстрационных задач? Исходники и настройки останутся.&lt;/p&gt;`,button(&#x27;Очистить&#x27;,&#x27;confirm-clear&#x27;,&#x27;primary&#x27;));break;
+   case&#x27;confirm-clear&#x27;:this.stopWorker();this.s.jobs=[];this.closeDialog();this.renderQueue();this.updateCount();break;
+   case&#x27;channel-toggle&#x27;:{const ch=this.s.channels.find(x=&gt;x.id===b.dataset.id);ch.enabled=!ch.enabled;this.renderView();saveAll();break;}
+   case&#x27;channel-connect&#x27;:{const ch=this.s.channels.find(x=&gt;x.id===b.dataset.id);ch.connected=!ch.connected;this.renderView();this.tell(ch.connected?&#x27;Демо: канал подключён. В готовой программе здесь будет авторизация.&#x27;:&#x27;Демо: доступ к каналу отключён.&#x27;);break;}
+   case&#x27;channel-delete&#x27;:this.dialog(&#x27;Удалить канал?&#x27;,`&lt;p&gt;Канал будет удалён только из прототипа. Реальный аккаунт не затрагивается.&lt;/p&gt;`,button(&#x27;Удалить&#x27;,&#x27;confirm-channel-delete&#x27;,&#x27;primary&#x27;,`data-id=&quot;${b.dataset.id}&quot;`));break;
+   case&#x27;confirm-channel-delete&#x27;:this.s.channels=this.s.channels.filter(x=&gt;x.id!==b.dataset.id);this.s.sources.forEach(src=&gt;src.c.targets=src.c.targets.filter(x=&gt;x!==b.dataset.id));this.closeDialog();this.renderView();break;
+   case&#x27;channel-add&#x27;:this.dialog(&#x27;Добавить демоканал&#x27;,`&lt;label class=&quot;e-label&quot;&gt;&lt;span&gt;Платформа&lt;/span&gt;&lt;select class=&quot;e-field&quot; data-new-platform&gt;&lt;option&gt;TT&lt;/option&gt;&lt;option&gt;YT&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;&lt;label class=&quot;e-label&quot;&gt;&lt;span&gt;Название канала&lt;/span&gt;&lt;input class=&quot;e-field&quot; data-new-channel placeholder=&quot;Например, Survival / 04&quot; maxlength=&quot;45&quot;&gt;&lt;/label&gt;&lt;p&gt;Подключение здесь демонстрационное. Пароль или токен не нужен.&lt;/p&gt;`,button(&#x27;Добавить&#x27;,&#x27;confirm-channel-add&#x27;,&#x27;primary&#x27;));break;
+   case&#x27;confirm-channel-add&#x27;:{const name=this.q(&#x27;[data-new-channel]&#x27;).value.trim();if(!name){this.modalError(&#x27;Укажи название.&#x27;);break;}if(this.s.channels.length&gt;=12){this.modalError(&#x27;В прототипе максимум 12 каналов.&#x27;);break;}this.s.channels.push({id:&#x27;ch&#x27;+Date.now(),name,platform:this.q(&#x27;[data-new-platform]&#x27;).value,enabled:true,connected:true});this.closeDialog();this.renderView();this.tell(&#x27;Демоканал добавлен. Выбери его в назначениях ролика.&#x27;);break;}
+   case&#x27;stats-refresh&#x27;:this.s.refresh++;this.renderView();this.tell(&#x27;Демонстрационные значения обновлены. Запросы к платформам не выполнялись.&#x27;);break;
+   case&#x27;settings-save&#x27;:saveAll();this.tell(&#x27;Настройки сохранены для этого прототипа.&#x27;);break;
+   case&#x27;reset-demo&#x27;:this.dialog(&#x27;Начать с чистого листа?&#x27;,`&lt;p&gt;Очередь, импортированные файлы и настройки этого подпрототипа будут сброшены.&lt;/p&gt;`,button(&#x27;Сбросить&#x27;,&#x27;confirm-reset&#x27;,&#x27;primary&#x27;));break;
+   case&#x27;confirm-reset&#x27;:this.stop();this.stopWorker();this.importURLs.forEach(url=&gt;URL.revokeObjectURL(url));this.importURLs=[];this.bannerURL=null;this.s.sources=makeSources();this.s.jobs=[];this.s.channels=[&#x27;t1&#x27;,&#x27;t2&#x27;,&#x27;t3&#x27;,&#x27;y1&#x27;,&#x27;y2&#x27;,&#x27;y3&#x27;].map((id,i)=&gt;({id,platform:i&lt;3?&#x27;TT&#x27;:&#x27;YT&#x27;,name:&#x27;Survival / 0&#x27;+(i%3+1),connected:true,enabled:true}));this.s.settings={encoder:&#x27;auto&#x27;,quality:&#x27;high&#x27;,interval:30,notifications:true,timezone:&#x27;Europe/Moscow&#x27;};this.s.index=0;this.s.time=32;this.s.view=&#x27;editor&#x27;;this.s.tab=&#x27;banner&#x27;;this.s.compare=false;this.s.hiddenBanner=false;this.closeDialog();this.renderView();this.tell(&#x27;Демонстрация сброшена.&#x27;);saveAll();break;
+  }}
+  removeSource(index){if(this.s.sources.length&lt;=1){this.tell(&#x27;Оставь хотя бы один исходник или добавь новый.&#x27;);return;}const src=this.s.sources[index];if(this.s.jobs.some(j=&gt;j.source===src.id)){this.tell(&#x27;Сначала удали задачи этого исходника из очереди.&#x27;);return;}if(src.url)URL.revokeObjectURL(src.url);this.s.sources.splice(index,1);this.s.index=Math.min(this.s.index,this.s.sources.length-1);this.s.time=this.config().start;this.renderView();saveAll();}
+  async importFiles(input){const files=[...input.files];input.value=&#x27;&#x27;;if(!files.length)return;if(input.dataset.import===&#x27;banner&#x27;){const file=files[0];if(!file.type.startsWith(&#x27;image/&#x27;)){this.tell(&#x27;Для предпросмотра выбери PNG, JPG, WebP или GIF. Видео-баннеры будут частью основного приложения.&#x27;);return;}if(this.bannerURL)URL.revokeObjectURL(this.bannerURL);this.bannerURL=URL.createObjectURL(file);this.bannerName=file.name;this.importURLs.push(this.bannerURL);this.config().template=&#x27;custom&#x27;;this.s.time=this.config().start;this.updateInspector();this.seek();this.tell(&#x27;Баннер открыт локально в браузере. Его содержимое никуда не отправляется.&#x27;);return;}if(this.s.sources.length+files.length&gt;12){this.tell(&#x27;В одном прототипе можно открыть до 12 исходников.&#x27;);return;}for(const file of files){if(!file.type.startsWith(&#x27;video/&#x27;))continue;const url=URL.createObjectURL(file);this.importURLs.push(url);this.s.sources.push({id:&#x27;file&#x27;+Date.now()+Math.random().toString(36).slice(2,6),name:file.name,title:file.name,duration:64,url,c:defaults(0)});}this.s.index=this.s.sources.length-1;this.s.time=32;this.s.view=&#x27;editor&#x27;;this.renderView();this.tell(&#x27;Локальное видео добавлено. Фильтры и баннер показаны в браузере; экспорт не выполняется.&#x27;);}
+  enqueue(forceDemo=false){
+   const current=this.config();
+   if(!current.targets.length){this.tell(&#x27;Выбери хотя бы один канал назначения.&#x27;);return;}
+   const selected=this.s.channels.filter(a=&gt;current.targets.includes(a.id));
+   if(!selected.length||selected.some(a=&gt;!a.connected||!a.enabled)){this.tell(&#x27;Среди назначений есть отключённый канал. Включи его в разделе «Каналы» или убери из назначений.&#x27;);return;}
+   const sources=forceDemo||current.scope===&#x27;all&#x27;?this.s.sources:[this.source()];
+   for(const src of sources){const c=src.c,start=c.timing===&#x27;middle&#x27;?src.duration/2:Number(c.start);if(!Number.isFinite(start)||start&lt;0||start&gt;=src.duration||!Number.isFinite(Number(c.duration))||Number(c.duration)&lt;=0||start+Number(c.duration)&gt;src.duration+.01){this.tell(&#x27;Баннер выходит за конец одного из роликов. Сократи длительность или измени таймкод.&#x27;);return;}}
+   const [hour,minute]=(current.at||&#x27;18:00&#x27;).split(&#x27;:&#x27;).map(Number);let count=0,slot=0;
+   for(const src of sources)for(const ch of selected){
+    const c=src.c,minutes=hour*60+minute+slot++*Number(this.s.settings.interval),days=Math.floor(minutes/1440);
+    const at=current.schedule===&#x27;now&#x27;?&#x27;После обработки&#x27;:String(Math.floor(minutes/60)%24).padStart(2,&#x27;0&#x27;)+&#x27;:&#x27;+String(minutes%60).padStart(2,&#x27;0&#x27;)+(days?&#x27; +&#x27;+days+&#x27; д&#x27;:&#x27;&#x27;);
+    if(this.s.jobs.some(j=&gt;j.source===src.id&amp;&amp;j.channel===ch.id))continue;
+    this.s.jobs.push({id:&#x27;j&#x27;+Date.now()+Math.random().toString(36).slice(2,7),source:src.id,title:src.name,channel:ch.id,channelName:ch.platform+&#x27; / &#x27;+ch.name,status:&#x27;pending&#x27;,progress:0,at,caption:c.caption,config:{start:c.timing===&#x27;middle&#x27;?src.duration/2:c.start,duration:c.duration,width:c.width,brightness:c.brightness,contrast:c.contrast,format:c.format||&#x27;1080 × 1920 · H.264&#x27;}});count++;
+   }
+   this.s.view=&#x27;queue&#x27;;this.s.queuePage=0;this.s.queueFilter=&#x27;all&#x27;;this.renderView();this.tell(count?`Добавлено ${count} демозадач с интервалом ${this.s.settings.interval} мин. Нажми «Запустить демо», чтобы проверить цикл.`:&#x27;Эти пары «исходник + канал» уже есть в очереди. Дубликаты не созданы.&#x27;);
+  }
+  queue(){const filtered=this.s.jobs.filter(j=&gt;this.s.queueFilter===&#x27;all&#x27;||j.status===this.s.queueFilter);const pages=Math.max(1,Math.ceil(filtered.length/4));this.s.queuePage=Math.max(0,Math.min(pages-1,this.s.queuePage));const rows=filtered.slice(this.s.queuePage*4,this.s.queuePage*4+4);const counts={done:this.s.jobs.filter(x=&gt;x.status===&#x27;published&#x27;).length,errors:this.s.jobs.filter(x=&gt;x.status===&#x27;error&#x27;).length};const status={pending:&#x27;Ожидает&#x27;,rendering:&#x27;Обработка&#x27;,scheduled:&#x27;В расписании&#x27;,published:&#x27;Опубликовано&#x27;,error:&#x27;Ошибка&#x27;};return `&lt;main class=&quot;e-content&quot;&gt;&lt;div class=&quot;e-page-head&quot;&gt;&lt;div&gt;&lt;h1&gt;Очередь выпуска&lt;/h1&gt;&lt;p&gt;Демонстрация полного цикла. Реальные запросы к платформам не выполняются.&lt;/p&gt;&lt;/div&gt;${button(icon(&#x27;arrow-left&#x27;)+&#x27; В монтажную&#x27;,&#x27;navigate&#x27;,&#x27;&#x27;,&#x27;data-view=&quot;editor&quot;&#x27;)}&lt;/div&gt;&lt;div class=&quot;e-summary&quot;&gt;&lt;div class=&quot;e-stat&quot;&gt;&lt;span&gt;Всего задач&lt;/span&gt;&lt;strong&gt;${this.s.jobs.length}&lt;/strong&gt;&lt;/div&gt;&lt;div class=&quot;e-stat&quot;&gt;&lt;span&gt;Завершено в демо&lt;/span&gt;&lt;strong&gt;${counts.done}&lt;/strong&gt;&lt;/div&gt;&lt;div class=&quot;e-stat&quot;&gt;&lt;span&gt;Нужна помощь&lt;/span&gt;&lt;strong&gt;${counts.errors}&lt;/strong&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;e-toolbar&quot;&gt;${button(icon(this.s.running?&#x27;pause&#x27;:&#x27;play&#x27;)+(this.s.running?&#x27; Пауза&#x27;:&#x27; Запустить демо&#x27;),&#x27;queue-play&#x27;,&#x27;primary&#x27;,this.s.jobs.length?&#x27;&#x27;:&#x27;disabled&#x27;)}${button(&#x27;Тест ошибки&#x27;,&#x27;queue-error&#x27;,&#x27;small&#x27;)}${button(&#x27;Очистить&#x27;,&#x27;queue-clear&#x27;,&#x27;small&#x27;)}&lt;select class=&quot;e-field&quot; data-queue-filter aria-label=&quot;Фильтр очереди&quot;&gt;${[[&#x27;all&#x27;,&#x27;Все задачи&#x27;],[&#x27;pending&#x27;,&#x27;Ожидают&#x27;],[&#x27;rendering&#x27;,&#x27;Обрабатываются&#x27;],[&#x27;scheduled&#x27;,&#x27;В расписании&#x27;],[&#x27;published&#x27;,&#x27;Опубликованы&#x27;],[&#x27;error&#x27;,&#x27;С ошибкой&#x27;]].map(([v,l])=&gt;option(v,l,this.s.queueFilter)).join(&#x27;&#x27;)}&lt;/select&gt;&lt;/div&gt;${rows.length?`&lt;table class=&quot;e-table&quot;&gt;&lt;thead&gt;&lt;tr&gt;&lt;th style=&quot;width:30%&quot;&gt;Видео&lt;/th&gt;&lt;th style=&quot;width:23%&quot;&gt;Канал&lt;/th&gt;&lt;th style=&quot;width:15%&quot;&gt;Время&lt;/th&gt;&lt;th style=&quot;width:17%&quot;&gt;Состояние&lt;/th&gt;&lt;th style=&quot;width:15%&quot;&gt;Действия&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;${rows.map(j=&gt;`&lt;tr&gt;&lt;td&gt;&lt;button type=&quot;button&quot; class=&quot;e-button quiet small e-job-title&quot; data-action=&quot;job-detail&quot; data-id=&quot;${j.id}&quot;&gt;${escape(j.title)}&lt;/button&gt;&lt;small&gt;Отдельная версия&lt;/small&gt;&lt;/td&gt;&lt;td&gt;${escape(j.channelName)}&lt;/td&gt;&lt;td class=&quot;e-mono&quot;&gt;${escape(j.at)}&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;e-badge ${j.status===&#x27;error&#x27;?&#x27;bad&#x27;:j.status===&#x27;published&#x27;?&#x27;good&#x27;:&#x27;&#x27;}&quot;&gt;${status[j.status]}&lt;/span&gt;${j.status===&#x27;rendering&#x27;?`&lt;div class=&quot;e-progress&quot;&gt;&lt;span style=&quot;width:${j.progress}%&quot;&gt;&lt;/span&gt;&lt;/div&gt;`:&#x27;&#x27;}&lt;/td&gt;&lt;td&gt;&lt;div class=&quot;e-row&quot;&gt;${j.status===&#x27;error&#x27;?button(&#x27;Повторить&#x27;,&#x27;job-retry&#x27;,&#x27;small&#x27;,`data-id=&quot;${j.id}&quot;`):&#x27;&#x27;}${button(&#x27;×&#x27;,&#x27;job-delete&#x27;,&#x27;small&#x27;,`data-id=&quot;${j.id}&quot; aria-label=&quot;Удалить задачу ${escape(j.title)} для ${escape(j.channelName)}&quot;`)}&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;`).join(&#x27;&#x27;)}&lt;/tbody&gt;&lt;/table&gt;&lt;div class=&quot;e-pager&quot;&gt;${button(&#x27;←&#x27;,&#x27;queue-page&#x27;,&#x27;small&#x27;,`data-delta=&quot;-1&quot; aria-label=&quot;Предыдущая страница&quot; ${this.s.queuePage===0?&#x27;disabled&#x27;:&#x27;&#x27;}`)}&lt;span class=&quot;e-mono e-muted&quot;&gt;${this.s.queuePage+1} / ${pages} · ${filtered.length} задач&lt;/span&gt;${button(&#x27;→&#x27;,&#x27;queue-page&#x27;,&#x27;small&#x27;,`data-delta=&quot;1&quot; aria-label=&quot;Следующая страница&quot; ${this.s.queuePage===pages-1?&#x27;disabled&#x27;:&#x27;&#x27;}`)}&lt;/div&gt;`:`&lt;div class=&quot;e-empty&quot;&gt;&lt;h2&gt;${this.s.jobs.length?&#x27;Нет задач с таким состоянием&#x27;:&#x27;Пока ничего в очереди&#x27;}&lt;/h2&gt;&lt;p&gt;Добавь пакет из монтажной или создай демонстрационный.&lt;/p&gt;${button(this.s.jobs.length?&#x27;Показать все&#x27;:&#x27;Добавить демопакет&#x27;,this.s.jobs.length?&#x27;queue-filter-reset&#x27;:&#x27;queue-demo&#x27;,&#x27;primary&#x27;)}&lt;/div&gt;`}&lt;/main&gt;`;}
+  renderQueue(){if(this.s.view===&#x27;queue&#x27;){this.q(&#x27;[data-view-root]&#x27;).innerHTML=this.queue();this.icons();}this.updateCount();}
+  stopWorker(){clearInterval(this.worker);this.worker=null;this.s.running=false;}
+  toggleWorker(){if(this.s.running){this.stopWorker();this.renderQueue();this.tell(&#x27;Демоочередь на паузе.&#x27;);return;}if(!this.s.jobs.some(j=&gt;[&#x27;pending&#x27;,&#x27;rendering&#x27;,&#x27;scheduled&#x27;].includes(j.status))){this.tell(&#x27;Нет задач для запуска. Ошибочные задачи можно повторить.&#x27;);return;}this.s.running=true;this.worker=setInterval(()=&gt;{if(this.el.closest(&#x27;[data-variant]&#x27;).hidden){this.stopWorker();this.renderQueue();return;}const j=this.s.jobs.find(x=&gt;[&#x27;pending&#x27;,&#x27;rendering&#x27;,&#x27;scheduled&#x27;].includes(x.status));if(!j){this.stopWorker();this.renderQueue();this.tell(&#x27;Демоцикл завершён. Ни один ролик не был отправлен в соцсети.&#x27;);return;}if(j.status===&#x27;pending&#x27;){j.status=&#x27;rendering&#x27;;j.progress=35;}else if(j.status===&#x27;rendering&#x27;){j.progress+=35;if(j.progress&gt;=100)j.status=&#x27;scheduled&#x27;;}else j.status=&#x27;published&#x27;;this.renderQueue();},450);this.renderQueue();this.tell(&#x27;Демонстрация: обработка → расписание → опубликовано. Время здесь ускорено.&#x27;);}
+  jobDialog(id){const j=this.s.jobs.find(x=&gt;x.id===id);if(!j)return;this.dialog(&#x27;Детали демозадачи&#x27;,`&lt;p&gt;&lt;strong style=&quot;color:var(--e-text)&quot;&gt;${escape(j.title)}&lt;/strong&gt;&lt;br&gt;${escape(j.channelName)}&lt;/p&gt;&lt;p&gt;Баннер: ${clock(j.config.start)}, длительность ${j.config.duration} с, ширина ${j.config.width}%.&lt;/p&gt;&lt;p&gt;Яркость: ${j.config.brightness}; контраст: ${j.config.contrast}%.&lt;/p&gt;&lt;label class=&quot;e-label&quot;&gt;&lt;span&gt;Описание&lt;/span&gt;&lt;textarea class=&quot;e-field&quot; readonly&gt;${escape(j.caption)}&lt;/textarea&gt;&lt;/label&gt;&lt;p&gt;Это локальная демозадача; URL публикации не создаётся.&lt;/p&gt;`,&#x27;&#x27;);}
+  channels(){const pages=Math.max(1,Math.ceil(this.s.channels.length/6)),page=Math.max(0,Math.min(pages-1,this.s.channelPage||0));this.s.channelPage=page;return `&lt;main class=&quot;e-content&quot;&gt;&lt;div class=&quot;e-page-head&quot;&gt;&lt;div&gt;&lt;h1&gt;Каналы и доступы&lt;/h1&gt;&lt;p&gt;Демонстрационные подключения, без паролей и токенов.&lt;/p&gt;&lt;/div&gt;${button(icon(&#x27;plus&#x27;)+&#x27; Добавить канал&#x27;,&#x27;channel-add&#x27;,&#x27;primary&#x27;)}&lt;/div&gt;&lt;div class=&quot;e-channel-list&quot;&gt;${this.s.channels.slice(page*6,page*6+6).map(ch=&gt;`&lt;article class=&quot;e-channel&quot;&gt;&lt;div class=&quot;e-row e-between&quot;&gt;&lt;div class=&quot;e-row&quot;&gt;&lt;span class=&quot;e-avatar&quot;&gt;${ch.platform}&lt;/span&gt;&lt;div&gt;&lt;h3&gt;${escape(ch.name)}&lt;/h3&gt;&lt;span class=&quot;e-small e-muted&quot;&gt;${ch.platform===&#x27;TT&#x27;?&#x27;TikTok&#x27;:&#x27;YouTube Shorts&#x27;}&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;span class=&quot;e-badge ${ch.connected?&#x27;good&#x27;:&#x27;bad&#x27;}&quot;&gt;${ch.connected?&#x27;Доступ есть&#x27;:&#x27;Нужен вход&#x27;}&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;e-row&quot;&gt;${button(ch.enabled?&#x27;В сетке ✓&#x27;:&#x27;Не участвует&#x27;,&#x27;channel-toggle&#x27;,&#x27;small&#x27;,`data-id=&quot;${ch.id}&quot; aria-pressed=&quot;${ch.enabled}&quot;`)}${button(ch.connected?&#x27;Отключить доступ&#x27;:&#x27;Подключить&#x27;,&#x27;channel-connect&#x27;,&#x27;small&#x27;,`data-id=&quot;${ch.id}&quot;`)}${button(&#x27;Удалить&#x27;,&#x27;channel-delete&#x27;,&#x27;small danger&#x27;,`data-id=&quot;${ch.id}&quot;`)}&lt;/div&gt;&lt;/article&gt;`).join(&#x27;&#x27;)}&lt;/div&gt;${pages&gt;1?`&lt;div class=&quot;e-pager&quot;&gt;${button(&#x27;←&#x27;,&#x27;channel-page&#x27;,&#x27;small&#x27;,`data-delta=&quot;-1&quot; aria-label=&quot;Предыдущие каналы&quot; ${page===0?&#x27;disabled&#x27;:&#x27;&#x27;}`)}&lt;span class=&quot;e-mono e-muted&quot;&gt;${page+1} / ${pages} · ${this.s.channels.length} каналов&lt;/span&gt;${button(&#x27;→&#x27;,&#x27;channel-page&#x27;,&#x27;small&#x27;,`data-delta=&quot;1&quot; aria-label=&quot;Следующие каналы&quot; ${page===pages-1?&#x27;disabled&#x27;:&#x27;&#x27;}`)}&lt;/div&gt;`:&#x27;&#x27;}&lt;/main&gt;`;}
+  stats(){const factor=Number(this.s.statsPeriod)/7,rows=this.s.channels.filter(ch=&gt;this.s.statsPlatform===&#x27;all&#x27;||ch.platform===this.s.statsPlatform).map((ch,i)=&gt;({ch,views:Math.round(([12400,8100,5600,9800,7200,4100][i%6]+this.s.refresh*132)*factor)})),total=rows.reduce((sum,x)=&gt;sum+x.views,0),max=Math.max(...rows.map(x=&gt;x.views),1),pages=Math.max(1,Math.ceil(rows.length/6)),page=Math.max(0,Math.min(pages-1,this.s.statsPage||0));this.s.statsPage=page;return `&lt;main class=&quot;e-content&quot;&gt;&lt;div class=&quot;e-page-head&quot;&gt;&lt;div&gt;&lt;h1&gt;Статистика сетки&lt;/h1&gt;&lt;p&gt;Условные показатели для проверки интерфейса.&lt;/p&gt;&lt;/div&gt;${button(icon(&#x27;refresh-cw&#x27;)+&#x27; Обновить демо&#x27;,&#x27;stats-refresh&#x27;)}&lt;/div&gt;&lt;div class=&quot;e-toolbar&quot;&gt;&lt;select class=&quot;e-field&quot; data-stat=&quot;statsPlatform&quot; aria-label=&quot;Платформа статистики&quot;&gt;${option(&#x27;all&#x27;,&#x27;Обе платформы&#x27;,this.s.statsPlatform)}${option(&#x27;TT&#x27;,&#x27;Только TikTok&#x27;,this.s.statsPlatform)}${option(&#x27;YT&#x27;,&#x27;Только YouTube&#x27;,this.s.statsPlatform)}&lt;/select&gt;&lt;select class=&quot;e-field&quot; data-stat=&quot;statsPeriod&quot; aria-label=&quot;Период статистики&quot;&gt;${option(&#x27;1&#x27;,&#x27;За сутки&#x27;,this.s.statsPeriod)}${option(&#x27;7&#x27;,&#x27;За 7 дней&#x27;,this.s.statsPeriod)}${option(&#x27;30&#x27;,&#x27;За 30 дней&#x27;,this.s.statsPeriod)}&lt;/select&gt;&lt;/div&gt;&lt;div class=&quot;e-summary&quot;&gt;&lt;div class=&quot;e-stat&quot;&gt;&lt;span&gt;Просмотры · демо&lt;/span&gt;&lt;strong&gt;${fmt(total)}&lt;/strong&gt;&lt;/div&gt;&lt;div class=&quot;e-stat&quot;&gt;&lt;span&gt;Лайки · демо&lt;/span&gt;&lt;strong&gt;${fmt(Math.round(total*.038))}&lt;/strong&gt;&lt;/div&gt;&lt;div class=&quot;e-stat&quot;&gt;&lt;span&gt;Каналов в отчёте&lt;/span&gt;&lt;strong&gt;${rows.length}&lt;/strong&gt;&lt;/div&gt;&lt;/div&gt;&lt;h2&gt;Просмотры по каналам&lt;/h2&gt;&lt;div class=&quot;e-bars&quot; role=&quot;img&quot; aria-label=&quot;Демонстрационное сравнение просмотров по каналам&quot;&gt;${rows.slice(page*6,page*6+6).map(({ch,views})=&gt;`&lt;div&gt;&lt;div class=&quot;e-bar-label&quot;&gt;&lt;span&gt;${ch.platform} / ${escape(ch.name)}&lt;/span&gt;&lt;strong class=&quot;e-mono&quot;&gt;${fmt(views)}&lt;/strong&gt;&lt;/div&gt;&lt;div class=&quot;e-bar-track&quot;&gt;&lt;span style=&quot;width:${views/max*100}%&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;`).join(&#x27;&#x27;)}&lt;/div&gt;${pages&gt;1?`&lt;div class=&quot;e-pager&quot;&gt;${button(&#x27;←&#x27;,&#x27;stats-page&#x27;,&#x27;small&#x27;,`data-delta=&quot;-1&quot; aria-label=&quot;Предыдущие показатели&quot; ${page===0?&#x27;disabled&#x27;:&#x27;&#x27;}`)}&lt;span class=&quot;e-mono e-muted&quot;&gt;${page+1} / ${pages}&lt;/span&gt;${button(&#x27;→&#x27;,&#x27;stats-page&#x27;,&#x27;small&#x27;,`data-delta=&quot;1&quot; aria-label=&quot;Следующие показатели&quot; ${page===pages-1?&#x27;disabled&#x27;:&#x27;&#x27;}`)}&lt;/div&gt;`:&#x27;&#x27;}&lt;/main&gt;`;}
+  settings(){const s=this.s.settings;return `&lt;main class=&quot;e-content&quot;&gt;&lt;div class=&quot;e-page-head&quot;&gt;&lt;div&gt;&lt;h1&gt;Настройки программы&lt;/h1&gt;&lt;p&gt;Выборы сохраняются в состоянии прототипа.&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;e-settings&quot;&gt;&lt;h2&gt;Экспорт и расписание&lt;/h2&gt;&lt;label class=&quot;e-label&quot;&gt;&lt;span&gt;Кодировщик&lt;/span&gt;&lt;select class=&quot;e-field&quot; data-setting=&quot;encoder&quot;&gt;${option(&#x27;auto&#x27;,&#x27;Автоматический выбор&#x27;,s.encoder)}${option(&#x27;cpu&#x27;,&#x27;Программный H.264&#x27;,s.encoder)}${option(&#x27;gpu&#x27;,&#x27;Аппаратный — если доступен&#x27;,s.encoder)}&lt;/select&gt;&lt;/label&gt;&lt;label class=&quot;e-label&quot;&gt;&lt;span&gt;Качество видео&lt;/span&gt;&lt;select class=&quot;e-field&quot; data-setting=&quot;quality&quot;&gt;${option(&#x27;high&#x27;,&#x27;Высокое&#x27;,s.quality)}${option(&#x27;balanced&#x27;,&#x27;Баланс качества и размера&#x27;,s.quality)}&lt;/select&gt;&lt;/label&gt;&lt;label class=&quot;e-label&quot;&gt;&lt;span&gt;Интервал между каналами, мин&lt;/span&gt;&lt;input class=&quot;e-field&quot; type=&quot;number&quot; min=&quot;5&quot; max=&quot;180&quot; value=&quot;${s.interval}&quot; data-setting=&quot;interval&quot;&gt;&lt;/label&gt;&lt;label class=&quot;e-label&quot;&gt;&lt;span&gt;Часовой пояс&lt;/span&gt;&lt;select class=&quot;e-field&quot; data-setting=&quot;timezone&quot;&gt;${option(&#x27;Europe/Moscow&#x27;,&#x27;Москва · UTC+3&#x27;,s.timezone)}${option(&#x27;UTC&#x27;,&#x27;UTC&#x27;,s.timezone)}&lt;/select&gt;&lt;/label&gt;&lt;label class=&quot;e-check&quot;&gt;&lt;input type=&quot;checkbox&quot; data-setting=&quot;notifications&quot; ${s.notifications?&#x27;checked&#x27;:&#x27;&#x27;}&gt; Показывать уведомления о завершении&lt;/label&gt;&lt;div class=&quot;e-row&quot; style=&quot;margin-top:23px&quot;&gt;${button(&#x27;Сохранить настройки&#x27;,&#x27;settings-save&#x27;,&#x27;primary&#x27;)}${button(&#x27;Сбросить демо&#x27;,&#x27;reset-demo&#x27;,&#x27;danger&#x27;)}&lt;/div&gt;&lt;hr class=&quot;e-divider&quot;&gt;&lt;h3&gt;Граница прототипа&lt;/h3&gt;&lt;p class=&quot;e-small e-muted&quot; style=&quot;margin-top:10px&quot;&gt;Можно открыть свои видео и изображения локально, менять предпросмотр и проверять сценарии. Экспорт, FFmpeg, OAuth и реальные публикации подключаются на этапе разработки приложения.&lt;/p&gt;&lt;/div&gt;&lt;/main&gt;`;}
+  dialog(title,content,actions){const layer=this.q(&#x27;[data-dialog]&#x27;);this.pause();this.lastFocus=document.activeElement;this.q(&#x27;.e-layout&#x27;).inert=true;this.q(&#x27;.e-head&#x27;).inert=true;layer.hidden=false;layer.innerHTML=`&lt;div class=&quot;e-dialog&quot; role=&quot;dialog&quot; aria-modal=&quot;true&quot; aria-labelledby=&quot;${this.id}-dialog-title&quot;&gt;&lt;div class=&quot;e-row e-between&quot;&gt;&lt;h2 id=&quot;${this.id}-dialog-title&quot;&gt;${escape(title)}&lt;/h2&gt;${button(&#x27;×&#x27;,&#x27;close-dialog&#x27;,&#x27;quiet small&#x27;,&#x27;aria-label=&quot;Закрыть окно&quot;&#x27;)}&lt;/div&gt;${content}&lt;div class=&quot;e-modal-error&quot; data-modal-error role=&quot;alert&quot;&gt;&lt;/div&gt;&lt;div class=&quot;e-row&quot;&gt;${button(&#x27;Закрыть&#x27;,&#x27;close-dialog&#x27;)}${actions}&lt;/div&gt;&lt;/div&gt;`;layer.onkeydown=e=&gt;{if(e.key!==&#x27;Tab&#x27;)return;const items=[...layer.querySelectorAll(&#x27;button,input,select,textarea&#x27;)].filter(x=&gt;!x.disabled),first=items[0],last=items.at(-1);if(e.shiftKey&amp;&amp;document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&amp;&amp;document.activeElement===last){e.preventDefault();first.focus();}};this.icons();requestAnimationFrame(()=&gt;layer.querySelector(&#x27;input,select,textarea,button&#x27;)?.focus());}
+  modalError(message){this.q(&#x27;[data-modal-error]&#x27;).textContent=message;}
+  closeDialog(){const layer=this.q(&#x27;[data-dialog]&#x27;);if(layer.hidden)return;layer.hidden=true;layer.innerHTML=&#x27;&#x27;;layer.onkeydown=null;this.q(&#x27;.e-layout&#x27;).inert=false;this.q(&#x27;.e-head&#x27;).inert=false;if(this.lastFocus?.isConnected)this.lastFocus.focus();}
+ }
+ instances.push(new Editor(document.getElementById(&#x27;ed-classic&#x27;),&#x27;classic&#x27;));
+ let iconAttempts=0;const iconTimer=setInterval(()=&gt;{iconAttempts++;if(globalThis.lucide){instances.forEach(app=&gt;app.icons());clearInterval(iconTimer);}else if(iconAttempts&gt;=12)clearInterval(iconTimer);},250);
+ window.addEventListener(&#x27;openai:set_globals&#x27;,e=&gt;{const saved=e.detail?.globals?.widgetState?.privateContent?.editors;if(!Array.isArray(saved)||ownSnapshots.has(JSON.stringify(saved)))return;instances.forEach(app=&gt;{app.applySaved(saved.find(x=&gt;x.id===app.id));app.renderView();});});
+})();
+&lt;/script&gt;
+
+&lt;script src=&quot;https://unpkg.com/@floating-ui/core@1.7.3/dist/floating-ui.core.umd.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://unpkg.com/@floating-ui/dom@1.7.4/dist/floating-ui.dom.umd.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+(() =&gt; {
+  if (window.FloatingUIDOM == null) {
+    return;
+  }
+  const { autoUpdate, computePosition, flip, offset, shift, size } =
+    window.FloatingUIDOM;
+  const tooltipPlacements = new Set([&quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, &quot;left&quot;]);
+  const tooltipId = `codex-visualization-tooltip-${
+    window.crypto?.randomUUID?.() ?? Date.now().toString(36)
+  }`;
+  const tooltipGap = 5;
+  const hoverDelay = 700;
+  const skipDelay = 300;
+  let activeTrigger = null;
+  let pendingTrigger = null;
+  let tooltip = null;
+  let openTimeout = null;
+  let autoUpdateCleanup = null;
+  let positionRequest = 0;
+  let skipDelayUntil = 0;
+  let lastPointerWasTouch = false;
+  let pinnedByTouch = false;
+
+  const getTrigger = (event) =&gt; {
+    for (const target of event.composedPath()) {
+      if (target?.nodeType === Node.ELEMENT_NODE) {
+        const trigger = target.closest(&quot;[data-tooltip]&quot;);
+        if (trigger) return trigger;
+      }
+    }
+    return null;
+  };
+  const containsTarget = (trigger, target) =&gt;
+    target?.nodeType != null &amp;&amp; trigger.contains(target);
+  const getContent = (trigger) =&gt;
+    trigger.getAttribute(&quot;data-tooltip&quot;)?.trim() ?? &quot;&quot;;
+  const getPlacement = (trigger) =&gt; {
+    const placement = trigger.getAttribute(&quot;data-tooltip-placement&quot;);
+    return tooltipPlacements.has(placement) ? placement : &quot;top&quot;;
+  };
+  const getTooltip = () =&gt; {
+    if (tooltip == null) {
+      tooltip = document.createElement(&quot;div&quot;);
+      tooltip.id = tooltipId;
+      tooltip.className = &quot;tooltip&quot;;
+      tooltip.setAttribute(&quot;role&quot;, &quot;tooltip&quot;);
+    }
+    return tooltip;
+  };
+  const setDescribedBy = (trigger, described) =&gt; {
+    const ids = new Set(
+      (trigger.getAttribute(&quot;aria-describedby&quot;) ?? &quot;&quot;)
+        .split(/\s+/)
+        .filter(Boolean),
+    );
+    if (described) {
+      ids.add(tooltipId);
+    } else {
+      ids.delete(tooltipId);
+    }
+    if (ids.size === 0) {
+      trigger.removeAttribute(&quot;aria-describedby&quot;);
+    } else {
+      trigger.setAttribute(&quot;aria-describedby&quot;, [...ids].join(&quot; &quot;));
+    }
+  };
+  const clearOpenTimeout = () =&gt; {
+    if (openTimeout != null) {
+      window.clearTimeout(openTimeout);
+      openTimeout = null;
+    }
+    pendingTrigger = null;
+  };
+  const closeTooltip = (activateSkipDelay = true) =&gt; {
+    clearOpenTimeout();
+    pinnedByTouch = false;
+    positionRequest += 1;
+    autoUpdateCleanup?.();
+    autoUpdateCleanup = null;
+    if (activeTrigger == null) {
+      return;
+    }
+    setDescribedBy(activeTrigger, false);
+    activeTrigger = null;
+    tooltip?.remove();
+    if (activateSkipDelay) {
+      skipDelayUntil = Date.now() + skipDelay;
+    }
+  };
+  const updatePosition = (trigger, floating) =&gt; {
+    const request = ++positionRequest;
+    void computePosition(trigger, floating, {
+      middleware: [
+        offset(tooltipGap),
+        flip({ padding: tooltipGap }),
+        shift({ padding: tooltipGap }),
+        size({
+          padding: tooltipGap,
+          apply({ availableHeight, availableWidth, elements }) {
+            elements.floating.style.setProperty(
+              &quot;--tooltip-available-width&quot;,
+              `${Math.max(0, availableWidth)}px`,
+            );
+            elements.floating.style.setProperty(
+              &quot;--tooltip-available-height&quot;,
+              `${Math.max(0, availableHeight)}px`,
+            );
+          },
+        }),
+      ],
+      placement: getPlacement(trigger),
+      strategy: &quot;fixed&quot;,
+    })
+      .then(({ x, y }) =&gt; {
+        if (activeTrigger !== trigger || request !== positionRequest) {
+          return;
+        }
+        const scale = window.devicePixelRatio || 1;
+        floating.style.transform = `translate(${Math.round(x * scale) / scale}px, ${Math.round(y * scale) / scale}px)`;
+        floating.style.visibility = &quot;visible&quot;;
+      })
+      .catch(() =&gt; {
+        if (activeTrigger === trigger &amp;&amp; request === positionRequest) {
+          closeTooltip(false);
+        }
+      });
+  };
+  const openTooltip = (trigger) =&gt; {
+    const content = getContent(trigger);
+    if (!trigger.isConnected || content.length === 0) {
+      return;
+    }
+    clearOpenTimeout();
+    if (activeTrigger === trigger) {
+      return;
+    }
+    closeTooltip();
+    const floating = getTooltip();
+    floating.textContent = content;
+    floating.style.visibility = &quot;hidden&quot;;
+    floating.style.transform = &quot;translate(0, 0)&quot;;
+    document.body.appendChild(floating);
+    activeTrigger = trigger;
+    setDescribedBy(trigger, true);
+    autoUpdateCleanup = autoUpdate(trigger, floating, () =&gt; {
+      updatePosition(trigger, floating);
+    });
+  };
+  const requestOpen = (trigger, immediate = false) =&gt; {
+    if (
+      getContent(trigger).length === 0 ||
+      activeTrigger === trigger ||
+      pendingTrigger === trigger
+    ) {
+      return;
+    }
+    clearOpenTimeout();
+    pendingTrigger = trigger;
+    const delay =
+      immediate || activeTrigger != null || Date.now() &lt; skipDelayUntil
+        ? 0
+        : hoverDelay;
+    if (delay === 0) {
+      openTooltip(trigger);
+      return;
+    }
+    openTimeout = window.setTimeout(() =&gt; {
+      openTimeout = null;
+      pendingTrigger = null;
+      openTooltip(trigger);
+    }, delay);
+  };
+  const handlePointerOpen = (event) =&gt; {
+    if (event.pointerType === &quot;touch&quot;) {
+      return;
+    }
+    const trigger = getTrigger(event);
+    if (trigger == null || containsTarget(trigger, event.relatedTarget)) {
+      return;
+    }
+    requestOpen(trigger);
+  };
+  const handlePointer = (event) =&gt; {
+    lastPointerWasTouch =
+      event.type === &quot;pointerdown&quot; &amp;&amp; event.pointerType === &quot;touch&quot;;
+  };
+  const handleTouchClick = (event) =&gt; {
+    const isTouch = event.pointerType === &quot;touch&quot; || lastPointerWasTouch;
+    lastPointerWasTouch = false;
+    if (!isTouch || event.detail === 0) {
+      return;
+    }
+    const trigger = getTrigger(event);
+    if (
+      trigger == null ||
+      !trigger.isConnected ||
+      getContent(trigger).length === 0 ||
+      (pinnedByTouch &amp;&amp; activeTrigger === trigger)
+    ) {
+      if (pinnedByTouch) {
+        closeTooltip();
+      }
+      return;
+    }
+    openTooltip(trigger);
+    pinnedByTouch = activeTrigger === trigger;
+    window.setTimeout(() =&gt; {
+      if (activeTrigger === trigger &amp;&amp; !trigger.isConnected) {
+        closeTooltip(false);
+      }
+    }, 0);
+  };
+  const handleLeave = (event) =&gt; {
+    if (pinnedByTouch) {
+      return;
+    }
+    const trigger = getTrigger(event);
+    if (trigger == null || containsTarget(trigger, event.relatedTarget)) {
+      return;
+    }
+    if (activeTrigger === trigger || pendingTrigger === trigger) {
+      closeTooltip();
+    }
+  };
+  const handleFocusIn = (event) =&gt; {
+    const trigger = getTrigger(event);
+    if (trigger?.matches(&quot;:focus-visible&quot;)) {
+      requestOpen(trigger, true);
+    }
+  };
+  const handleKeyDown = (event) =&gt; {
+    if (event.key === &quot;Escape&quot;) {
+      closeTooltip();
+    }
+  };
+  const handleContextMenu = (event) =&gt; {
+    lastPointerWasTouch = false;
+    const trigger = getTrigger(event);
+    if (activeTrigger === trigger || pendingTrigger === trigger) {
+      closeTooltip();
+    }
+  };
+  const handlers = {
+    pointerover: handlePointerOpen,
+    pointerdown: handlePointer,
+    pointercancel: handlePointer,
+    click: handleTouchClick,
+    pointerout: handleLeave,
+    focusin: handleFocusIn,
+    focusout: handleLeave,
+    keydown: handleKeyDown,
+    contextmenu: handleContextMenu,
+  };
+  const roots = new Map();
+  const handledEvents = new WeakSet();
+  const handleEvent = (event) =&gt; {
+    if (handledEvents.has(event)) return;
+    handledEvents.add(event);
+    handlers[event.type](event);
+  };
+  const discoverRoots = (node) =&gt; {
+    if (node.shadowRoot) listen(node.shadowRoot);
+    for (const element of node.querySelectorAll(&quot;*&quot;)) {
+      if (element.shadowRoot) listen(element.shadowRoot);
+    }
+  };
+  const listen = (root) =&gt; {
+    if (roots.has(root)) return;
+    for (const type of Object.keys(handlers)) root.addEventListener(type, handleEvent);
+    const observer = new window.MutationObserver((records) =&gt; {
+      for (const { addedNodes } of records) {
+        for (const node of addedNodes) {
+          if (node.nodeType === Node.ELEMENT_NODE) discoverRoots(node);
+        }
+      }
+      for (const [root, cleanup] of roots) {
+        if (root.host &amp;&amp; !root.host.isConnected) {
+          cleanup();
+          roots.delete(root);
+        }
+      }
+      if (activeTrigger &amp;&amp; !activeTrigger.isConnected) closeTooltip(false);
+    });
+    observer.observe(root, { childList: true, subtree: true });
+    roots.set(root, () =&gt; {
+      observer.disconnect();
+      for (const type of Object.keys(handlers)) root.removeEventListener(type, handleEvent);
+    });
+    discoverRoots(root);
+  };
+  const destroy = () =&gt; {
+    closeTooltip(false);
+    lastPointerWasTouch = false;
+    for (const cleanup of roots.values()) cleanup();
+    roots.clear();
+    tooltip = null;
+  };
+
+  // Events between children of one shadow root never reach the document.
+  listen(document);
+  window.addEventListener(&quot;pagehide&quot;, destroy, { once: true });
+})();
+&lt;/script&gt;
+&lt;script id=&quot;codex-visualization-tabs&quot;&gt;
+(() =&gt; {
+  const selector = &#x27;.nav[role=&quot;tablist&quot;] [role=&quot;tab&quot;]&#x27;;
+  const disabled = &#x27;:disabled,[aria-disabled=&quot;true&quot;]&#x27;;
+  const selectTab = (selected) =&gt; {
+    const panelId = selected.getAttribute(&quot;aria-controls&quot;);
+    for (const tab of selected.closest(&#x27;[role=&quot;tablist&quot;]&#x27;).querySelectorAll(&#x27;[role=&quot;tab&quot;]&#x27;)) {
+      const active = tab === selected;
+      tab.classList.toggle(&quot;active&quot;, active);
+      tab.setAttribute(&quot;aria-selected&quot;, String(active));
+      const id = tab.getAttribute(&quot;aria-controls&quot;);
+      const panel = id &amp;&amp; document.getElementById(id);
+      if (panel != null) {
+        panel.hidden = id !== panelId;
+        if (!panel.hidden &amp;&amp; selected.id) {
+          panel.setAttribute(&quot;aria-labelledby&quot;, selected.id);
+        }
+      }
+    }
+  };
+  const interact = (event) =&gt; {
+    const tab = event.target?.closest?.(selector);
+    if (event.defaultPrevented || tab == null || tab.matches(disabled)) {
+      return;
+    }
+    if (event.type === &quot;click&quot;) {
+      selectTab(tab);
+      return;
+    }
+    const tabs = Array.from(
+      tab.closest(&#x27;[role=&quot;tablist&quot;]&#x27;).querySelectorAll(&#x27;[role=&quot;tab&quot;]&#x27;),
+    ).filter((candidate) =&gt; !candidate.matches(disabled));
+    const current = tabs.indexOf(tab);
+    let next;
+    if (event.key === &quot;ArrowRight&quot; || event.key === &quot;ArrowDown&quot;) {
+      next = (current + 1) % tabs.length;
+    } else if (event.key === &quot;ArrowLeft&quot; || event.key === &quot;ArrowUp&quot;) {
+      next = (current + tabs.length - 1) % tabs.length;
+    } else if (event.key === &quot;Home&quot;) {
+      next = 0;
+    } else if (event.key === &quot;End&quot;) {
+      next = tabs.length - 1;
+    } else {
+      return;
+    }
+    event.preventDefault();
+    tabs[next].focus();
+    selectTab(tabs[next]);
+  };
+
+  for (const list of document.querySelectorAll(&#x27;.nav[role=&quot;tablist&quot;]&#x27;)) {
+    const selected =
+      list.querySelector(&#x27;[role=&quot;tab&quot;][aria-selected=&quot;true&quot;]&#x27;) ??
+      list.querySelector(&#x27;[role=&quot;tab&quot;].active&#x27;) ??
+      list.querySelector(&#x27;[role=&quot;tab&quot;]&#x27;);
+    if (selected != null) {
+      selectTab(selected);
+    }
+  }
+  document.addEventListener(&quot;click&quot;, interact);
+  document.addEventListener(&quot;keydown&quot;, interact);
+  window.addEventListener(&quot;pagehide&quot;, () =&gt; {
+    document.removeEventListener(&quot;click&quot;, interact);
+    document.removeEventListener(&quot;keydown&quot;, interact);
+  }, { once: true });
+})();
+&lt;/script&gt;
+&lt;script id=&quot;codex-visualization-carousel&quot;&gt;
+  (() =&gt; {
+    for (const root of document.querySelectorAll(&quot;.viz-carousel&quot;)) {
+      const panels = Array.from(
+        root.querySelectorAll(&quot;:scope &gt; [data-variant]&quot;),
+      );
+      if (panels.length === 0) {
+        continue;
+      }
+      root.setAttribute(&quot;role&quot;, &quot;group&quot;);
+      panels.forEach((panel, index) =&gt; {
+        panel.hidden = index !== 0;
+        panel.setAttribute(&quot;role&quot;, &quot;group&quot;);
+        if (!panel.hasAttribute(&quot;aria-label&quot;)) {
+          panel.setAttribute(&quot;aria-label&quot;, panel.dataset.variant);
+        }
+      });
+      root.dataset.activeVariant = panels[0].dataset.variant;
+      if (panels.length === 1) {
+        continue;
+      }
+
+      const controls = document.createElement(&quot;div&quot;);
+      controls.className = &quot;viz-carousel-controls&quot;;
+      // Portable copy of the settings dropdown&#x27;s legacy glyph; no 14px icon-package preset matches it.
+      // https://github.com/openai/openai/blob/master/codex/codex-apps/webview/src/icons/chevron.svg
+      controls.innerHTML = `
+      &lt;button type=&quot;button&quot; class=&quot;viz-carousel-previous cursor-interaction&quot;&gt;&lt;i data-lucide=&quot;chevron-left&quot; aria-hidden=&quot;true&quot;&gt;&lt;/i&gt;&lt;/button&gt;
+      &lt;details class=&quot;viz-carousel-picker&quot;&gt;
+        &lt;summary class=&quot;cursor-interaction&quot;&gt;
+          &lt;span class=&quot;viz-carousel-count tabular-nums&quot;&gt;&lt;/span&gt;
+          &lt;span class=&quot;viz-carousel-name&quot;&gt;&lt;/span&gt;
+          &lt;svg class=&quot;viz-carousel-caret&quot; width=&quot;14&quot; height=&quot;14&quot; viewBox=&quot;0 0 20 21&quot; fill=&quot;none&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;&gt;
+            &lt;path d=&quot;M15.2793 7.71101C15.539 7.45131 15.961 7.45131 16.2207 7.71101C16.4804 7.97071 16.4804 8.39272 16.2207 8.65242L10.4707 14.4024C10.211 14.6621 9.78902 14.6621 9.52932 14.4024L3.77932 8.65242L3.69436 8.54792C3.52385 8.28979 3.55205 7.93828 3.77932 7.71101C4.00659 7.48374 4.3581 7.45554 4.61623 7.62605L4.72073 7.71101L10 12.9903L15.2793 7.71101Z&quot; fill=&quot;currentColor&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;0.6&quot; /&gt;
+          &lt;/svg&gt;
+        &lt;/summary&gt;
+        &lt;div class=&quot;viz-carousel-options&quot;&gt;&lt;/div&gt;
+      &lt;/details&gt;
+      &lt;button type=&quot;button&quot; class=&quot;viz-carousel-next cursor-interaction&quot;&gt;&lt;i data-lucide=&quot;chevron-right&quot; aria-hidden=&quot;true&quot;&gt;&lt;/i&gt;&lt;/button&gt;`;
+      const previous = controls.querySelector(&quot;.viz-carousel-previous&quot;);
+      const next = controls.querySelector(&quot;.viz-carousel-next&quot;);
+      const picker = controls.querySelector(&quot;.viz-carousel-picker&quot;);
+      const summary = picker.querySelector(&quot;summary&quot;);
+      const count = controls.querySelector(&quot;.viz-carousel-count&quot;);
+      const name = controls.querySelector(&quot;.viz-carousel-name&quot;);
+      const options = controls.querySelector(&quot;.viz-carousel-options&quot;);
+      const status = document.createElement(&quot;span&quot;);
+      status.className = &quot;sr-only&quot;;
+      status.setAttribute(&quot;role&quot;, &quot;status&quot;);
+      status.setAttribute(&quot;aria-live&quot;, &quot;polite&quot;);
+      status.setAttribute(&quot;aria-atomic&quot;, &quot;true&quot;);
+      previous.setAttribute(
+        &quot;aria-label&quot;,
+        root.dataset.previousLabel ?? &quot;Previous variant&quot;,
+      );
+      next.setAttribute(&quot;aria-label&quot;, root.dataset.nextLabel ?? &quot;Next variant&quot;);
+
+      let active = 0;
+      let mousePointerId = null;
+      let summaryPointerHandled = false;
+      summary.addEventListener(&quot;pointerdown&quot;, (event) =&gt; {
+        summaryPointerHandled =
+          event.pointerType === &quot;mouse&quot; &amp;&amp; event.button === 0 &amp;&amp; !event.ctrlKey;
+        if (!summaryPointerHandled) {
+          return;
+        }
+        event.preventDefault();
+        summary.focus({ preventScroll: true });
+        picker.open = !picker.open;
+        mousePointerId = picker.open ? event.pointerId : null;
+      });
+      summary.addEventListener(&quot;click&quot;, (event) =&gt; {
+        if (summaryPointerHandled &amp;&amp; event.detail &gt; 0) {
+          event.preventDefault();
+        }
+      });
+      const choices = panels.map((panel, index) =&gt; {
+        const choice = document.createElement(&quot;button&quot;);
+        choice.type = &quot;button&quot;;
+        choice.className = &quot;cursor-interaction&quot;;
+        choice.textContent = panel.dataset.variant;
+        choice.addEventListener(&quot;click&quot;, () =&gt; {
+          select(index);
+          summary.focus();
+        });
+        choice.addEventListener(&quot;pointerup&quot;, (event) =&gt; {
+          if (
+            picker.open &amp;&amp;
+            event.pointerType === &quot;mouse&quot; &amp;&amp;
+            event.button === 0 &amp;&amp;
+            event.pointerId === mousePointerId
+          ) {
+            choice.click();
+          }
+        });
+        options.appendChild(choice);
+        return choice;
+      });
+      const select = (index) =&gt; {
+        const changed = active !== index;
+        active = index;
+        panels.forEach((panel, position) =&gt; {
+          panel.hidden = position !== active;
+          choices[position].setAttribute(
+            &quot;aria-current&quot;,
+            String(position === active),
+          );
+        });
+        root.dataset.activeVariant = panels[active].dataset.variant;
+        count.textContent = `${active + 1} / ${panels.length}`;
+        name.textContent = panels[active].dataset.variant;
+        picker.open = false;
+        mousePointerId = null;
+        if (changed) {
+          status.textContent = `${count.textContent}: ${name.textContent}`;
+        }
+      };
+      previous.addEventListener(&quot;click&quot;, () =&gt;
+        select((active + panels.length - 1) % panels.length),
+      );
+      next.addEventListener(&quot;click&quot;, () =&gt;
+        select((active + 1) % panels.length),
+      );
+      picker.addEventListener(&quot;keydown&quot;, (event) =&gt; {
+        if (event.key === &quot;Escape&quot; &amp;&amp; picker.open) {
+          event.preventDefault();
+          picker.open = false;
+          mousePointerId = null;
+          summary.focus();
+          return;
+        }
+        if (event.altKey || event.ctrlKey || event.metaKey) {
+          return;
+        }
+        const index = choices.indexOf(document.activeElement);
+        let nextIndex;
+        if (event.key === &quot;ArrowDown&quot;) {
+          nextIndex = index &lt; 0 ? active : (index + 1) % choices.length;
+        } else if (event.key === &quot;ArrowUp&quot;) {
+          nextIndex = index &lt; 0 ? active : (index + choices.length - 1) % choices.length;
+        } else if (picker.open &amp;&amp; event.key === &quot;Home&quot;) {
+          nextIndex = 0;
+        } else if (picker.open &amp;&amp; event.key === &quot;End&quot;) {
+          nextIndex = choices.length - 1;
+        } else {
+          return;
+        }
+        event.preventDefault();
+        picker.open = true;
+        choices[nextIndex].focus();
+      });
+      picker.addEventListener(&quot;focusout&quot;, (event) =&gt; {
+        if (!picker.contains(event.relatedTarget)) {
+          picker.open = false;
+          mousePointerId = null;
+        }
+      });
+      const dismiss = (event) =&gt; {
+        if (!summary.contains(event.target)) {
+          mousePointerId = null;
+        }
+        if (!picker.contains(event.target)) {
+          picker.open = false;
+        }
+      };
+      const endPointerSelection = () =&gt; {
+        mousePointerId = null;
+      };
+      const sizePicker = () =&gt; {
+        root.style.setProperty(
+          &quot;--viz-carousel-picker-height&quot;,
+          `${picker.open ? options.offsetHeight : 0}px`,
+        );
+      };
+      picker.addEventListener(&quot;toggle&quot;, sizePicker);
+      window.addEventListener(&quot;resize&quot;, sizePicker);
+      document.addEventListener(&quot;pointerdown&quot;, dismiss);
+      document.addEventListener(&quot;pointerup&quot;, endPointerSelection);
+      document.addEventListener(&quot;pointercancel&quot;, endPointerSelection);
+      window.addEventListener(&quot;blur&quot;, endPointerSelection);
+      window.addEventListener(
+        &quot;pagehide&quot;,
+        () =&gt; {
+          document.removeEventListener(&quot;pointerdown&quot;, dismiss);
+          document.removeEventListener(&quot;pointerup&quot;, endPointerSelection);
+          document.removeEventListener(&quot;pointercancel&quot;, endPointerSelection);
+          window.removeEventListener(&quot;blur&quot;, endPointerSelection);
+          window.removeEventListener(&quot;resize&quot;, sizePicker);
+        },
+        { once: true },
+      );
+      root.append(controls, status);
+      select(0);
+    }
+  })();
+&lt;/script&gt;
+&lt;script id=&quot;codex-visualization-lucide&quot; async src=&quot;https://unpkg.com/lucide@1.17.0/dist/umd/lucide.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+(() =&gt; {
+  const initialize = () =&gt; {
+    globalThis.lucide?.createIcons({ attrs: { width: 16, height: 16 } });
+  };
+  if (globalThis.lucide != null) {
+    initialize();
+    return;
+  }
+  document
+    .getElementById(&quot;codex-visualization-lucide&quot;)
+    ?.addEventListener(&quot;load&quot;, initialize, { once: true });
+})();
+&lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe>
+
+<script>(() => {
+  const frame = document.getElementById("codex-visualization");
+  if (!(frame instanceof HTMLIFrameElement)) {
+    return;
+  }
+  const isShare = document.documentElement.classList.contains(
+    "visualization-share-root",
+  );
+  let viewportHeight = globalThis.innerHeight;
+  let sizeFingerprint = null;
+  let sizeWriteTimeout;
+  let lastSize = null;
+  let pendingSize = null;
+  const storageKey = `codex:visualization-widget-state-v2:${JSON.stringify([
+    globalThis.location.pathname,
+    globalThis.location.search,
+  ])}`;
+  const sizeStorageKey = `${storageKey}:share-size-v1`;
+  const parseState = (serializedState) => {
+    if (
+      typeof serializedState !== "string" ||
+      new TextEncoder().encode(serializedState).length > 16 * 1024
+    ) {
+      throw new TypeError(
+        "Widget state must be a JSON object of at most 16 KiB",
+      );
+    }
+    /** @type {unknown} */
+    const state = JSON.parse(serializedState);
+    if (
+      state == null ||
+      typeof state !== "object" ||
+      Array.isArray(state) ||
+      ("imageIds" in state &&
+        (!Array.isArray(state.imageIds) || state.imageIds.length > 0))
+    ) {
+      throw new TypeError("Widget state must be a JSON object");
+    }
+    const storedState = { modelContent: null, privateContent: null, ...state };
+    const canonicalState = JSON.stringify(
+      storedState,
+      (_key, /** @type {unknown} */ value) => {
+        if (typeof value === "number" && !Number.isFinite(value)) {
+          throw new TypeError("Widget state must contain finite numbers");
+        }
+        return value;
+      },
+    );
+    if (new TextEncoder().encode(canonicalState).length > 16 * 1024) {
+      throw new TypeError(
+        "Widget state must be a JSON object of at most 16 KiB",
+      );
+    }
+    return storedState;
+  };
+  let storage = null;
+  let state = null;
+  try {
+    const localStorage = globalThis.localStorage;
+    const probeKey = `${storageKey}:probe`;
+    localStorage.setItem(probeKey, "1");
+    localStorage.removeItem(probeKey);
+    storage = localStorage;
+    const savedState = storage.getItem(storageKey);
+    if (savedState != null) {
+      try {
+        state = parseState(savedState);
+      } catch {
+        // Invalid saved state does not disable future writes.
+      }
+    }
+  } catch {
+    storage = null;
+  }
+  const persistSize = () => {
+    globalThis.clearTimeout(sizeWriteTimeout);
+    if (pendingSize == null) {
+      return;
+    }
+    try {
+      storage?.setItem(sizeStorageKey, pendingSize);
+    } catch {
+      // A denied or full cache must not affect the visualization.
+    }
+    pendingSize = null;
+  };
+  if (isShare) {
+    globalThis.addEventListener("pagehide", persistSize);
+  }
+  const initialGlobals = {
+    widgetState: state,
+    statePersistence: storage == null ? "none" : "local",
+  };
+
+  const channel = new MessageChannel();
+  channel.port1.addEventListener("message", (event) => {
+    const data = event.data;
+    if (typeof data !== "object" || data == null) {
+      return;
+    }
+    if (data.type === "widget-state-write") {
+      if (!Number.isSafeInteger(data.id) || data.id <= 0) {
+        return;
+      }
+      let ok = false;
+      try {
+        if (storage != null) {
+          const state = parseState(data.state);
+          storage.setItem(storageKey, JSON.stringify(state));
+          ok = true;
+        }
+      } catch {
+        // Storage denial, quota limits, and invalid state return a failed receipt.
+      }
+      channel.port1.postMessage({
+        type: "widget-state-result",
+        id: data.id,
+        ok,
+      });
+      return;
+    }
+    if (data.type === "height") {
+      const height = data.height;
+      if (
+        typeof height !== "number" ||
+        !Number.isFinite(height) ||
+        height < 0
+      ) {
+        return;
+      }
+      if (height <= 10_000) {
+        const width = isShare && storage != null ? frame.clientWidth : null;
+        frame.style.height = Math.ceil(height) + "px";
+        if (isShare && storage != null) {
+          const size = JSON.stringify({
+            fingerprint: sizeFingerprint,
+            width,
+            viewportHeight: globalThis.innerHeight,
+            dark: globalThis.matchMedia("(prefers-color-scheme: dark)").matches,
+            scale: globalThis.devicePixelRatio,
+            height: Math.ceil(height),
+          });
+          if (size !== lastSize) {
+            lastSize = size;
+            pendingSize = size;
+            globalThis.clearTimeout(sizeWriteTimeout);
+            sizeWriteTimeout = globalThis.setTimeout(persistSize, 100);
+          }
+        }
+      }
+      if (isShare) {
+        // Keep unusually tall content accessible without accepting an unbounded height.
+        if (height > 10_000 && Number.parseFloat(frame.style.height) === 0) {
+          frame.style.removeProperty("height");
+        }
+        frame.scrolling = height > 10_000 ? "auto" : "no";
+        document.documentElement.classList.add("visualization-share-ready");
+      }
+      return;
+    }
+    if (data.type === "scroll-to") {
+      const top = data.top;
+      if (
+        typeof top === "number" &&
+        Number.isFinite(top) &&
+        top >= 0 &&
+        globalThis.navigator.userActivation?.isActive === true
+      ) {
+        globalThis.scrollTo({
+          top: Math.ceil(
+            globalThis.scrollY + frame.getBoundingClientRect().top + top,
+          ),
+        });
+      }
+      return;
+    }
+    if (data.type === "open-external") {
+      const rawHref = data.href;
+      if (typeof rawHref !== "string") {
+        return;
+      }
+      let href;
+      try {
+        const url = new URL(rawHref, document.baseURI);
+        if (url.protocol !== "https:") {
+          return;
+        }
+        href = url.href;
+      } catch {
+        return;
+      }
+      if (globalThis.navigator.userActivation?.isActive === true) {
+        const anchor = document.createElement("a");
+        anchor.href = href;
+        anchor.rel = "noopener noreferrer";
+        anchor.target = "_blank";
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+      }
+      return;
+    }
+    if (data.type === "follow-up") {
+      const prompt = data.prompt;
+      if (
+        typeof prompt !== "string" ||
+        globalThis.navigator.userActivation?.isActive !== true
+      ) {
+        return;
+      }
+      const title = data.title;
+      globalThis.prompt(typeof title === "string" ? title : prompt, prompt);
+    }
+  });
+  channel.port1.start();
+  const srcdoc = frame.dataset.srcdoc;
+  if (srcdoc == null) {
+    return;
+  }
+  globalThis.addEventListener("resize", () => {
+    const height = Number.parseFloat(frame.style.height);
+    if (!isShare && (!Number.isFinite(height) || height <= viewportHeight)) {
+      frame.style.removeProperty("height");
+    }
+    viewportHeight = globalThis.innerHeight;
+    channel.port1.postMessage({ type: "measure" });
+  });
+  frame.addEventListener(
+    "load",
+    () => {
+      frame.contentWindow?.postMessage(
+        { type: "codex-visualization-initialize" },
+        "*",
+        [channel.port2],
+      );
+    },
+    { once: true },
+  );
+  // Match the trusted bootstrap element, not the same text in an authored title.
+  const frameHtml = srcdoc.replace(
+    '<script type="application/json" id="codex-visualization-widget-state">__CODEX_VISUALIZATION_WIDGET_STATE__<\/script>',
+    () =>
+      '<script type="application/json" id="codex-visualization-widget-state">' +
+      JSON.stringify(initialGlobals).replaceAll("<", "\\u003c") +
+      "<\/script>",
+  );
+  if (isShare && storage != null) {
+    // Fingerprint the rendered document, including restored widget state, without
+    // storing its content. This is a layout cache, not a security identity.
+    let hash = 5381;
+    for (let index = 0; index < frameHtml.length; index += 1) {
+      hash = (hash * 33 + frameHtml.charCodeAt(index)) % 4_294_967_296;
+    }
+    sizeFingerprint = hash.toString(36);
+    try {
+      const size = JSON.parse(storage.getItem(sizeStorageKey) ?? "null");
+      if (
+        size?.fingerprint === sizeFingerprint &&
+        size.width === frame.clientWidth &&
+        size.viewportHeight === globalThis.innerHeight &&
+        size.dark ===
+          globalThis.matchMedia("(prefers-color-scheme: dark)").matches &&
+        size.scale === globalThis.devicePixelRatio &&
+        typeof size.height === "number" &&
+        Number.isFinite(size.height) &&
+        size.height >= 0 &&
+        size.height <= 10_000
+      ) {
+        frame.style.height = size.height + "px";
+      }
+    } catch {
+      // Ignore missing or invalid cache entries and measure the live frame.
+    }
+  }
+  frame.srcdoc = frameHtml;
+  delete frame.dataset.srcdoc;
+})();
+</script>
+</body>
+</html>

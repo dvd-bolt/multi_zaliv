@@ -1,0 +1,26 @@
+{
+  "activeDraft": "passed",
+  "modalErrors": "passed",
+  "singleSave": "passed",
+  "archivePreservesFiles": "passed",
+  "longNames": "passed",
+  "thirtyAccounts": "passed",
+  "previewControls": "passed",
+  "connectionRecovery": "passed",
+  "consoleExceptions": [],
+  "failedRequests": [],
+  "expectedResponses": [
+    {
+      "url": "http://127.0.0.1:8767/api/assets/e72f5a49fadb4c44844d91e57c1514a8/edit",
+      "status": 400
+    },
+    {
+      "url": "http://127.0.0.1:8767/api/assets?kind=banner",
+      "status": 400
+    },
+    {
+      "url": "http://127.0.0.1:8767/api/state",
+      "status": 503
+    }
+  ]
+}

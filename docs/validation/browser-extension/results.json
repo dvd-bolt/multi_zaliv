@@ -1,0 +1,17 @@
+{
+  "unpackedExtension": "passed",
+  "realChromeApis": "passed",
+  "webCryptoToPythonHmac": "passed",
+  "explicitConfirmation": "passed",
+  "encryptedSession": "passed",
+  "noGooglePermission": true,
+  "noPublications": true,
+  "syntheticTikTok": true,
+  "uiBounds": {
+    "h": 600,
+    "top": 105.21875,
+    "bottom": 494.78125,
+    "scroll": false
+  },
+  "errors": []
+}

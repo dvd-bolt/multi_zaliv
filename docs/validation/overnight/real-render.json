@@ -1,0 +1,12 @@
+{
+  "source": "C:\\Users\\dvd\\Desktop\\видосы для банерки\\projects\\shaft-4\\episodes\\s02e03\\output\\final_episode.mp4",
+  "source_sha256_unchanged": "8856dd34e00ecc0702f2bf6e5f712aeeac737822618681cbcce2c525127a17c9",
+  "duration": 71.866667,
+  "elapsed_seconds": 143.42,
+  "output_size_mb": 4.19,
+  "audio_envelope_correlation": 0.999987,
+  "audio_envelope_lag_seconds": 0.0,
+  "video": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\data\\quality-real-20261025-024404\\SurvivalFlow-real-check.mp4",
+  "poster": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\data\\quality-real-20261025-024404\\rendered-banner.png",
+  "external_publications": false
+}

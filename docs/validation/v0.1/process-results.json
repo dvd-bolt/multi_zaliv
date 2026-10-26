@@ -1,0 +1,10 @@
+{
+  "ui": "passed",
+  "closed_browser_render": "passed",
+  "crash_during_render": "passed",
+  "restart_persistence": "passed",
+  "single_worker": "passed",
+  "no_publications": true,
+  "data_directory": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\data\\validation-20261025-030806",
+  "jobs": 6
+}

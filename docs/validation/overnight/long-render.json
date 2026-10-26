@@ -1,0 +1,30 @@
+{
+  "duration": 30,
+  "dimensions": [
+    720,
+    1280
+  ],
+  "elapsed_seconds": 59.01,
+  "size_mb": 2.32,
+  "audio_pulse_drift_seconds": 0.0,
+  "source_onsets": [
+    0.0,
+    5.05,
+    10.04,
+    15.04,
+    20.03,
+    25.02
+  ],
+  "output_onsets": [
+    0.0,
+    5.05,
+    10.04,
+    15.04,
+    20.03,
+    25.02
+  ],
+  "video": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\data\\quality-20261025-023800\\SurvivalFlow-30s.mp4",
+  "poster": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\data\\quality-20261025-023800\\rendered-banner.png",
+  "synthetic": true,
+  "external_publications": false
+}

@@ -1,0 +1,61 @@
+{
+  "checks": [
+    "actual WebView2 renderer and local API",
+    {
+      "view": "Очередь",
+      "bounds": {
+        "w": 1026,
+        "h": 643,
+        "sw": 1026,
+        "sh": 643,
+        "over": false
+      }
+    },
+    {
+      "view": "Каналы",
+      "bounds": {
+        "w": 1026,
+        "h": 643,
+        "sw": 1026,
+        "sh": 643,
+        "over": false
+      }
+    },
+    {
+      "view": "Статистика",
+      "bounds": {
+        "w": 1026,
+        "h": 643,
+        "sw": 1026,
+        "sh": 643,
+        "over": false
+      }
+    },
+    {
+      "view": "Настройки",
+      "bounds": {
+        "w": 1026,
+        "h": 643,
+        "sw": 1026,
+        "sh": 643,
+        "over": false
+      }
+    },
+    {
+      "view": "Монтаж",
+      "bounds": {
+        "w": 1026,
+        "h": 643,
+        "sw": 1026,
+        "sh": 643,
+        "over": false
+      }
+    },
+    "React edit/save synchronizes native unsaved guard",
+    "source MP4 decodes and plays in WebView2",
+    "duplicate launch focuses existing window and exits",
+    "window closed: API and worker survive, export ready and unapproved, MP4 range response"
+  ],
+  "job_id": "67afde3a2e2844d6a1922e8d5e058e85",
+  "errors": []
+}

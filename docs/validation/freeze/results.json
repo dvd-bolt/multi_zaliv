@@ -1,0 +1,28 @@
+{
+  "bounds": {
+    "top": 74.734375,
+    "bottom": 525.265625,
+    "scroll": false
+  },
+  "first": {
+    "time": 2.5,
+    "paused": true
+  },
+  "held": {
+    "time": 2.5,
+    "paused": true
+  },
+  "advert": {
+    "time": 1.245027,
+    "paused": false,
+    "muted": false,
+    "volume": 1
+  },
+  "resumed": {
+    "time": 3.421623,
+    "paused": false
+  },
+  "errors": [],
+  "synthetic": true,
+  "noPublications": true
+}

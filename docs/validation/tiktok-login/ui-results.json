@@ -1,0 +1,192 @@
+{
+  "simulatedAuth": true,
+  "noRealAccounts": true,
+  "checks": [
+    {
+      "name": "tiktok-before-login",
+      "w": 1024,
+      "h": 600,
+      "sw": 1024,
+      "sh": 600,
+      "dialogs": [
+        {
+          "top": 146.703125,
+          "bottom": 453.28125,
+          "left": 292,
+          "right": 732,
+          "sh": 307,
+          "ch": 307
+        }
+      ]
+    },
+    {
+      "name": "tiktok-waiting",
+      "w": 1024,
+      "h": 600,
+      "sw": 1024,
+      "sh": 600,
+      "dialogs": [
+        {
+          "top": 105.21875,
+          "bottom": 494.78125,
+          "left": 292,
+          "right": 732,
+          "sh": 390,
+          "ch": 390
+        }
+      ]
+    },
+    {
+      "name": "tiktok-google-rejected",
+      "w": 1024,
+      "h": 600,
+      "sw": 1024,
+      "sh": 600,
+      "dialogs": [
+        {
+          "top": 138.3125,
+          "bottom": 461.6875,
+          "left": 292,
+          "right": 732,
+          "sh": 323,
+          "ch": 323
+        }
+      ]
+    },
+    {
+      "name": "tiktok-cancelled",
+      "w": 1024,
+      "h": 600,
+      "sw": 1024,
+      "sh": 600,
+      "dialogs": [
+        {
+          "top": 146.703125,
+          "bottom": 453.28125,
+          "left": 292,
+          "right": 732,
+          "sh": 307,
+          "ch": 307
+        }
+      ]
+    },
+    {
+      "name": "tiktok-confirm",
+      "w": 1024,
+      "h": 600,
+      "sw": 1024,
+      "sh": 600,
+      "dialogs": [
+        {
+          "top": 168.5,
+          "bottom": 431.484375,
+          "left": 292,
+          "right": 732,
+          "sh": 263,
+          "ch": 263
+        }
+      ]
+    },
+    {
+      "name": "tiktok-verifying",
+      "w": 1024,
+      "h": 600,
+      "sw": 1024,
+      "sh": 600,
+      "dialogs": [
+        {
+          "top": 196.90625,
+          "bottom": 403.09375,
+          "left": 292,
+          "right": 732,
+          "sh": 206,
+          "ch": 206
+        }
+      ]
+    },
+    {
+      "name": "tiktok-connected",
+      "w": 1024,
+      "h": 600,
+      "sw": 1024,
+      "sh": 600,
+      "dialogs": [
+        {
+          "top": 133.3125,
+          "bottom": 466.6875,
+          "left": 292,
+          "right": 732,
+          "sh": 333,
+          "ch": 333
+        }
+      ]
+    },
+    {
+      "name": "tiktok-channel-card",
+      "w": 1024,
+      "h": 600,
+      "sw": 1024,
+      "sh": 600,
+      "dialogs": []
+    },
+    {
+      "name": "tiktok-error",
+      "w": 1024,
+      "h": 600,
+      "sw": 1024,
+      "sh": 600,
+      "dialogs": [
+        {
+          "top": 134.015625,
+          "bottom": 465.984375,
+          "left": 292,
+          "right": 732,
+          "sh": 332,
+          "ch": 332
+        }
+      ]
+    },
+    {
+      "name": "tiktok-error-wide",
+      "w": 1366,
+      "h": 600,
+      "sw": 1366,
+      "sh": 600,
+      "dialogs": [
+        {
+          "top": 134.015625,
+          "bottom": 465.984375,
+          "left": 463,
+          "right": 903,
+          "sh": 332,
+          "ch": 332
+        }
+      ]
+    }
+  ],
+  "requests": [
+    {
+      "path": "/api/accounts/e71c7d50af274b3a9c0b3bfc1d78a5e7/connect",
+      "body": null
+    },
+    {
+      "path": "/api/accounts/e71c7d50af274b3a9c0b3bfc1d78a5e7/connect/return-to-tiktok",
+      "body": null
+    },
+    {
+      "path": "/api/accounts/e71c7d50af274b3a9c0b3bfc1d78a5e7/connect/cancel",
+      "body": null
+    },
+    {
+      "path": "/api/accounts/e71c7d50af274b3a9c0b3bfc1d78a5e7/connect",
+      "body": null
+    },
+    {
+      "path": "/api/accounts/e71c7d50af274b3a9c0b3bfc1d78a5e7/connect/confirm",
+      "body": {
+        "handle": "cartoon.channel"
+      }
+    }
+  ],
+  "errors": []
+}
