@@ -194,7 +194,10 @@ def normalized_caption(value):
     for character in ("\u200b", "\ufeff", "\u2060"):
         value = value.replace(character, "")
     value = value.replace("\u00a0", " ")
-    return "\n".join(line.rstrip() for line in value.split("\n")).strip()
+    # Rich editors render paragraph blocks with extra newlines/spaces. Compare
+    # word boundaries, not the number of layout whitespace characters. Never
+    # remove a boundary or ignore letters, hashtag text, case or emoji joiners.
+    return " ".join(value.split())
 
 
 def set_caption(page, description, caption):
@@ -224,7 +227,9 @@ def set_caption(page, description, caption):
     description.press("ControlOrMeta+A")
     description.press("Backspace")
     if caption:
-        description.press_sequentially(caption, delay=80)
+        # Typing 220 characters at 80 ms already takes 17.6 s, longer than
+        # the context's 15 s default. Budget for the entire controlled input.
+        description.press_sequentially(caption, delay=80, timeout=max(15000, len(caption) * 100 + 10000))
     description.press("Escape")
     description.press("Tab")
     if not committed():
@@ -251,9 +256,11 @@ def upload_on_page(page, source, config, expected, *, before_post=lambda: None, 
     """Operates on an authenticated Playwright page; injection seam is for local fixtures only."""
     clicked = False
     responses = []
+    phase = "проверка аккаунта"
     try:
         identity(page, expected)
         signature = session_signature(page.context)
+        phase = "открытие TikTok Studio"
         page.goto(UPLOAD, wait_until="domcontentloaded", timeout=45000)
         deadline = time.monotonic() + timeout + min(200, len(config.get("caption", "")) * 0.09)
         frame = None
@@ -278,13 +285,17 @@ def upload_on_page(page, source, config, expected, *, before_post=lambda: None, 
             inputs = video_inputs
         if inputs.count() != 1:
             raise BeforePublishError("Не удалось однозначно найти загрузку видео в TikTok")
+        phase = "передача MP4"
         inputs.set_input_files(str(source))
         description = frame.locator('[contenteditable="true"]')
+        phase = "ожидание редактора описания"
         description.first.wait_for(state="visible", timeout=timeout * 1000)
         if description.count() != 1:
             raise BeforePublishError("Не удалось однозначно найти описание TikTok")
         caption = config.get("caption", "")
+        phase = "ввод описания"
         set_caption(page, description, caption)
+        phase = "выбор видимости"
         set_privacy(frame, config.get("visibility"))
         if config.get("synthetic"):
             aigc = frame.locator('[data-e2e="aigc_container"] input[type=checkbox]')
@@ -295,6 +306,7 @@ def upload_on_page(page, source, config, expected, *, before_post=lambda: None, 
             aigc.check()
             if not aigc.is_checked():
                 raise BeforePublishError("TikTok не подтвердил пометку ИИ-контента")
+        phase = "ожидание обработки файла"
         post = frame.locator('button[data-e2e="post_video_button"]')
         post.wait_for(state="visible", timeout=timeout * 1000)
         while time.monotonic() < deadline:
@@ -362,14 +374,15 @@ def upload_on_page(page, source, config, expected, *, before_post=lambda: None, 
         return UploadResult(external_id, f"https://www.tiktok.com/@{expected}/video/{external_id}")
     except (BeforePublishError, PublicationUncertain):
         raise
-    except Exception:
+    except Exception as error:
         if clicked:
             raise PublicationUncertain(
                 "Ответ TikTok потерян после публикации. Проверьте профиль; повторная отправка запрещена."
             ) from None
-        raise BeforePublishError(
-            "Не удалось подготовить публикацию TikTok. Проверьте вход, сеть и доступность TikTok Studio."
-        ) from None
+        logging.getLogger(__name__).warning(
+            "TikTok preparation failed: phase=%s error=%s", phase, type(error).__name__
+        )
+        raise BeforePublishError(f"TikTok: сбой на этапе «{phase}». Публикация не нажималась.") from None
 
 
 @contextmanager

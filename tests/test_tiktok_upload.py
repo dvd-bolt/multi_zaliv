@@ -291,6 +291,33 @@ def test_caption_normalization_preserves_meaning():
     assert normalized_caption("hello world") != normalized_caption("helloworld")
     assert normalized_caption("ABC") != normalized_caption("abc")
     assert normalized_caption("👨\u200d👩\u200d👦") == "👨\u200d👩\u200d👦"
+    assert normalized_caption("Scene\n\n#cartoons #бубавпн") == normalized_caption(
+        "Scene\n\n\n#cartoons  #бубавпн"
+    )
+    assert normalized_caption("Scene #cartoons") != normalized_caption("Scene #cartoon")
+    assert normalized_caption("Scene #cartoons") != normalized_caption("Scene#cartoons")
+
+
+def test_controlled_caption_typing_outlives_page_default_timeout(browser):
+    from backend.tiktok_upload import normalized_caption, set_caption
+
+    context = browser.new_context()
+    context.set_default_timeout(700)
+    page = context.new_page()
+    page.set_content('<div contenteditable="true"></div><button>Other</button>')
+    page.evaluate("""() => {
+      const editor = document.querySelector('[contenteditable]');
+      editor.addEventListener('input', event => {
+        if (event.data && event.data.length > 1) editor.textContent = '';
+      });
+    }""")
+    try:
+        caption = "A longer caption with #cartoons"
+        assert len(caption) * 80 > 700
+        set_caption(page, page.locator("[contenteditable]"), caption)
+        assert normalized_caption(page.locator("[contenteditable]").inner_text()) == caption
+    finally:
+        context.close()
 
 
 @pytest.mark.parametrize(
