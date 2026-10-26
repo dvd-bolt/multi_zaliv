@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-27, 00:08",
+  "testsPassed": 150,
+  "testWarnings": 1,
+  "build": "passed",
+  "ruff": "passed",
+  "actualWebView2": "passed",
+  "launcher": "passed",
+  "browserExtension": "passed",
+  "freezeAndAudio": "passed",
+  "buba": "passed",
+  "statisticsUI": "passed",
+  "liveMetrics": {
+    "updated": 2,
+    "unavailable": 0
+  },
+  "databaseIntegrity": "ok",
+  "foreignKeyIssues": 0,
+  "frozenDesignVerified": 11,
+  "batchSources": 3,
+  "batchVariants": 18,
+  "mockedUploads": {
+    "youtube": 9,
+    "tiktok": 9
+  },
+  "newRealPublications": 0,
+  "uiReport": "../autopublish/ui-results.json",
+  "fixed": [
+    "queue overflow with long lists",
+    "pagination overflow",
+    "validation error overflow"
+  ],
+  "knownLimits": [
+    "first real upload in the new automatic mode still pending",
+    "old orange_moon_code account disconnected",
+    "one Starlette test dependency deprecation warning"
+  ]
+}

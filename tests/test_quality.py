@@ -105,6 +105,10 @@ def test_cancel_wins_if_committed_before_upload_claim(sample, monkeypatch):
 
 
 def test_failed_builtin_banner_releases_job(sample, monkeypatch):
+    # New imports reuse the last banner preset; this regression explicitly needs the built-in banner.
+    with Session.begin() as db:
+        source = db.get(Asset, sample[0]["id"])
+        source.edit = {**source.edit, "banner_id": None}
     key = client.post("/api/queue", json=sample[2]).json()["created"][0]
     with Session.begin() as db:
         db.get(Job, key).created = "1900-01-01T00:00:00+00:00"
@@ -283,9 +287,10 @@ def test_migration_preserves_a_version_one_database(tmp_path):
     assert result.returncode == 0, result.stderr.decode(errors="replace")
     with sqlite3.connect(path) as db:
         assert db.execute("SELECT name,archived FROM assets WHERE id='kept'").fetchone() == ("Keep me", 0)
-        assert db.execute("SELECT MAX(version) FROM schema_migrations").fetchone()[0] == 5
+        assert db.execute("SELECT MAX(version) FROM schema_migrations").fetchone()[0] == 6
         assert "upload_started_at" in [row[1] for row in db.execute("PRAGMA table_info(jobs)")]
         assert "validation_upload" in [row[1] for row in db.execute("PRAGMA table_info(jobs)")]
+        assert "auto_publish" in [row[1] for row in db.execute("PRAGMA table_info(jobs)")]
 
 
 def test_processing_poll_does_not_restart_upload_interval(sample, monkeypatch):

@@ -9,6 +9,8 @@ from pathlib import Path
 from typing import Annotated
 
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile
+from fastapi.exception_handlers import request_validation_exception_handler
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import select, text
@@ -41,6 +43,7 @@ from .db import (
     settings,
     uid,
 )
+from .hashtags import DEFAULT_HASHTAGS
 from .maintenance import backup_database, cleanup_exports
 from .media import builtin_banner, inspect
 from .platforms import AUTH, begin_youtube, cancelling_auth, import_tiktok, refresh_metrics
@@ -53,6 +56,9 @@ from .schemas import (
     CommentReview,
     Edit,
     Enqueue,
+    GeminiGenerate,
+    GeminiKey,
+    GeminiOptions,
     JobAction,
     SettingsUpdate,
     TikTokConfirmation,
@@ -105,6 +111,13 @@ async def invalid(_, error):
     return JSONResponse({"detail": str(error)}, status_code=400)
 
 
+@app.exception_handler(RequestValidationError)
+async def validation_error(request: Request, error):
+    if request.url.path == "/api/ai/key":
+        return JSONResponse({"detail": "Проверьте формат API-ключа Gemini"}, status_code=422)
+    return await request_validation_exception_handler(request, error)
+
+
 @app.exception_handler(RuntimeError)
 async def unavailable(_, error):
     return JSONResponse({"detail": str(error)}, status_code=503)
@@ -134,6 +147,7 @@ def job_data(db, job):
                 "progress",
                 "scheduled",
                 "approved",
+                "auto_publish",
                 "validation_upload",
                 "attempts",
                 "error",
@@ -163,6 +177,7 @@ def state():
             heartbeat and (datetime.now(UTC) - datetime.fromisoformat(heartbeat)).total_seconds() < 15
         )
         return {
+            "default_hashtags": DEFAULT_HASHTAGS,
             "assets": [
                 asset_data(a)
                 for a in db.scalars(
@@ -392,12 +407,8 @@ def upload(kind: str, file: Annotated[UploadFile, File()]):
                 digest.update(block)
                 output.write(block)
         info = inspect(destination, kind, asset_id)
-        edit = (
-            Edit(duration=min(2.5, info["duration"] / 2), buba_mode=True).model_dump()
-            if kind == "video"
-            else {}
-        )
         with Session.begin() as db:
+            edit = new_video_edit(db, info) if kind == "video" else {}
             asset = Asset(
                 id=asset_id,
                 kind=kind,
@@ -418,7 +429,53 @@ def upload(kind: str, file: Annotated[UploadFile, File()]):
         file.file.close()
 
 
-@app.get("/api/assets/{key}/{mode}")
+def new_video_edit(db, media):
+    previous = db.scalar(
+        select(Asset).where(Asset.kind == "video", Asset.archived.is_(False)).order_by(Asset.created.desc())
+    )
+    fields = (
+        "banner_id",
+        "banner_text",
+        "freeze_video",
+        "banner_audio",
+        "banner_height",
+        "x",
+        "y",
+        "width",
+        "opacity",
+        "duration",
+        "brightness",
+        "contrast",
+        "saturation",
+        "warmth",
+        "zoom",
+        "mirror",
+        "format",
+        "fit",
+        "banner_end",
+        "targets",
+        "overrides",
+        "visibility",
+        "buba_mode",
+        "auto_hashtags",
+    )
+    preset = {key: previous.edit[key] for key in fields if key in previous.edit} if previous else {}
+    duration = preset.get("duration", 2.5)
+    if not preset.get("freeze_video"):
+        duration = min(duration, media["duration"] / 2)
+    # Reuse setup, never another video's title, description or factual declarations.
+    return Edit.model_validate(
+        {
+            "buba_mode": True,
+            "auto_hashtags": True,
+            **preset,
+            "timing": "middle",
+            "start": 0,
+            "duration": duration,
+        }
+    ).model_dump()
+
+
 def asset_file(key: str, mode: str):
     with Session() as db:
         item = require(db, Asset, key)
@@ -428,6 +485,16 @@ def asset_file(key: str, mode: str):
         if not path.exists():
             raise HTTPException(404, "Файл отсутствует")
         return FileResponse(path)
+
+
+@app.get("/api/assets/{key}/file")
+def source_file(key: str):
+    return asset_file(key, "file")
+
+
+@app.get("/api/assets/{key}/thumbnail")
+def source_thumbnail(key: str):
+    return asset_file(key, "thumbnail")
 
 
 @app.delete("/api/assets/{key}")
@@ -459,7 +526,21 @@ def create_jobs(request: Enqueue):
     with Session.begin() as db:
         # Serialize read/check/insert, so simultaneous clicks reuse the same durable jobs.
         db.execute(text("BEGIN IMMEDIATE"))
-        return enqueue(db, request)
+        result = enqueue(db, request)
+    if request.auto_publish:
+        try:
+            ensure_queue_worker()
+        except (OSError, RuntimeError):
+            result["worker_warning"] = (
+                "Задания сохранены, но рабочий процесс не запустился. Перезапустите SurvivalFlow."
+            )
+    return result
+
+
+def ensure_queue_worker():
+    from scripts.launch import ensure_services
+
+    ensure_services()
 
 
 @app.post("/api/jobs/{key}/action")
@@ -609,6 +690,70 @@ def google_client(payload: dict):
         raise ValueError("Нужен OAuth JSON типа Desktop app из Google Cloud")
     vault.put("google_client", payload)
     return {"saved": True}
+
+
+@app.get("/api/ai")
+def ai_status():
+    from .gemini import MODELS
+
+    with Session() as db:
+        return {
+            "configured": bool(vault.get("gemini_api")),
+            "models": MODELS,
+            "auto": settings(db).get("gemini_auto", True),
+        }
+
+
+@app.put("/api/ai/key")
+def ai_key(request: GeminiKey):
+    secret = request.api_key.strip()
+    if len(secret) < 15 or any(c.isspace() for c in secret):
+        raise ValueError("Проверьте формат API-ключа Gemini")
+    vault.put("gemini_api", {"api_key": secret})
+    return {"saved": True}
+
+
+@app.delete("/api/ai/key")
+def ai_remove_key():
+    vault.remove("gemini_api")
+    return {"removed": True}
+
+
+@app.post("/api/ai/check")
+def ai_check():
+    from .gemini import check_models
+
+    return check_models()
+
+
+@app.put("/api/ai/options")
+def ai_options(request: GeminiOptions):
+    with Session.begin() as db:
+        item = db.get(Setting, "application")
+        item.value = {**settings(db), "gemini_auto": request.auto}
+    return {"saved": True}
+
+
+@app.get("/api/assets/{key}/ai-caption")
+def ai_caption_status(key: str):
+    from .gemini import task_status
+
+    with Session() as db:
+        asset = require(db, Asset, key)
+        if asset.kind != "video" or asset.archived:
+            raise ValueError("Выберите активный исходник видео")
+        return task_status(asset.id, asset.sha256)
+
+
+@app.post("/api/assets/{key}/ai-caption")
+def ai_caption(key: str, request: GeminiGenerate):
+    from .gemini import start
+
+    with Session() as db:
+        asset = require(db, Asset, key)
+        if asset.kind != "video" or asset.archived:
+            raise ValueError("Выберите активный исходник видео")
+        return start(asset.id, asset.sha256, Path(asset.path), asset.media["duration"], request.force)
 
 
 @app.patch("/api/settings")

@@ -63,6 +63,7 @@ class Job(Base):
     progress: Mapped[float] = mapped_column(Float, default=0)
     scheduled: Mapped[str | None] = mapped_column(String, nullable=True)
     approved: Mapped[bool] = mapped_column(Boolean, default=False)
+    auto_publish: Mapped[bool] = mapped_column(Boolean, default=False)
     validation_upload: Mapped[bool] = mapped_column(Boolean, default=False)
     attempts: Mapped[int] = mapped_column(Integer, default=0)
     error: Mapped[str | None] = mapped_column(String, nullable=True)
@@ -168,6 +169,11 @@ def migrate():
             for table in (BubaSubmission.__table__, CommentScan.__table__, Comment.__table__):
                 table.create(conn, checkfirst=True)
             conn.execute(text("INSERT INTO schema_migrations VALUES (5)"))
+        if version < 6:
+            columns = [row[1] for row in conn.execute(text("PRAGMA table_info(jobs)"))]
+            if "auto_publish" not in columns:
+                conn.execute(text("ALTER TABLE jobs ADD COLUMN auto_publish BOOLEAN NOT NULL DEFAULT 0"))
+            conn.execute(text("INSERT INTO schema_migrations VALUES (6)"))
     with Session.begin() as db:
         if not db.get(Setting, "application"):
             db.add(Setting(key="application", value=DEFAULTS.copy()))

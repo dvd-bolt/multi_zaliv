@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-26T22:37:06.053183+03:00",
+  "testsPassed": 149,
+  "schemaVersion": 6,
+  "legacyJobsChecked": 5,
+  "legacyApprovalsUnchanged": true,
+  "newRealPublications": 0,
+  "realFFmpeg": true,
+  "remoteAdapters": "mocked",
+  "uiReport": "ui-results.json",
+  "rollout": "API and worker restarted; no live tasks activated"
+}

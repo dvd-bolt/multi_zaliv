@@ -105,15 +105,24 @@ def job_report(db, job):
 
 
 def require_ready(db, job):
-    from .db import Variant, settings
+    from .db import Asset, Variant
 
-    if not db.get(Variant, job.variant_id).config.get("buba_mode"):
+    variant = db.get(Variant, job.variant_id)
+    source = db.get(Asset, variant.asset_id)
+    banner = db.get(Asset, variant.banner_id) if variant.banner_id else None
+    require_config_ready(db, source.media, banner.media if banner else None, variant.config)
+
+
+def require_config_ready(db, media, banner, config):
+    from .db import settings
+
+    if not config.get("buba_mode"):
         if settings(db).get("buba_required"):
             raise ValueError(
                 "Это старый вариант без режима БУБА. Включите БУБА в монтажной, проверьте настройки и создайте новый MP4."
             )
         return
-    checked = job_report(db, job)
+    checked = report(media, banner, config)
     if checked["enabled"] and not checked["ready"]:
         errors = [i["message"] for i in checked["issues"] if i["level"] == "error"]
         raise ValueError(

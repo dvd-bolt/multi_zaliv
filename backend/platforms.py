@@ -40,7 +40,7 @@ def check_rebinding(db, account, external_id):
         and db.scalar(select(Variant.id).where(Variant.account_id == account.id).limit(1))
     ):
         raise AccountIdentityError(
-            "Р­С‚РѕС‚ Р°РєРєР°СѓРЅС‚ СѓР¶Рµ СЃРІСЏР·Р°РЅ СЃ Р·Р°РґР°РЅРёСЏРјРё РґСЂСѓРіРѕРіРѕ РєР°РЅР°Р»Р°. Р”РѕР±Р°РІСЊС‚Рµ РЅРѕРІС‹Р№ РєР°РЅР°Р» РѕС‚РґРµР»СЊРЅРѕР№ Р·Р°РїРёСЃСЊСЋ."
+            "Этот аккаунт уже связан с заданиями другого канала. Добавьте новый канал отдельной записью."
         )
 
 
@@ -67,7 +67,7 @@ def youtube_service(account):
 
     token = vault.get(account.id)
     if not token:
-        raise ValueError("РџРѕРґРєР»СЋС‡РёС‚Рµ YouTube С‡РµСЂРµР· Google OAuth")
+        raise ValueError("Подключите YouTube через Google OAuth")
     credentials = Credentials.from_authorized_user_info(token, SCOPES)
     if credentials.expired and credentials.refresh_token:
         credentials.refresh(Request())
@@ -82,12 +82,10 @@ def begin_youtube(account_id):
 
     client = vault.get("google_client")
     if not client:
-        raise ValueError(
-            "РЎРЅР°С‡Р°Р»Р° РёРјРїРѕСЂС‚РёСЂСѓР№С‚Рµ OAuth JSON РїСЂРёР»РѕР¶РµРЅРёСЏ Desktop РІ РЅР°СЃС‚СЂРѕР№РєР°С…"
-        )
+        raise ValueError("Сначала импортируйте OAuth JSON приложения Desktop в настройках")
     with AUTH_LOCK:
         if any(pending(s) for s in AUTH.values()):
-            raise ValueError("Р—Р°РІРµСЂС€РёС‚Рµ С‚РµРєСѓС‰РёР№ РІС…РѕРґ РІ Р±СЂР°СѓР·РµСЂРµ")
+            raise ValueError("Завершите текущий вход в браузере")
         AUTH[account_id] = "waiting"
         ticket = object()
         AUTH_TICKETS[account_id] = ticket
@@ -104,16 +102,14 @@ def begin_youtube(account_id):
                 port=0,
                 timeout_seconds=180,
                 authorization_prompt_message="",
-                success_message="SurvivalFlow: РІС…РѕРґ Р·Р°РІРµСЂС€С‘РЅ. РњРѕР¶РЅРѕ Р·Р°РєСЂС‹С‚СЊ СЌС‚Сѓ РІРєР»Р°РґРєСѓ.",
+                success_message="SurvivalFlow: вход завершён. Можно закрыть эту вкладку.",
             )
             from googleapiclient.discovery import build
 
             service = build("youtube", "v3", credentials=credentials, cache_discovery=False)
             items = service.channels().list(part="snippet", mine=True).execute().get("items", [])
             if len(items) != 1:
-                raise ValueError(
-                    "РќРµ СѓРґР°Р»РѕСЃСЊ РѕРґРЅРѕР·РЅР°С‡РЅРѕ РѕРїСЂРµРґРµР»РёС‚СЊ YouTube-РєР°РЅР°Р»"
-                )
+                raise ValueError("Не удалось однозначно определить YouTube-канал")
             with AUTH_LOCK, Session.begin() as db:
                 if AUTH_TICKETS.get(account_id) is not ticket:
                     return
@@ -123,9 +119,7 @@ def begin_youtube(account_id):
                     select(Account).where(Account.external_id == items[0]["id"], Account.id != account_id)
                 )
                 if duplicate:
-                    raise AccountIdentityError(
-                        "Р­С‚РѕС‚ РєР°РЅР°Р» СѓР¶Рµ РїРѕРґРєР»СЋС‡С‘РЅ РІ РґСЂСѓРіРѕР№ Р·Р°РїРёСЃРё"
-                    )
+                    raise AccountIdentityError("Этот канал уже подключён в другой записи")
                 vault.put(account_id, json.loads(credentials.to_json()))
                 account.name = items[0]["snippet"]["title"]
                 account.external_id, account.connected, account.method = items[0]["id"], True, "oauth"
@@ -137,7 +131,7 @@ def begin_youtube(account_id):
             auth_result(
                 account_id,
                 ticket,
-                "error: Р’С…РѕРґ РЅРµ Р·Р°РІРµСЂС€С‘РЅ. РџСЂРѕРІРµСЂСЊС‚Рµ OAuth Desktop, С‚РµСЃС‚РѕРІС‹С… РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№ Рё РґРѕСЃС‚СѓРї Рє РєР°РЅР°Р»Сѓ.",
+                "error: Вход не завершён. Проверьте OAuth Desktop, тестовых пользователей и доступ к каналу.",
             )
 
     thread = threading.Thread(target=login, daemon=True)
@@ -147,17 +141,17 @@ def begin_youtube(account_id):
 
 def import_tiktok(account, payload):
     if not isinstance(payload.get("handle", ""), str):
-        raise ValueError("РЈРєР°Р¶РёС‚Рµ РёРјСЏ TikTok-Р°РєРєР°СѓРЅС‚Р° СЃС‚СЂРѕРєРѕР№")
+        raise ValueError("Укажите имя TikTok-аккаунта строкой")
     handle = payload.get("handle", "").lstrip("@")
     cookies = payload.get("cookies")
     if not re.fullmatch(r"[A-Za-z0-9_.]{2,24}", handle):
-        raise ValueError("РЈРєР°Р¶РёС‚Рµ РёРјСЏ TikTok-Р°РєРєР°СѓРЅС‚Р° Р±РµР· СЃСЃС‹Р»РєРё")
+        raise ValueError("Укажите имя TikTok-аккаунта без ссылки")
     if (
         not isinstance(cookies, list)
         or not all(isinstance(c, dict) for c in cookies)
         or not any(c.get("name") == "sessionid" for c in cookies)
     ):
-        raise ValueError("РќСѓР¶РµРЅ СЌРєСЃРїРѕСЂС‚ cookies СЃ sessionid РёР· РІР°С€РµРіРѕ Р±СЂР°СѓР·РµСЂР°")
+        raise ValueError("Нужен экспорт cookies с sessionid из вашего браузера")
     allowed = ("name", "value", "domain", "path", "expires", "httpOnly", "secure", "sameSite")
     cleaned = [
         {k: v for k, v in cookie.items() if k in allowed}
@@ -165,7 +159,7 @@ def import_tiktok(account, payload):
         if str(cookie.get("domain", "")).lstrip(".") in ("tiktok.com", "www.tiktok.com")
     ]
     if not any(c.get("name") == "sessionid" for c in cleaned):
-        raise ValueError("РЎРµСЃСЃРёСЏ РґРѕР»Р¶РЅР° РїСЂРёРЅР°РґР»РµР¶Р°С‚СЊ tiktok.com")
+        raise ValueError("Сессия должна принадлежать tiktok.com")
     with Session() as db:
         check_rebinding(db, account, handle)
     vault.put(account.id, {"cookies": cleaned, "handle": handle})
@@ -209,18 +203,22 @@ def dispatch_one(db):
                         elif state in ("rejected", "failed", "deleted"):
                             job.status, job.error = (
                                 "rejected",
-                                "РџР»Р°С‚С„РѕСЂРјР° РѕС‚РєР»РѕРЅРёР»Р° СЂРѕР»РёРє: " + state,
+                                "Платформа отклонила ролик: " + state,
                             )
                         job.updated = now()
                     else:
-                        job.error = "РџР»Р°С‚С„РѕСЂРјР° РїРѕРєР° РЅРµ РІРµСЂРЅСѓР»Р° СЂРѕР»РёРє. РџСЂРѕРІРµСЂРёРј РїРѕР·Р¶Рµ Р±РµР· РїРѕРІС‚РѕСЂРЅРѕР№ РѕС‚РїСЂР°РІРєРё."
+                        job.error = "Платформа пока не вернула ролик. Проверим позже без повторной отправки."
                         job.updated = now()
                 except Exception:
-                    job.error = "РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРѕРІРµСЂРёС‚СЊ РѕР±СЂР°Р±РѕС‚РєСѓ. РџРѕРІС‚РѕСЂРёРј РїСЂРѕРІРµСЂРєСѓ Р±РµР· РїРѕРІС‚РѕСЂРЅРѕР№ Р·Р°РіСЂСѓР·РєРё."
+                    job.error = "Не удалось проверить обработку. Повторим проверку без повторной загрузки."
                     job.updated = now()
             db.commit()
             continue
         if not job.approved:
+            continue
+        if not account.enabled:
+            job.status = "waiting_auth"
+            job.error = "Канал выключен. Включите его для продолжения автозалива."
             continue
         if not account.connected:
             job.status = "waiting_auth"
@@ -231,17 +229,17 @@ def dispatch_one(db):
             and not job.validation_upload
         ):
             job.status = "waiting_auth"
-            job.error = "Р’С…РѕРґ РІ TikTok СЃРѕС…СЂР°РЅС‘РЅ. РђРІС‚РѕРїСѓР±Р»РёРєР°С†РёСЏ РµС‰С‘ С‚СЂРµР±СѓРµС‚ РїСЂРѕРІРµСЂРєРё РёРЅС‚РµРіСЂР°С†РёРё."
+            job.error = "Вход в TikTok сохранён. Автопубликация ещё требует проверки интеграции."
             continue
         if job.scheduled:
             date = datetime.fromisoformat(job.scheduled)
             current = datetime.now(UTC)
             if date > current:
                 continue
-            if current - date > timedelta(minutes=10):
+            if current - date > timedelta(minutes=10) and not job.auto_publish:
                 job.status, job.error = (
                     "missed",
-                    "Р’СЂРµРјСЏ РїСЂРѕРїСѓС‰РµРЅРѕ. РџРѕРґС‚РІРµСЂРґРёС‚Рµ РЅРѕРІС‹Р№ Р·Р°РїСѓСЃРє.",
+                    "Время пропущено. Подтвердите новый запуск.",
                 )
                 continue
         interval = settings(db)["interval"]
@@ -261,7 +259,7 @@ def dispatch_one(db):
         if not variant.output or not Path(variant.output).exists():
             job.status, job.error = (
                 "failed",
-                "Р­РєСЃРїРѕСЂС‚ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚; С‚СЂРµР±СѓРµС‚СЃСЏ РїРѕРІС‚РѕСЂРЅР°СЏ РѕР±СЂР°Р±РѕС‚РєР°",
+                "Экспорт отсутствует; требуется повторная обработка",
             )
             return
         from .buba import require_ready
@@ -289,12 +287,12 @@ def dispatch_one(db):
                 service = youtube_service(account)
                 identity = service.channels().list(part="id", mine=True).execute()["items"]
                 if not any(item["id"] == account.external_id for item in identity):
-                    raise ValueError("РђРІС‚РѕСЂРёР·РѕРІР°РЅ РґСЂСѓРіРѕР№ РєР°РЅР°Р»")
+                    raise ValueError("Авторизован другой канал")
                 request = service.videos().insert(
                     part="snippet,status",
                     body={
                         "snippet": {
-                            "title": config["title"] or "Р’РёРґРµРѕ",
+                            "title": config["title"] or "Видео",
                             "description": config["caption"],
                             "categoryId": "22",
                         },
@@ -311,7 +309,7 @@ def dispatch_one(db):
                     _, response = request.next_chunk(num_retries=0)
                 external_id = response.get("id")
                 if not external_id:
-                    raise ValueError("РџР»Р°С‚С„РѕСЂРјР° РЅРµ РІРµСЂРЅСѓР»Р° ID")
+                    raise ValueError("Платформа не вернула ID")
                 job.external_id, job.url = external_id, "https://www.youtube.com/watch?v=" + external_id
                 job.status = "platform_processing"
             else:
@@ -329,7 +327,7 @@ def dispatch_one(db):
                         or account.external_id != expected
                     ):
                         raise BeforePublishError(
-                            "Р—Р°РґР°РЅРёРµ РёР»Рё РїРѕРґРєР»СЋС‡РµРЅРёРµ РёР·РјРµРЅРёР»РѕСЃСЊ; РїСѓР±Р»РёРєР°С†РёСЏ РѕСЃС‚Р°РЅРѕРІР»РµРЅР°",
+                            "Задание или подключение изменилось; публикация остановлена",
                             auth=True,
                         )
                     job.upload_started_at, job.updated = now(), now()
@@ -363,16 +361,14 @@ def dispatch_one(db):
                     )
                 )
                 if duplicate:
-                    raise ValueError(
-                        "ID СѓР¶Рµ СѓС‡С‚С‘РЅ Сѓ РґСЂСѓРіРѕРіРѕ Р·Р°РґР°РЅРёСЏ; С‚СЂРµР±СѓРµС‚СЃСЏ СЂСѓС‡РЅР°СЏ РїСЂРѕРІРµСЂРєР°"
-                    )
+                    raise ValueError("ID уже учтён у другого задания; требуется ручная проверка")
                 job.external_id, job.url, job.status = result.external_id, result.url, result.status
-                job.error = "TikTok РїСЂРёРЅСЏР» РїСѓР±Р»РёРєР°С†РёСЋ Рё РІРµСЂРЅСѓР» ID. РћР±СЂР°Р±РѕС‚РєР° Рё С„Р°РєС‚РёС‡РµСЃРєР°СЏ РІРёРґРёРјРѕСЃС‚СЊ РїРѕРєР° РЅРµ РїРѕРґС‚РІРµСЂР¶РґРµРЅС‹."
+                job.error = "TikTok принял публикацию и вернул ID. Обработка и фактическая видимость пока не подтверждены."
                 account.method = "browser_verified"
         except Exception:
             # Never retry automatically after a possibly completed remote write.
             job.status = "unknown"
-            job.error = "Р РµР·СѓР»СЊС‚Р°С‚ РѕС‚РїСЂР°РІРєРё РЅРµРёР·РІРµСЃС‚РµРЅ. РџСЂРѕРІРµСЂСЊС‚Рµ РєР°РЅР°Р» РІСЂСѓС‡РЅСѓСЋ РїРµСЂРµРґ РґР°Р»СЊРЅРµР№С€РёРјРё РґРµР№СЃС‚РІРёСЏРјРё."
+            job.error = "Результат отправки неизвестен. Проверьте канал вручную перед дальнейшими действиями."
         job.updated = now()
         db.commit()
         return
@@ -392,7 +388,7 @@ def refresh_metrics(db):
                         .execute()["items"]
                     )
                     if not items:
-                        raise ValueError("РќРµС‚ РґР°РЅРЅС‹С…")
+                        raise ValueError("Нет данных")
                     stats = items[0]["statistics"]
                     values = {
                         k: int(stats[remote]) if remote in stats else None
@@ -421,7 +417,7 @@ def refresh_metrics(db):
                         response.raise_for_status()
                         videos = response.json().get("data", {}).get("videos", [])
                         if len(videos) != 1 or videos[0]["id"] != job.external_id:
-                            raise ValueError("РќРµС‚ РґР°РЅРЅС‹С…")
+                            raise ValueError("Нет данных")
                         values = {
                             key: videos[0].get(remote)
                             for key, remote in (

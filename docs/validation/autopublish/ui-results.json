@@ -1,0 +1,37 @@
+{
+  "synthetic": true,
+  "realFFmpeg": true,
+  "remoteUploadsMocked": true,
+  "automaticRenderAndDispatch": true,
+  "noExtraApproval": true,
+  "renderOnlyStillWorks": true,
+  "duplicateRemoteWrites": 0,
+  "doubleClickSingleJob": true,
+  "scheduleBounds": {
+    "top": 133.125,
+    "bottom": 466.875,
+    "scroll": false
+  },
+  "bubaBounds": {
+    "top": 88.640625,
+    "bottom": 511.34375,
+    "scroll": false
+  },
+  "bulkBounds": {
+    "top": 49.859375,
+    "bottom": 550.125,
+    "scroll": false
+  },
+  "pagedBounds": {
+    "top": 29.859375,
+    "bottom": 570.125,
+    "scroll": false
+  },
+  "errorBounds": {
+    "top": 205.40625,
+    "bottom": 394.59375,
+    "scroll": false
+  },
+  "expectedValidationError": true,
+  "errors": []
+}

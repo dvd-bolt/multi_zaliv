@@ -8,6 +8,7 @@ export type Edit = {
   banner_audio: boolean;
   banner_height: number | null;
   buba_mode: boolean;
+  auto_hashtags: boolean;
   buba_review: Record<string, boolean>;
   x: number;
   y: number;
@@ -53,6 +54,7 @@ export type Job = {
   progress: number;
   scheduled: string | null;
   approved: boolean;
+  auto_publish: boolean;
   validation_upload: boolean;
   error: string | null;
   url: string | null;
@@ -76,6 +78,7 @@ export type Settings = {
   notifications: boolean;
 };
 export type State = {
+  default_hashtags: string[];
   assets: Asset[];
   accounts: Account[];
   jobs: Job[];

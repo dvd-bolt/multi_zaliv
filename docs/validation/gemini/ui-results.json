@@ -1,0 +1,23 @@
+{
+  "synthetic": true,
+  "noRealGoogleRequests": true,
+  "requests": 3,
+  "geometry": {
+    "pageHeight": 600,
+    "viewport": 600,
+    "contentBottom": 444.734375,
+    "saveTop": 453.609375
+  },
+  "bounds": {
+    "top": 111.21875,
+    "bottom": 488.78125,
+    "scroll": false
+  },
+  "errorBounds": {
+    "top": 192,
+    "bottom": 407.984375,
+    "scroll": false
+  },
+  "errors": [],
+  "manualTextPreserved": true
+}

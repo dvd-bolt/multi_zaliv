@@ -13,13 +13,13 @@
     "paused": true
   },
   "advert": {
-    "time": 1.245027,
+    "time": 1.193131,
     "paused": false,
     "muted": false,
     "volume": 1
   },
   "resumed": {
-    "time": 3.421623,
+    "time": 3.388083,
     "paused": false
   },
   "errors": [],

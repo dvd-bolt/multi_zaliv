@@ -28,6 +28,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { api, type Account, type Asset, type Edit, type Job, type Metric, type State } from './api';
+import { GeminiSettings, useGemini } from './Gemini';
 
 import { latestMetrics, channelSummaries, channelsReport } from './statistics';
 import { CampaignPanel, JobCampaignPanel } from './Campaign';
@@ -138,12 +139,14 @@ function Modal({
   children,
   error,
   busy = false,
+  className = '',
 }: {
   title: string;
   onClose: () => void;
   children: ReactNode;
   error?: string;
   busy?: boolean;
+  className?: string;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -155,7 +158,7 @@ function Modal({
     <dialog
       ref={ref}
       aria-label={title}
-      className="e-native-dialog"
+      className={'e-native-dialog ' + className}
       onCancel={(event) => {
         event.preventDefault();
         onClose();
@@ -277,6 +280,10 @@ export default function App() {
   const [batchIds, setBatchIds] = useState<string[]>([]),
     [batchPage, setBatchPage] = useState(0);
   const [testConsent, setTestConsent] = useState(false);
+  const [autoPublish, setAutoPublish] = useState(true);
+  const [bubaConfirmed, setBubaConfirmed] = useState(false);
+  const [queueSelectionPage, setQueueSelectionPage] = useState(0);
+  const [queueError, setQueueError] = useState('');
   const [statsAccount, setStatsAccount] = useState('all');
   const [statsMode, setStatsMode] = useState('videos');
   const [statsPlatform, setStatsPlatform] = useState('all');
@@ -311,6 +318,8 @@ export default function App() {
     setMessage('');
     setError(false);
     setTestConsent(false);
+    setBubaConfirmed(false);
+    setQueueSelectionPage(0);
   }, [modal]);
   useEffect(() => {
     setCurrentJob((current) =>
@@ -439,8 +448,13 @@ export default function App() {
         setError(false);
       }
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : 'Не удалось выполнить действие');
+      const problem = e instanceof Error ? e.message : 'Не удалось выполнить действие';
+      setMessage(problem);
       setError(true);
+      if (modal === 'enqueue') {
+        setQueueError(problem);
+        setModal('enqueue-error');
+      }
     } finally {
       mutationPending.current = false;
       setBusy(false);
@@ -451,11 +465,22 @@ export default function App() {
     setDraft((d) => (d ? { ...d, ...value } : d));
     setDirty(true);
   };
+  const gemini = useGemini(
+    selected,
+    draft?.caption ?? '',
+    draft?.title ?? '',
+    !!draft?.buba_mode,
+    draft?.auto_hashtags ? (data?.default_hashtags ?? []) : [],
+    patch,
+  );
   const save = async () => {
     if (!asset || !draft) return;
     const revision = draftRevision.current;
-    await api(`/assets/${asset.id}/edit`, 'PUT', draft);
-    if (revision === draftRevision.current) setDirty(false);
+    const saved = await api<Asset>(`/assets/${asset.id}/edit`, 'PUT', draft);
+    if (revision === draftRevision.current) {
+      setDraft(saved.edit);
+      setDirty(false);
+    }
   };
   const selectAsset = (next: Asset) =>
     next.id === selected
@@ -633,6 +658,11 @@ export default function App() {
   const overlayHeight =
     draft?.banner_height ?? (overlayWidth * (9 / 16)) / (overlayMedia.width / overlayMedia.height);
   const targets = draft?.targets ?? [];
+  const queueSources = allSources ? videos : asset ? [asset] : [];
+  const queueAccounts = data.accounts.filter((a) => targets.includes(a.id));
+  const queueSourcePages = Math.max(1, Math.ceil(queueSources.length / 3));
+  const queueAccountPages = Math.max(1, Math.ceil(queueAccounts.length / 6));
+  const queuePages = Math.max(queueSourcePages, queueAccountPages);
   const filteredJobs = data.jobs.filter((j) => filter === 'all' || j.status === filter);
   const visibleJobs = filteredJobs.slice(jobPage * 4, jobPage * 4 + 4);
   const statsAccounts = data.accounts.filter(
@@ -1280,6 +1310,53 @@ export default function App() {
                             onChange={(e) => patch({ caption: e.target.value })}
                           />
                         </Field>
+                        <div className="e-row" style={{ gap: 5 }}>
+                          <Button
+                            disabled={gemini.running || busy}
+                            onClick={() => void gemini.generate()}
+                          >
+                            {gemini.running ? 'ИИ анализирует…' : 'ИИ: описание'}
+                          </Button>
+                          {gemini.proposal && (
+                            <Button onClick={() => gemini.applyProposal(gemini.proposal!)}>
+                              Применить
+                            </Button>
+                          )}
+                          <button
+                            className="e-button"
+                            aria-label="Настройки Gemini"
+                            title={gemini.status || 'Настройки Gemini'}
+                            onClick={() => setModal('gemini')}
+                          >
+                            ИИ ⚙
+                          </button>
+                        </div>
+                        {gemini.status && (
+                          <span
+                            className="e-small e-muted truncate"
+                            style={{ display: 'block', maxWidth: '100%' }}
+                            title={gemini.status}
+                            role="status"
+                          >
+                            {gemini.failed ? (
+                              <button
+                                className="e-small e-muted"
+                                style={{
+                                  padding: 0,
+                                  border: 0,
+                                  background: 'none',
+                                  textDecoration: 'underline',
+                                  cursor: 'pointer',
+                                }}
+                                onClick={() => setModal('gemini-error')}
+                              >
+                                Ошибка ИИ · показать причину
+                              </button>
+                            ) : (
+                              gemini.status
+                            )}
+                          </span>
+                        )}
                         <Field label="Видимость">
                           <select
                             className="e-field"
@@ -1321,8 +1398,7 @@ export default function App() {
                           Сведения о содержимом
                         </Button>
                         <p className="e-small e-muted">
-                          Постановка в очередь создаёт файлы. Отправка подтверждается после
-                          просмотра.
+                          В очереди можно включить автозалив по времени.
                         </p>
                       </>
                     )}
@@ -1514,7 +1590,9 @@ export default function App() {
                                     dateStyle: 'short',
                                     timeStyle: 'short',
                                   })
-                                : 'После подтверждения'}
+                                : j.approved
+                                  ? 'Автоматически после рендера'
+                                  : 'После подтверждения'}
                             </td>
                             <td>
                               <Button
@@ -1932,6 +2010,7 @@ export default function App() {
                       <Upload size={13} />
                       Импорт OAuth JSON
                     </Button>
+                    <Button onClick={() => setModal('gemini')}>Gemini · ИИ</Button>
                     <span className={'e-badge' + (data.google_configured ? ' good' : '')}>
                       {data.google_configured ? 'Конфигурация сохранена' : 'Не настроено'}
                     </span>
@@ -1996,6 +2075,31 @@ export default function App() {
               <X size={15} />
             </button>
           </div>
+        )}
+        {modal === 'gemini' && (
+          <Modal title="Gemini · описания и хэштеги" onClose={close}>
+            <GeminiSettings />
+          </Modal>
+        )}
+        {modal === 'gemini-error' && (
+          <Modal title="Gemini · причина ошибки" onClose={close}>
+            <p className="e-small" style={{ overflowWrap: 'anywhere' }}>
+              {gemini.status}
+            </p>
+            <p className="e-small e-muted">
+              Название и описание сохранены. При временном сбое программа проверяет резервные модели
+              по порядку; ошибки ключа и запроса останавливают цепочку.
+            </p>
+            <Button
+              disabled={gemini.running || busy}
+              onClick={() => {
+                setModal('');
+                void gemini.generate();
+              }}
+            >
+              Повторить анализ
+            </Button>
+          </Modal>
         )}
         {modal === 'banner' && draft && (
           <Modal
@@ -2254,18 +2358,72 @@ export default function App() {
             </Button>
           </Modal>
         )}
+        {modal === 'enqueue-error' && (
+          <Modal title="Автозалив · проверь параметры" onClose={close}>
+            <p role="alert" style={{ overflowWrap: 'anywhere' }}>
+              {queueError}
+            </p>
+            <Button primary onClick={() => setModal('enqueue')}>
+              К параметрам очереди
+            </Button>
+          </Modal>
+        )}
         {modal === 'enqueue' && (
           <Modal
             busy={busy}
             error={error ? message : undefined}
-            title="Создать варианты"
+            title="Рендер и публикация"
+            className="queue-dialog"
             onClose={close}
           >
             <p>
               {allSources ? videos.length : 1} исходник(а) × {targets.length} аккаунт(ов) ={' '}
-              {(allSources ? videos.length : 1) * targets.length} вариантов. Применяются сохранённые
-              настройки каждого исходника; получатели выбраны в монтажной.
+              {(allSources ? videos.length : 1) * targets.length} вариантов.
             </p>
+            <ul className="queue-selection" aria-label="Выбранные каналы">
+              {queueAccounts
+                .slice(
+                  Math.min(queueSelectionPage, queueAccountPages - 1) * 6,
+                  (Math.min(queueSelectionPage, queueAccountPages - 1) + 1) * 6,
+                )
+                .map((a) => (
+                  <li key={a.id} title={`${a.platform} · ${a.name}`}>
+                    <span>{a.platform === 'youtube' ? 'YT' : 'TT'}</span>
+                    <span className="truncate">{a.name}</span>
+                  </li>
+                ))}
+            </ul>
+            <ul className="queue-selection queue-sources" aria-label="Выбранные исходники">
+              {queueSources
+                .slice(
+                  Math.min(queueSelectionPage, queueSourcePages - 1) * 3,
+                  (Math.min(queueSelectionPage, queueSourcePages - 1) + 1) * 3,
+                )
+                .map((a) => (
+                  <li key={a.id} title={a.name}>
+                    <span className="truncate">{a.name}</span>
+                    <span>
+                      {visibility[(a.id === selected ? draft : a.edit)?.visibility ?? 'private']}
+                    </span>
+                  </li>
+                ))}
+            </ul>
+            {queuePages > 1 && (
+              <Pager
+                page={queueSelectionPage}
+                set={setQueueSelectionPage}
+                total={queuePages}
+                size={1}
+              />
+            )}
+            <label className="e-check">
+              <input
+                type="checkbox"
+                checked={autoPublish}
+                onChange={(e) => setAutoPublish(e.target.checked)}
+              />
+              Автозалив после рендера
+            </label>
             <Field label={`Время отправки · ${data.settings.timezone} (необязательно)`}>
               <input
                 className="e-field"
@@ -2275,42 +2433,78 @@ export default function App() {
               />
             </Field>
             <p>
-              Сначала программа создаст MP4. После просмотра нужно отдельно подтвердить материал,
-              аккаунт и видимость. Пока подтверждения нет, публикация не начнётся.
+              {autoPublish
+                ? 'Рендер сразу, затем отправка по времени. Без времени — после готовности. Повторного подтверждения нет.'
+                : 'Будут созданы MP4 для просмотра. Для публикации потребуется отдельное подтверждение.'}
             </p>
+            {autoPublish &&
+              (allSources ? videos : asset ? [asset] : []).some((a) => {
+                const edit = a.id === selected ? draft : a.edit;
+                return edit?.buba_mode && !Object.values(edit.buba_review).every(Boolean);
+              }) && (
+                <label className="e-check e-small" style={{ alignItems: 'flex-start' }}>
+                  <input
+                    type="checkbox"
+                    checked={bubaConfirmed}
+                    onChange={(e) => setBubaConfirmed(e.target.checked)}
+                  />
+                  Подтверждаю для выбранных роликов условия БУБА: ссылка бота в шапке без сторонней
+                  рекламы; разборчивая озвучка и звук рекламы; права и существенная переработка;
+                  русская аудитория; без хромакея, чужих водяных знаков, политики, 18+, оскорблений
+                  и шок-контента; без накрутки, платного продвижения и приманок.
+                </label>
+              )}
+            {autoPublish && (
+              <p className="e-small e-muted">
+                Компьютер должен быть включён. Интервал канала: {data.settings.interval} мин.
+              </p>
+            )}
             <div className="e-row">
               <Button disabled={busy} onClick={close}>
                 Отмена
               </Button>
               <Button
                 primary
-                disabled={busy || !targets.length}
+                disabled={busy || !targets.length || (autoPublish && gemini.running)}
                 onClick={() =>
-                  void run(async () => {
-                    await save();
-                    const result = await api<{ created: string[]; existing: string[] }>(
-                      '/queue',
-                      'POST',
-                      {
+                  void run(
+                    async () => {
+                      await save();
+                      const result = await api<{
+                        created: string[];
+                        existing: string[];
+                        activated: string[];
+                        worker_warning?: string;
+                      }>('/queue', 'POST', {
                         asset_ids: allSources ? videos.map((a) => a.id) : [selected],
                         account_ids: targets,
+                        auto_publish: autoPublish,
+                        buba_confirmed: bubaConfirmed,
                         scheduled: schedule
                           ? new Date(
                               schedule + (data.settings.timezone === 'UTC' ? 'Z' : '+03:00'),
                             ).toISOString()
                           : null,
-                      },
-                    );
-                    setModal('');
-                    setView('queue');
-                    if (!result.created.length)
-                      throw new Error(
-                        'Такие варианты уже есть в очереди. Измените настройки для нового варианта.',
-                      );
-                  }, 'Варианты добавлены в очередь')
+                      });
+                      setModal('');
+                      setView('queue');
+                      if (result.worker_warning) throw new Error(result.worker_warning);
+                      if (!result.created.length && !result.activated.length)
+                        throw new Error(
+                          'Такие варианты уже есть в очереди или опубликованы. Повторная отправка не создана.',
+                        );
+                    },
+                    autoPublish
+                      ? 'Автозалив запущен: рендер → отправка по расписанию'
+                      : 'Варианты добавлены для проверки',
+                  )
                 }
               >
-                Создать варианты
+                {autoPublish
+                  ? gemini.running
+                    ? 'Ждём описание ИИ…'
+                    : 'Запустить автозалив'
+                  : 'Создать MP4'}
               </Button>
             </div>
           </Modal>
@@ -2733,13 +2927,14 @@ export default function App() {
                 <Button onClick={() => setModal('reconcile')}>Сверить ID ролика</Button>
               )}
               <Button onClick={() => setModal('job-campaign')}>БУБА и комментарии</Button>
-              {['ready', 'waiting_auth', 'missed', 'scheduled'].includes(currentJob.status) && (
-                <Button primary disabled={busy} onClick={() => setModal('approve')}>
-                  {canAutoPublish(currentJob.account)
-                    ? 'Подтвердить отправку'
-                    : 'Проверить и отправить в TikTok'}
-                </Button>
-              )}
+              {['ready', 'waiting_auth', 'missed', 'scheduled'].includes(currentJob.status) &&
+                (!currentJob.approved || currentJob.status === 'missed') && (
+                  <Button primary disabled={busy} onClick={() => setModal('approve')}>
+                    {canAutoPublish(currentJob.account)
+                      ? 'Подтвердить отправку'
+                      : 'Проверить и отправить в TikTok'}
+                  </Button>
+                )}
               {['failed', 'cancelled'].includes(currentJob.status) && (
                 <Button
                   disabled={busy}

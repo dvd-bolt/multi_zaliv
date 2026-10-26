@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-26T22:09:43.121795+03:00",
+  "liveModelsAvailable": [
+    "gemini-3.8-flash",
+    "gemini-3.6-flash",
+    "gemini-3.5-flash-lite",
+    "gemini-3.1-flash-lite"
+  ],
+  "configured": true,
+  "auto": true,
+  "liveGenerationVerified": true,
+  "liveGenerationFailure": [],
+  "newTestsPassed": 17,
+  "regressionChecksAfterEncodingRepairPassed": 19,
+  "uiReport": "ui-results.json",
+  "realPublications": false,
+  "secretsIncluded": false,
+  "sourceDurationSeconds": 110.9,
+  "liveModel": "gemini-3.6-flash",
+  "liveTried": [
+    "gemini-3.8-flash",
+    "gemini-3.6-flash"
+  ],
+  "liveFallbackReason": "HTTP 503",
+  "liveCachedGetAndPost": "ready",
+  "captionSemanticReview": "pending user"
+}

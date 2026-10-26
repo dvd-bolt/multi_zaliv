@@ -4,6 +4,7 @@ from typing import Literal
 from pydantic import AwareDatetime, BaseModel, Field, model_validator
 
 from .buba import with_hashtag
+from .hashtags import with_defaults
 
 
 class BubaReview(BaseModel):
@@ -35,6 +36,7 @@ class Edit(BaseModel):
     banner_audio: bool = False
     banner_height: float | None = Field(None, ge=5, le=100, allow_inf_nan=False)
     buba_mode: bool = False
+    auto_hashtags: bool = False
     buba_review: BubaReview = Field(default_factory=BubaReview)
     x: float = Field(50, ge=0, le=100)
     y: float = Field(77, ge=0, le=100)
@@ -58,10 +60,12 @@ class Edit(BaseModel):
 
     @model_validator(mode="after")
     def campaign_caption(self):
+        if self.auto_hashtags:
+            self.caption = with_defaults(self.caption)
         if self.buba_mode:
             self.caption = with_hashtag(self.caption)
-            if len(self.caption) > 2200:
-                raise ValueError("Освободите место в описании для #бубавпн")
+        if len(self.caption) > 2200:
+            raise ValueError("Освободите место в описании для автоматических хэштегов")
         return self
 
     def effective(self, length: float):
@@ -85,6 +89,8 @@ class Enqueue(BaseModel):
     asset_ids: list[str] = Field(min_length=1, max_length=30)
     account_ids: list[str] = Field(min_length=1, max_length=30)
     scheduled: str | None = None
+    auto_publish: bool = False
+    buba_confirmed: bool = False
 
 
 class JobAction(BaseModel):
@@ -125,3 +131,15 @@ class BubaTracking(BaseModel):
 
 class CommentReview(BaseModel):
     reviewed: bool
+
+
+class GeminiKey(BaseModel):
+    api_key: str = Field(min_length=15, max_length=300)
+
+
+class GeminiOptions(BaseModel):
+    auto: bool
+
+
+class GeminiGenerate(BaseModel):
+    force: bool = False

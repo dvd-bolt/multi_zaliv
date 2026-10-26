@@ -1,6 +1,6 @@
 import hashlib
 import json
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from sqlalchemy import select, update
@@ -20,16 +20,32 @@ def enqueue(db, request):
     accounts = [db.get(Account, key) for key in dict.fromkeys(request.account_ids)]
     if any(a is None or not a.enabled for a in accounts):
         raise ValueError("Выбранный аккаунт недоступен")
+    if request.auto_publish:
+        for account in accounts:
+            if not account.connected or not account.external_id:
+                raise ValueError(f"Подключите {account.name} перед автозаливом")
+            if account.platform == "tiktok" and account.method != "browser_verified":
+                raise ValueError(f"{account.name}: сначала завершите первую проверочную отправку TikTok")
     accounts.sort(key=lambda a: a.id)
     assets = [db.get(Asset, key) for key in dict.fromkeys(request.asset_ids)]
     if any(a is None or a.kind != "video" or a.archived for a in assets):
         raise ValueError("Исходник не найден")
-    created, existing = [], []
+    created, existing, activated = [], [], []
     for asset in assets:
+        if request.auto_publish and request.buba_confirmed and asset.edit.get("buba_mode"):
+            from .buba import REVIEW
+
+            asset.edit = {**asset.edit, "buba_review": {key: True for key in REVIEW}}
         config = Edit.model_validate(asset.edit).effective(asset.media["duration"])
         banner = db.get(Asset, config["banner_id"]) if config["banner_id"] else None
         if config["banner_id"] and (banner is None or banner.kind != "banner"):
             raise ValueError("Баннер не найден")
+        if request.auto_publish:
+            from .buba import require_config_ready
+
+            require_config_ready(db, asset.media, banner.media if banner else None, config)
+            if config["visibility"] == "unlisted" and any(a.platform == "tiktok" for a in accounts):
+                raise ValueError("Для TikTok выберите «Открытый доступ» или «Только я»")
         for slot, account in enumerate(accounts):
             variant_config = variation(config, account.id, slot, len(accounts))
             variant_config["quality"] = settings(db)["quality"]
@@ -41,7 +57,25 @@ def enqueue(db, request):
             ).hexdigest()
             variant = db.scalar(select(Variant).where(Variant.fingerprint == fingerprint))
             if variant:
-                existing.append(db.scalar(select(Job.id).where(Job.variant_id == variant.id)))
+                job = db.scalar(select(Job).where(Job.variant_id == variant.id))
+                existing.append(job.id)
+                if (
+                    request.auto_publish
+                    and not job.external_id
+                    and not job.upload_started_at
+                    and job.status in ("queued", "rendering", "ready", "waiting_auth", "missed", "scheduled")
+                ):
+                    # The queue click explicitly authorizes this same immutable variant.
+                    # Never revive a possibly sent, cancelled or failed publication here.
+                    if not job.approved or not job.auto_publish or job.scheduled != scheduled:
+                        job.approved, job.scheduled, job.error = True, scheduled, None
+                        job.auto_publish = True
+                        if job.status not in ("queued", "rendering"):
+                            job.status = (
+                                "scheduled" if variant.output and Path(variant.output).is_file() else "queued"
+                            )
+                        job.updated = now()
+                        activated.append(job.id)
                 continue
             variant = Variant(
                 asset_id=asset.id,
@@ -52,11 +86,20 @@ def enqueue(db, request):
             )
             db.add(variant)
             db.flush()
-            job = Job(variant_id=variant.id, scheduled=scheduled)
+            job = Job(
+                variant_id=variant.id,
+                scheduled=scheduled,
+                approved=request.auto_publish,
+                auto_publish=request.auto_publish,
+            )
             db.add(job)
             db.flush()
             created.append(job.id)
-    return {"created": created, "existing": existing}
+    if request.auto_publish:
+        from .db import Setting
+
+        db.get(Setting, "application").value = {**settings(db), "paused": False}
+    return {"created": created, "existing": existing, "activated": activated}
 
 
 def recover(db):
@@ -70,6 +113,21 @@ def recover(db):
             status="unknown",
             updated=now(),
             error="Рабочий процесс прерван во время отправки. Сначала проверьте результат на платформе.",
+        )
+    )
+    db.execute(
+        update(Job)
+        .where(
+            Job.auto_publish.is_(True),
+            Job.approved.is_(True),
+            Job.status.in_(["queued", "scheduled", "waiting_auth", "ready"]),
+            Job.scheduled.is_not(None),
+            Job.scheduled < (datetime.now(UTC) - timedelta(minutes=10)).isoformat(),
+        )
+        .values(
+            status="missed",
+            error="Время прошло, пока программа была выключена или компьютер спал. Выберите новое время.",
+            updated=now(),
         )
     )
 
@@ -88,10 +146,12 @@ def action(db, job, request):
         ):
             raise ValueError("Отправку уже нельзя безопасно отменить")
         job.status = "cancelled"
+        job.approved = False
     elif request.action == "retry":
         if job.status not in ("failed", "cancelled") or job.external_id:
             raise ValueError("Повтор разрешён только после ошибки обработки или отмены")
-        job.status, job.progress, job.error, job.approved = "queued", 0, None, False
+        keep_auto = job.auto_publish and job.approved and job.status == "failed" and not job.upload_started_at
+        job.status, job.progress, job.error, job.approved = "queued", 0, None, bool(keep_auto)
     elif request.action in ("approve", "resume", "test_upload"):
         if job.status not in ("ready", "waiting_auth", "missed", "scheduled"):
             raise ValueError("Сначала дождитесь готового видео")
@@ -126,6 +186,12 @@ def action(db, job, request):
         if request.action == "resume":
             job.scheduled = None
         job.status = "scheduled" if account.connected else "waiting_auth"
+        if (
+            request.action == "resume"
+            and job.auto_publish
+            and (not variant.output or not Path(variant.output).is_file())
+        ):
+            job.status = "queued"
     elif request.action == "reconcile":
         if job.status != "unknown" or not request.external_id:
             raise ValueError("Укажите ID ролика для задания с неизвестным результатом")

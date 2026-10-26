@@ -10,7 +10,7 @@ from pathlib import Path
 
 from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.schedulers.blocking import BlockingScheduler
-from sqlalchemy import select, update
+from sqlalchemy import case, select, update
 
 from .config import DATA
 from .db import Asset, Job, Session, Variant, now, settings
@@ -18,11 +18,15 @@ from .media import builtin_banner, render
 from .queue import recover
 
 HEARTBEAT_LOCK = threading.Lock()
+RECOVERY_NEEDED = threading.Event()
 
 
 def heartbeat():
     with HEARTBEAT_LOCK:
         try:
+            marker = DATA / "worker.heartbeat"
+            if marker.exists() and time.time() - marker.stat().st_mtime > 600:
+                RECOVERY_NEEDED.set()
             # Use mtime: Windows readers/antivirus can briefly prevent replacing an open JSON file.
             # A diagnostic heartbeat must never turn a successful render into a failed job.
             (DATA / "worker.heartbeat").touch()
@@ -36,12 +40,17 @@ def tick():
         options = settings(db)
         if options["paused"]:
             return
+        if RECOVERY_NEEDED.is_set():
+            recover(db)
+            db.commit()
+            RECOVERY_NEEDED.clear()
+        # Due publications take precedence over the next render in a large batch.
+        from .platforms import dispatch_one
+
+        dispatch_one(db)
+        db.commit()
         job = db.scalar(select(Job).where(Job.status == "queued").order_by(Job.created))
         if not job:
-            from .platforms import dispatch_one
-
-            dispatch_one(db)
-            db.commit()
             return
         job_id = job.id
         changed = db.execute(
@@ -93,7 +102,12 @@ def tick():
             completed = db.execute(
                 update(Job)
                 .where(Job.id == job_id, Job.status == "rendering")
-                .values(status="ready", progress=100, error=None, updated=now())
+                .values(
+                    status=case((Job.approved.is_(True), "scheduled"), else_="ready"),
+                    progress=100,
+                    error=None,
+                    updated=now(),
+                )
             ).rowcount
             if completed:
                 db.get(Variant, variant.id).output = str(output)
