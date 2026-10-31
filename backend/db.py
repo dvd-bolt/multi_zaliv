@@ -140,6 +140,10 @@ DEFAULTS = {
     "retention_days": 30,
     "notifications": True,
     "project_name": "Банерка / Новый пакет",
+    # 1 — «Фильмы и анимация»; 24 — «Развлечения»; 23 — «Юмор»; 22 — «Люди и блоги».
+    "youtube_category": "1",
+    # One video goes to one TikTok and one YouTube: BUBA pays for a video once, copies only compete.
+    "one_per_platform": True,
 }
 
 

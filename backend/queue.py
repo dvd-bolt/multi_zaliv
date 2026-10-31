@@ -26,6 +26,13 @@ def enqueue(db, request):
                 raise ValueError(f"Подключите {account.name} перед автозаливом")
             if account.platform == "tiktok" and account.method != "browser_verified":
                 raise ValueError(f"{account.name}: сначала завершите первую проверочную отправку TikTok")
+    if settings(db).get("one_per_platform", True):
+        platforms = [a.platform for a in accounts]
+        if len(platforms) != len(set(platforms)):
+            raise ValueError(
+                "Один ролик — на один TikTok и один YouTube. Выберите по одному аккаунту на платформу "
+                "(или отключите правило в Настройках)."
+            )
     accounts.sort(key=lambda a: a.id)
     assets = [db.get(Asset, key) for key in dict.fromkeys(request.asset_ids)]
     if any(a is None or a.kind != "video" or a.archived for a in assets):

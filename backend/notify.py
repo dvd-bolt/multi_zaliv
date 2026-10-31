@@ -83,16 +83,21 @@ def pending(db):
 
 
 def flush(db, send=post, clock=time.monotonic):
-    """Report new outcomes. Without a configured connection they are marked silently (no backlog later)."""
+    """Report new outcomes and payout reminders. Without a connection they are marked silently (no backlog)."""
     global _pause_until
+    from . import payouts
+
     jobs = pending(db)
-    if not jobs:
+    reminders = payouts.events(db)
+    if not jobs and not reminders:
         db.commit()
         return 0
     conn = connection()
     if not conn:
         for job in jobs:
             job.notified_status = job.status
+        for job_id, kind, _ in reminders:
+            payouts.remember(db, job_id, kind)
         db.commit()
         return 0
     if clock() < _pause_until:
@@ -106,13 +111,19 @@ def flush(db, send=post, clock=time.monotonic):
             group = auth.setdefault(event["account_id"], {**event, "jobs": []})
             group["jobs"].append(job)
         else:
-            events.append(({**event}, [job]))
-    events += [
-        ({k: v for k, v in group.items() if k != "jobs"} | {"count": len(group["jobs"])}, group["jobs"])
-        for group in auth.values()
-    ]
+            events.append(({**event}, lambda job=job: setattr(job, "notified_status", job.status)))
+    for group in auth.values():
+        owners = group.pop("jobs")
+        events.append(
+            (
+                {**group, "count": len(owners)},
+                lambda owners=owners: [setattr(j, "notified_status", j.status) for j in owners],
+            )
+        )
+    for job_id, kind, event in reminders:
+        events.append((event, lambda job_id=job_id, kind=kind: payouts.remember(db, job_id, kind)))
     sent = 0
-    for event, owners in events:
+    for event, done in events:
         try:
             ok = send(conn, {"event": event})
         except Exception:
@@ -120,8 +131,7 @@ def flush(db, send=post, clock=time.monotonic):
         if not ok:
             _pause_until = clock() + RETRY_AFTER
             break
-        for job in owners:
-            job.notified_status = job.status
+        done()
         sent += 1
     db.commit()
     return sent

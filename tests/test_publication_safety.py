@@ -153,3 +153,24 @@ def test_cleanup_never_deletes_original_or_unknown_export(publication):
         from pathlib import Path
 
         assert Path(db.get(Asset, publication[1]).path).exists()
+
+
+def test_youtube_metadata_category_tags_language_and_title(publication, monkeypatch):
+    service = FakeYouTube()
+    monkeypatch.setattr(platforms, "youtube_service", lambda _: service)
+    with Session.begin() as db:
+        variant = db.get(Variant, publication[2])
+        variant.config = {
+            **variant.config,
+            "title": "",
+            "caption": "Шахта №4: люди в лифте. Не свети вверх. #бубавпн",
+            "genre": "auto",
+        }
+    with Session() as db:
+        platforms.dispatch_one(db)
+        db.commit()
+    snippet = service.body["snippet"]
+    assert snippet["title"] == "Шахта №4: люди в лифте."
+    assert snippet["categoryId"] == "1"
+    assert snippet["defaultLanguage"] == snippet["defaultAudioLanguage"] == "ru"
+    assert snippet["tags"][:2] == ["бубавпн", "хоррор"]

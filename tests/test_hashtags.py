@@ -2,21 +2,44 @@ import pytest
 from fastapi.testclient import TestClient
 
 from backend.app import app
-from backend.hashtags import DEFAULT_HASHTAGS, with_defaults
+from backend.hashtags import (
+    DEFAULT_HASHTAGS,
+    MAX_TAGS,
+    detect,
+    present,
+    title_from,
+    with_defaults,
+    youtube_tags,
+)
 from backend.schemas import Edit
 
 
-def test_fixed_tags_are_case_insensitive_and_match_full_tokens():
-    source = "Сцена #МУЛЬТИКИ #мультфильмы_другое"
-    result = with_defaults(source)
+def test_genre_tags_are_case_insensitive_limited_and_idempotent():
+    source = "Сцена #ХОРРОР #хоррор_другое"
+    result = with_defaults(source, "horror")
     assert result.startswith(source)
-    assert result.count("#МУЛЬТИКИ") == 1 and "\n#мультфильмы #юмор" in result
-    assert with_defaults(result) == result
+    assert "#хоррор" not in result[len(source) :].lower().split()  # already present in another case
+    assert len(present(result)) == MAX_TAGS
+    assert with_defaults(result, "horror") == result
+
+
+def test_auto_genre_from_title_and_text():
+    assert detect("Шахта №4: Не свети вверх") == "horror"
+    assert detect("Смешной прикол с котом") == "comedy"
+    assert detect("") == "story"
+    assert "#хоррор" in with_defaults("История о людях в лифте. Страшно.", "auto")
+    assert (
+        title_from("Герои прячутся в темноте. Потом выходят. #анимация", "x.mp4")
+        == "Герои прячутся в темноте."
+    )
+    assert title_from("#бубавпн", "my_episode.mp4") == "my episode"
+    assert youtube_tags("Текст #бубавпн", "horror")[:2] == ["бубавпн", "хоррор"]
 
 
 def test_fixed_tags_work_without_ai_and_preserve_legacy_opt_out():
     edit = Edit(caption="Смешной момент", auto_hashtags=True, buba_mode=True)
-    assert all(tag in edit.caption for tag in (*DEFAULT_HASHTAGS, "#бубавпн"))
+    assert all(tag in edit.caption for tag in ("#юмор", "#бубавпн"))
+    assert "#мультфильмы" not in edit.caption
     assert Edit.model_validate(edit.model_dump()).caption == edit.caption
     assert Edit(caption="Без автоматики").caption == "Без автоматики"
     assert "#бубавпн" not in Edit(auto_hashtags=True).caption

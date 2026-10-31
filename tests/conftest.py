@@ -22,4 +22,8 @@ def legacy_non_campaign_mode():
     from backend.db import Session, Setting, settings
 
     with Session.begin() as db:
-        db.get(Setting, "application").value = {**settings(db), "buba_required": False}
+        db.get(Setting, "application").value = {
+            **settings(db),
+            "buba_required": False,
+            "one_per_platform": False,
+        }

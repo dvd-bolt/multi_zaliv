@@ -37,6 +37,7 @@ class Edit(BaseModel):
     banner_height: float | None = Field(None, ge=5, le=100, allow_inf_nan=False)
     buba_mode: bool = False
     auto_hashtags: bool = False
+    genre: Literal["auto", "horror", "mystery", "comedy", "drama", "adventure", "scifi", "story"] = "auto"
     buba_review: BubaReview = Field(default_factory=BubaReview)
     x: float = Field(50, ge=0, le=100)
     y: float = Field(77, ge=0, le=100)
@@ -61,7 +62,7 @@ class Edit(BaseModel):
     @model_validator(mode="after")
     def campaign_caption(self):
         if self.auto_hashtags:
-            self.caption = with_defaults(self.caption)
+            self.caption = with_defaults(self.caption, self.genre, self.title)
         if self.buba_mode:
             self.caption = with_hashtag(self.caption)
         if len(self.caption) > 2200:
@@ -112,6 +113,8 @@ class SettingsUpdate(BaseModel):
     retention_days: int | None = Field(None, ge=1, le=365)
     notifications: bool | None = None
     project_name: str | None = Field(None, min_length=1, max_length=80)
+    youtube_category: Literal["1", "24", "23", "22"] | None = None
+    one_per_platform: bool | None = None
 
 
 class TikTokConfirmation(BaseModel):

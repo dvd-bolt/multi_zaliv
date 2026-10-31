@@ -44,7 +44,7 @@ from .db import (
     settings,
     uid,
 )
-from .hashtags import DEFAULT_HASHTAGS
+from .hashtags import DEFAULT_HASHTAGS, GENRES
 from .maintenance import backup_database, cleanup_exports
 from .media import builtin_banner, inspect
 from .platforms import AUTH, begin_youtube, cancelling_auth, import_tiktok, refresh_metrics
@@ -179,6 +179,7 @@ def state():
         )
         return {
             "default_hashtags": DEFAULT_HASHTAGS,
+            "genres": {key: {"label": label, "tags": tags} for key, (label, tags) in GENRES.items()},
             "assets": [
                 asset_data(a)
                 for a in db.scalars(
@@ -770,6 +771,42 @@ def update_settings(request: SettingsUpdate):
 
 class TelegramConnect(BaseModel):
     code: str
+
+
+class PayoutChoice(BaseModel):
+    job_id: str
+
+
+class PayoutState(BaseModel):
+    state: str
+
+
+@app.get("/api/payouts")
+def payouts_overview():
+    from .payouts import overview
+
+    with Session() as db:
+        return overview(db)
+
+
+@app.post("/api/payouts/{asset_id}/choose")
+def payouts_choose(asset_id: str, request: PayoutChoice):
+    from .payouts import choose
+
+    with Session.begin() as db:
+        db.execute(text("BEGIN IMMEDIATE"))
+        choose(db, asset_id, request.job_id)
+    return {"ok": True}
+
+
+@app.post("/api/payouts/job/{job_id}/state")
+def payouts_state(job_id: str, request: PayoutState):
+    from .payouts import mark
+
+    with Session.begin() as db:
+        db.execute(text("BEGIN IMMEDIATE"))
+        mark(db, job_id, request.state)
+    return {"ok": True}
 
 
 @app.post("/api/telegram")

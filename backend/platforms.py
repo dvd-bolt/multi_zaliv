@@ -270,6 +270,20 @@ def dispatch_one(db):
             job.status, job.approved, job.error = "ready", False, str(error)
             db.commit()
             return
+        # Upload metadata is prepared before the remote write: an error here must not become "unknown".
+        from .db import Asset
+        from .hashtags import title_from, youtube_tags
+
+        source = db.get(Asset, variant.asset_id)
+        youtube_title = (variant.config.get("title") or "").strip() or title_from(
+            variant.config.get("caption", ""), source.name if source else ""
+        )
+        youtube_category = str(settings(db).get("youtube_category") or "1")
+        if account.platform == "youtube" and not youtube_title:
+            job.status, job.approved = "ready", False
+            job.error = "Укажите название ролика для YouTube"
+            db.commit()
+            return
         claimed = db.execute(
             update(Job)
             .where(Job.id == job.id, Job.status == job.status, Job.approved.is_(True))
@@ -292,9 +306,14 @@ def dispatch_one(db):
                     part="snippet,status",
                     body={
                         "snippet": {
-                            "title": config["title"] or "Видео",
+                            "title": youtube_title,
                             "description": config["caption"],
-                            "categoryId": "22",
+                            "categoryId": youtube_category,
+                            "tags": youtube_tags(
+                                config["caption"], config.get("genre"), config.get("title", "")
+                            ),
+                            "defaultLanguage": "ru",
+                            "defaultAudioLanguage": "ru",
                         },
                         "status": {
                             "privacyStatus": config["visibility"],
