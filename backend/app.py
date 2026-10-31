@@ -156,6 +156,7 @@ def job_data(db, job):
                 "url",
                 "created",
                 "updated",
+                "upload_started_at",
             )
         },
         "account": public_account(account),

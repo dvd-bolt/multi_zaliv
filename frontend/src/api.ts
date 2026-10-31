@@ -29,13 +29,20 @@ export type Edit = {
   synthetic: boolean;
   made_for_kids: boolean;
   targets: string[];
+  genre: 'auto' | 'horror' | 'mystery' | 'comedy' | 'drama' | 'adventure' | 'scifi' | 'story';
   overrides: Record<string, Record<string, number | boolean>>;
 };
 export type Asset = {
   id: string;
   name: string;
   kind: 'video' | 'banner';
-  media: { width: number; height: number; duration: number; has_audio: boolean; image?: boolean };
+  media: {
+    width: number;
+    height: number;
+    duration: number;
+    has_audio: boolean;
+    image?: boolean;
+  };
   edit: Edit;
 };
 export type Account = {
@@ -65,6 +72,7 @@ export type Job = {
   has_output: boolean;
   updated: string;
   created: string;
+  upload_started_at?: string | null;
 };
 export type Settings = {
   buba_required: boolean;
@@ -76,9 +84,12 @@ export type Settings = {
   retention_days: number;
   project_name: string;
   notifications: boolean;
+  youtube_category?: '1' | '24' | '23' | '22';
+  one_per_platform?: boolean;
 };
 export type State = {
   default_hashtags: string[];
+  genres?: Record<string, { label: string; tags: string[] }>;
   assets: Asset[];
   accounts: Account[];
   jobs: Job[];
@@ -112,3 +123,25 @@ export async function api<T>(path: string, method = 'GET', body?: unknown): Prom
   }
   return response.json();
 }
+
+export type Publication = {
+  job_id: string;
+  platform: 'youtube' | 'tiktok';
+  account: string;
+  url: string | null;
+  views: number | null;
+  captured: string | null;
+  published_at: string;
+  state: string | null;
+};
+export type Payout = {
+  asset_id: string;
+  name: string;
+  title: string;
+  publications: Publication[];
+  chosen: string | null;
+  recommended: string | null;
+  deadline: string | null;
+  progress: number;
+  phase: 'choose' | 'collecting' | 'ready' | 'submitted' | 'paid' | 'rejected' | 'expired';
+};

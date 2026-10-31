@@ -27,7 +27,17 @@ import {
   Download,
   Trash2,
 } from 'lucide-react';
-import { api, type Account, type Asset, type Edit, type Job, type Metric, type State } from './api';
+import {
+  api,
+  type Account,
+  type Asset,
+  type Edit,
+  type Job,
+  type Metric,
+  type Payout,
+  type State,
+} from './api';
+import Stats from './Stats';
 import { GeminiSettings, useGemini } from './Gemini';
 
 import { latestMetrics, channelSummaries, channelsReport } from './statistics';
@@ -273,7 +283,6 @@ export default function App() {
   const [metrics, setMetrics] = useState<Metric[]>([]),
     [jobPage, setJobPage] = useState(0),
     [channelPage, setChannelPage] = useState(0),
-    [metricPage, setMetricPage] = useState(0),
     [filter, setFilter] = useState('all');
   const [historyJob, setHistoryJob] = useState(''),
     [externalId, setExternalId] = useState('');
@@ -284,12 +293,12 @@ export default function App() {
   const [bubaConfirmed, setBubaConfirmed] = useState(false);
   const [queueSelectionPage, setQueueSelectionPage] = useState(0);
   const [queueError, setQueueError] = useState('');
-  const [statsAccount, setStatsAccount] = useState('all');
-  const [statsMode, setStatsMode] = useState('videos');
-  const [statsPlatform, setStatsPlatform] = useState('all');
-  const [browserPairing, setBrowserPairing] = useState<{ code: string; expires_at: number } | null>(
-    null,
-  );
+  const statsAccount = 'all',
+    statsPlatform = 'all';
+  const [browserPairing, setBrowserPairing] = useState<{
+    code: string;
+    expires_at: number;
+  } | null>(null);
   const [archiveCandidate, setArchiveCandidate] = useState<Asset | null>(null);
   const [targetPage, setTargetPage] = useState(0);
   const [showOriginal, setShowOriginal] = useState(false),
@@ -379,10 +388,14 @@ export default function App() {
       clearInterval(timer);
     };
   }, []);
+  const [payouts, setPayouts] = useState<Payout[]>([]);
   useEffect(() => {
     if (view === 'stats')
-      void api<Metric[]>('/metrics')
-        .then(setMetrics)
+      void Promise.all([api<Metric[]>('/metrics'), api<Payout[]>('/payouts')])
+        .then(([m, pay]) => {
+          setMetrics(m);
+          setPayouts(pay);
+        })
         .catch(() => {
           setMessage('Не удалось загрузить статистику');
           setError(true);
@@ -399,7 +412,9 @@ export default function App() {
   useEffect(() => {
     const sync = () => {
       const host = window as Window & {
-        pywebview?: { api?: { set_dirty?: (value: boolean) => Promise<unknown> } };
+        pywebview?: {
+          api?: { set_dirty?: (value: boolean) => Promise<unknown> };
+        };
       };
       void host.pywebview?.api?.set_dirty?.(dirty)?.catch(() => {});
     };
@@ -471,7 +486,7 @@ export default function App() {
     draft?.caption ?? '',
     draft?.title ?? '',
     !!draft?.buba_mode,
-    draft?.auto_hashtags ? (data?.default_hashtags ?? []) : [],
+    [], // genre tags are added on save (backend, up to 5 in total)
     patch,
   );
   const save = async () => {
@@ -504,7 +519,10 @@ export default function App() {
       const next = await api<Asset>(`/assets?kind=${kind}`, 'POST', form);
       setData((current) =>
         current
-          ? { ...current, assets: [...current.assets.filter((a) => a.id !== next.id), next] }
+          ? {
+              ...current,
+              assets: [...current.assets.filter((a) => a.id !== next.id), next],
+            }
           : current,
       );
       if (kind === 'video') {
@@ -514,7 +532,11 @@ export default function App() {
         setTime(0);
         setSourcePage(Math.floor(videos.length / 3));
       } else {
-        patch({ banner_id: next.id, freeze_video: true, banner_audio: !!next.media.has_audio });
+        patch({
+          banner_id: next.id,
+          freeze_video: true,
+          banner_audio: !!next.media.has_audio,
+        });
       }
     }, 'Файл импортирован');
   };
@@ -625,7 +647,11 @@ export default function App() {
               patch({
                 overrides: {
                   ...draft.overrides,
-                  [variantTarget]: { ...defaults, ...draft.overrides[variantTarget], [key]: n },
+                  [variantTarget]: {
+                    ...defaults,
+                    ...draft.overrides[variantTarget],
+                    [key]: n,
+                  },
                 },
               });
             } else patch({ [key]: n });
@@ -661,6 +687,18 @@ export default function App() {
   const targets = draft?.targets ?? [];
   const queueSources = allSources ? videos : asset ? [asset] : [];
   const queueAccounts = data.accounts.filter((a) => targets.includes(a.id));
+  // One video → one TikTok + one YouTube: picking a second account of a platform replaces the first.
+  const toggleTarget = (a: Account) =>
+    targets.includes(a.id)
+      ? targets.filter((id) => id !== a.id)
+      : [
+          ...targets.filter(
+            (id) =>
+              data.settings.one_per_platform === false ||
+              data.accounts.find((x) => x.id === id)?.platform !== a.platform,
+          ),
+          a.id,
+        ];
   const queueSourcePages = Math.max(1, Math.ceil(queueSources.length / 3));
   const queueAccountPages = Math.max(1, Math.ceil(queueAccounts.length / 6));
   const queuePages = Math.max(queueSourcePages, queueAccountPages);
@@ -769,7 +807,10 @@ export default function App() {
               disabled={busy}
               onClick={() =>
                 void run(
-                  () => api('/settings', 'PATCH', { paused: !data.settings.paused }),
+                  () =>
+                    api('/settings', 'PATCH', {
+                      paused: !data.settings.paused,
+                    }),
                   data.settings.paused ? 'Очередь запущена' : 'Новые задания приостановлены',
                 )
               }
@@ -1358,27 +1399,58 @@ export default function App() {
                             )}
                           </span>
                         )}
-                        <Field label="Видимость">
-                          <select
-                            className="e-field"
-                            value={draft.visibility}
-                            onChange={(e) =>
-                              patch({ visibility: e.target.value as Edit['visibility'] })
-                            }
-                          >
-                            {Object.entries(visibility).map(([key, name]) => (
-                              <option key={key} value={key}>
-                                {name}
-                              </option>
-                            ))}
-                          </select>
-                        </Field>
+                        <div className="e-grid2">
+                          <Field label="Видимость">
+                            <select
+                              className="e-field"
+                              value={draft.visibility}
+                              onChange={(e) =>
+                                patch({
+                                  visibility: e.target.value as Edit['visibility'],
+                                })
+                              }
+                            >
+                              {Object.entries(visibility).map(([key, name]) => (
+                                <option key={key} value={key}>
+                                  {name}
+                                </option>
+                              ))}
+                            </select>
+                          </Field>
+                          <Field label="Жанр">
+                            <select
+                              className="e-field"
+                              value={draft.genre ?? 'auto'}
+                              onChange={(e) => patch({ genre: e.target.value as Edit['genre'] })}
+                            >
+                              <option value="auto">Авто</option>
+                              {Object.entries(data.genres ?? {}).map(([key, g]) => (
+                                <option key={key} value={key}>
+                                  {g.label}
+                                </option>
+                              ))}
+                            </select>
+                          </Field>
+                        </div>
+                        <p
+                          className="e-small e-tagline truncate"
+                          title="Хэштеги добавляются при сохранении, всего до 5"
+                        >
+                          {draft.genre && draft.genre !== 'auto'
+                            ? (data.genres?.[draft.genre]?.tags ?? []).join(' ')
+                            : 'Хэштеги жанра подберутся по названию и описанию'}
+                          {draft.buba_mode ? ' #бубавпн' : ''}
+                        </p>
                         <div className="e-grid2">
                           <Field label="Размер MP4">
                             <select
                               className="e-field"
                               value={draft.format}
-                              onChange={(e) => patch({ format: e.target.value as Edit['format'] })}
+                              onChange={(e) =>
+                                patch({
+                                  format: e.target.value as Edit['format'],
+                                })
+                              }
                             >
                               <option value="1080">1080 × 1920</option>
                               <option value="720">720 × 1280</option>
@@ -1437,9 +1509,7 @@ export default function App() {
                           aria-pressed={targets.includes(a.id)}
                           onClick={() =>
                             patch({
-                              targets: targets.includes(a.id)
-                                ? targets.filter((id) => id !== a.id)
-                                : [...targets, a.id],
+                              targets: toggleTarget(a),
                             })
                           }
                         >
@@ -1700,233 +1770,58 @@ export default function App() {
               </section>
             )}
             {view === 'stats' && (
-              <section className="e-content stats-view">
-                <div className="e-page-head">
-                  <div>
-                    <h1>Статистика</h1>
-                    <p>Последние накопительные счётчики. Это не прирост за период.</p>
-                  </div>
-                  <div className="e-row">
-                    <Button onClick={() => setModal('metric-import')}>Импорт CSV</Button>
-                    <Button
-                      disabled={!data.jobs.length}
-                      onClick={() => {
-                        setHistoryJob(data.jobs[0]?.id ?? '');
-                        setModal('history');
-                      }}
-                    >
-                      Динамика
-                    </Button>
-                    <Button
-                      disabled={busy}
-                      onClick={() =>
-                        void run(async () => {
-                          const result = await api<{ updated: number; unavailable: number }>(
-                            '/metrics/refresh',
-                            'POST',
-                          );
-                          setMetrics(await api('/metrics'));
-                          if (result.unavailable)
-                            throw new Error(
-                              `Обновлено: ${result.updated}. Нет доступа к данным: ${result.unavailable}.`,
-                            );
-                        }, 'Метрики обновлены')
-                      }
-                    >
-                      Обновить метрики
-                    </Button>
-                  </div>
-                </div>
-                <div className="e-toolbar">
-                  <select
-                    className="e-field"
-                    aria-label="Вид статистики"
-                    value={statsMode}
-                    onChange={(e) => {
-                      setStatsMode(e.target.value);
-                      setMetricPage(0);
-                    }}
-                  >
-                    <option value="videos">Ролики</option>
-                    <option value="channels">Сводка каналов</option>
-                  </select>
-                  <select
-                    className="e-field"
-                    aria-label="Платформа статистики"
-                    value={statsPlatform}
-                    onChange={(e) => {
-                      setStatsPlatform(e.target.value);
-                      setStatsAccount('all');
-                      setMetricPage(0);
-                    }}
-                  >
-                    <option value="all">Все платформы</option>
-                    <option value="youtube">YouTube</option>
-                    <option value="tiktok">TikTok</option>
-                  </select>
-                  <select
-                    className="e-field"
-                    aria-label="Канал статистики"
-                    value={statsAccount}
-                    onChange={(e) => {
-                      setStatsAccount(e.target.value);
-                      setMetricPage(0);
-                    }}
-                  >
-                    <option value="all">Все аккаунты</option>
-                    {data.accounts
-                      .filter((a) => statsPlatform === 'all' || a.platform === statsPlatform)
-                      .map((a) => (
-                        <option key={a.id} value={a.id}>
-                          {a.platform} · {a.name}
-                        </option>
-                      ))}
-                  </select>
-                  {statsMode === 'channels' && (
-                    <Button
-                      disabled={!summaries.length}
-                      onClick={() => {
-                        const url = URL.createObjectURL(
-                          new Blob([channelsReport(summaries)], { type: 'text/csv;charset=utf-8' }),
-                        );
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.download = 'frameflow-channels.csv';
-                        link.click();
-                        setTimeout(() => URL.revokeObjectURL(url), 1000);
-                      }}
-                    >
-                      <Download size={13} /> Экспорт CSV
-                    </Button>
-                  )}
-                </div>
-                {statsMode === 'channels' && summaries.length ? (
-                  <>
-                    <table className="e-table" aria-label="Сводка каналов">
-                      <thead>
-                        <tr>
-                          <th style={{ width: '32%' }}>Канал / охват данных</th>
-                          <th>Просмотры</th>
-                          <th>Лайки</th>
-                          <th>Комментарии</th>
-                          <th style={{ width: '23%' }}>Свежий снимок</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {summaries.slice(metricPage * 4, metricPage * 4 + 4).map((row) => (
-                          <tr key={row.account.id}>
-                            <td>
-                              <b className="truncate" title={row.account.name}>
-                                {row.account.name}
-                              </b>
-                              <small>
-                                {row.account.platform} · Снимки: {row.measured} из {row.jobs} задач
-                              </small>
-                              <small className="truncate" title={row.sources.join(', ')}>
-                                {row.sources.join(', ') || 'Нет снимков'}
-                              </small>
-                            </td>
-                            {(['views', 'likes', 'comments'] as const).map((key) => (
-                              <td key={key}>
-                                {row[key].value?.toLocaleString('ru-RU') ?? '—'}
-                                <small>
-                                  {row[key].covered} из {row.jobs} задач
-                                </small>
-                              </td>
-                            ))}
-                            <td>
-                              {row.captured
-                                ? new Date(row.captured).toLocaleString('ru-RU', {
-                                    timeZone: data.settings.timezone,
-                                  })
-                                : '—'}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    <p className="stats-note">
-                      Сумма известных значений; без данных — «—». Платформы не суммируются. Даты и
-                      возраст роликов могут различаться.
-                    </p>
-                    <Pager
-                      page={metricPage}
-                      set={setMetricPage}
-                      total={summaries.length}
-                      size={4}
-                    />
-                  </>
-                ) : !metricRows.length ? (
-                  <div className="e-empty">
-                    <ChartNoAxesCombined size={32} />
-                    <h2>Данных ещё нет</h2>
-                    <p>
-                      Подключите канал и подтвердите публикацию. Затем здесь появятся реальные
-                      метрики.
-                    </p>
-                  </div>
-                ) : (
-                  <>
-                    <table className="e-table">
-                      <thead>
-                        <tr>
-                          <th style={{ width: '35%' }}>Ролик / аккаунт</th>
-                          <th>Просмотры</th>
-                          <th>Лайки</th>
-                          <th>Комментарии</th>
-                          <th style={{ width: '25%' }}>Обновлено</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {metricRows.slice(metricPage * 6, metricPage * 6 + 6).map((m) => (
-                          <tr key={m.id}>
-                            <td>
-                              <b
-                                className="truncate"
-                                title={data.jobs.find((j) => j.id === m.job_id)?.account.name}
-                              >
-                                {data.jobs.find((j) => j.id === m.job_id)?.asset_name ?? m.job_id} ·{' '}
-                                {data.jobs.find((j) => j.id === m.job_id)?.account.name}
-                              </b>
-                              <small>
-                                {data.jobs.find((j) => j.id === m.job_id)?.account.platform} ·{' '}
-                                {m.source}
-                                {jobsById.get(m.job_id)?.url && (
-                                  <>
-                                    {' '}
-                                    ·{' '}
-                                    <a
-                                      href={jobsById.get(m.job_id)!.url!}
-                                      target="_blank"
-                                      rel="noreferrer"
-                                    >
-                                      Открыть ролик
-                                    </a>
-                                  </>
-                                )}
-                              </small>
-                            </td>
-                            <td>{m.values.views?.toLocaleString('ru-RU') ?? '—'}</td>
-                            <td>{m.values.likes?.toLocaleString('ru-RU') ?? '—'}</td>
-                            <td>{m.values.comments?.toLocaleString('ru-RU') ?? '—'}</td>
-                            <td>
-                              {new Date(m.captured).toLocaleString('ru-RU', {
-                                timeZone: data.settings.timezone,
-                              })}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    <Pager
-                      page={metricPage}
-                      set={setMetricPage}
-                      total={metricRows.length}
-                      size={6}
-                    />
-                  </>
-                )}
-              </section>
+              <Stats
+                data={data}
+                metrics={metrics}
+                payouts={payouts}
+                busy={busy}
+                timezone={data.settings.timezone}
+                refresh={() =>
+                  void run(async () => {
+                    const result = await api<{
+                      updated: number;
+                      unavailable: number;
+                    }>('/metrics/refresh', 'POST');
+                    setMetrics(await api('/metrics'));
+                    setPayouts(await api('/payouts'));
+                    if (result.unavailable)
+                      throw new Error(
+                        `Обновлено: ${result.updated}. Нет доступа к данным: ${result.unavailable}.`,
+                      );
+                  }, 'Метрики обновлены')
+                }
+                importCsv={() => setModal('metric-import')}
+                history={(jobId) => {
+                  setHistoryJob(jobId);
+                  setModal('history');
+                }}
+                exportCsv={() => {
+                  const url = URL.createObjectURL(
+                    new Blob([channelsReport(summaries)], {
+                      type: 'text/csv;charset=utf-8',
+                    }),
+                  );
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.download = 'frameflow-channels.csv';
+                  link.click();
+                  setTimeout(() => URL.revokeObjectURL(url), 1000);
+                }}
+                choose={(assetId, jobId) =>
+                  void run(async () => {
+                    await api(`/payouts/${assetId}/choose`, 'POST', {
+                      job_id: jobId,
+                    });
+                    setPayouts(await api('/payouts'));
+                  }, 'Площадка для выплаты выбрана')
+                }
+                mark={(jobId, state) =>
+                  void run(async () => {
+                    await api(`/payouts/job/${jobId}/state`, 'POST', { state });
+                    setPayouts(await api('/payouts'));
+                  }, 'Статус заявки обновлён')
+                }
+              />
             )}
             {view === 'settings' && (
               <section className="e-content">
@@ -1941,7 +1836,10 @@ export default function App() {
                       checked={!!data.settings.buba_required}
                       onChange={(e) =>
                         void run(
-                          () => api('/settings', 'PATCH', { buba_required: e.target.checked }),
+                          () =>
+                            api('/settings', 'PATCH', {
+                              buba_required: e.target.checked,
+                            }),
                           'Правила отправки обновлены',
                         )
                       }
@@ -1958,7 +1856,9 @@ export default function App() {
                       onBlur={(e) => {
                         if (e.target.value !== data.settings.project_name)
                           void run(() =>
-                            api('/settings', 'PATCH', { project_name: e.target.value }),
+                            api('/settings', 'PATCH', {
+                              project_name: e.target.value,
+                            }),
                           );
                       }}
                     />
@@ -1968,7 +1868,11 @@ export default function App() {
                       className="e-field"
                       value={data.settings.timezone}
                       onChange={(e) =>
-                        void run(() => api('/settings', 'PATCH', { timezone: e.target.value }))
+                        void run(() =>
+                          api('/settings', 'PATCH', {
+                            timezone: e.target.value,
+                          }),
+                        )
                       }
                     >
                       <option>Europe/Moscow</option>
@@ -1980,7 +1884,11 @@ export default function App() {
                       className="e-field"
                       value={data.settings.quality}
                       onChange={(e) =>
-                        void run(() => api('/settings', 'PATCH', { quality: e.target.value }))
+                        void run(() =>
+                          api('/settings', 'PATCH', {
+                            quality: e.target.value,
+                          }),
+                        )
                       }
                     >
                       <option value="high">Высокое · CRF 20</option>
@@ -1996,11 +1904,49 @@ export default function App() {
                       defaultValue={data.settings.interval}
                       onBlur={(e) =>
                         void run(() =>
-                          api('/settings', 'PATCH', { interval: Number(e.target.value) }),
+                          api('/settings', 'PATCH', {
+                            interval: Number(e.target.value),
+                          }),
                         )
                       }
                     />
                   </Field>
+                  <Field label="YouTube · категория роликов">
+                    <select
+                      className="e-field"
+                      value={data.settings.youtube_category ?? '1'}
+                      onChange={(e) =>
+                        void run(
+                          () =>
+                            api('/settings', 'PATCH', {
+                              youtube_category: e.target.value,
+                            }),
+                          'Категория YouTube сохранена',
+                        )
+                      }
+                    >
+                      <option value="1">Фильмы и анимация</option>
+                      <option value="24">Развлечения</option>
+                      <option value="23">Юмор</option>
+                      <option value="22">Люди и блоги</option>
+                    </select>
+                  </Field>
+                  <label className="e-check">
+                    <input
+                      type="checkbox"
+                      checked={data.settings.one_per_platform !== false}
+                      onChange={(e) =>
+                        void run(
+                          () =>
+                            api('/settings', 'PATCH', {
+                              one_per_platform: e.target.checked,
+                            }),
+                          'Правило каналов сохранено',
+                        )
+                      }
+                    />
+                    Один ролик — один TikTok и один YouTube
+                  </label>
                   <h3>Подключение Google</h3>
                   <p className="e-muted e-small">
                     OAuth Desktop app · YouTube Data API v3 · добавьте свой аккаунт в тестовые
@@ -2019,8 +1965,8 @@ export default function App() {
                   <hr className="e-divider" />
                   <h3>Уведомления в Telegram</h3>
                   <p className="e-muted e-small">
-                    Бот пишет «опубликовано» со ссылкой, ошибки и «нужно войти заново». Код подключения:
-                    команда /frameflow в боте. Ключ хранится в Windows DPAPI.
+                    Бот пишет «опубликовано» со ссылкой, ошибки и «нужно войти заново». Код
+                    подключения: команда /frameflow в боте. Ключ хранится в Windows DPAPI.
                   </p>
                   {data.telegram_configured ? (
                     <div className="e-row">
@@ -2028,7 +1974,10 @@ export default function App() {
                       <Button
                         disabled={busy}
                         onClick={() =>
-                          void run(() => api('/telegram', 'DELETE'), 'Уведомления в Telegram отключены')
+                          void run(
+                            () => api('/telegram', 'DELETE'),
+                            'Уведомления в Telegram отключены',
+                          )
                         }
                       >
                         Отключить
@@ -2046,7 +1995,9 @@ export default function App() {
                         disabled={busy || !telegramCode.trim()}
                         onClick={() =>
                           void run(async () => {
-                            await api('/telegram', 'POST', { code: telegramCode.trim() });
+                            await api('/telegram', 'POST', {
+                              code: telegramCode.trim(),
+                            });
                             setTelegramCode('');
                           }, 'Подключено: в Telegram пришло проверочное сообщение')
                         }
@@ -2079,7 +2030,10 @@ export default function App() {
                       disabled={busy}
                       onClick={() =>
                         void run(async () => {
-                          const result = await api<{ ok: boolean; free_gb: number }>('/health');
+                          const result = await api<{
+                            ok: boolean;
+                            free_gb: number;
+                          }>('/health');
                           if (!result.ok)
                             throw new Error('Не найдены FFmpeg или ffprobe. Выполните установку.');
                           setMessage(`FFmpeg / ffprobe доступны. Свободно ${result.free_gb} ГБ.`);
@@ -2307,7 +2261,9 @@ export default function App() {
                 defaultValue={data.settings.retention_days}
                 onBlur={(e) =>
                   void run(() =>
-                    api('/settings', 'PATCH', { retention_days: Number(e.target.value) }),
+                    api('/settings', 'PATCH', {
+                      retention_days: Number(e.target.value),
+                    }),
                   )
                 }
               />
@@ -2382,9 +2338,7 @@ export default function App() {
                     checked={targets.includes(a.id)}
                     onChange={() =>
                       patch({
-                        targets: targets.includes(a.id)
-                          ? targets.filter((id) => id !== a.id)
-                          : [...targets, a.id],
+                        targets: toggleTarget(a),
                       })
                     }
                   />
@@ -2584,7 +2538,10 @@ export default function App() {
                 disabled={busy || !accountName.trim()}
                 onClick={() =>
                   void run(async () => {
-                    await api('/accounts', 'POST', { platform, name: accountName.trim() });
+                    await api('/accounts', 'POST', {
+                      platform,
+                      name: accountName.trim(),
+                    });
                     setAccountName('');
                     setModal('');
                   }, 'Аккаунт добавлен')
@@ -2847,7 +2804,9 @@ export default function App() {
                 disabled={busy || !batchIds.length}
                 onClick={() =>
                   void run(async () => {
-                    await api('/jobs/approve-batch', 'POST', { job_ids: batchIds });
+                    await api('/jobs/approve-batch', 'POST', {
+                      job_ids: batchIds,
+                    });
                     setModal('');
                   }, 'Пакет подтверждён. Отправки начнутся при доступе к аккаунтам и запущенной очереди')
                 }
@@ -2980,7 +2939,9 @@ export default function App() {
                   disabled={busy}
                   onClick={() =>
                     void run(async () => {
-                      await api(`/jobs/${currentJob.id}/action`, 'POST', { action: 'retry' });
+                      await api(`/jobs/${currentJob.id}/action`, 'POST', {
+                        action: 'retry',
+                      });
                       setModal('');
                     }, 'Обработка поставлена в очередь')
                   }
@@ -3001,7 +2962,9 @@ export default function App() {
                   disabled={busy}
                   onClick={() =>
                     void run(async () => {
-                      await api(`/jobs/${currentJob.id}/action`, 'POST', { action: 'cancel' });
+                      await api(`/jobs/${currentJob.id}/action`, 'POST', {
+                        action: 'cancel',
+                      });
                       setModal('');
                     }, 'Задание отменено')
                   }

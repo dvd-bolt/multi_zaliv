@@ -48,6 +48,8 @@ def post(conn, payload, timeout=10):
     except urllib.error.HTTPError as error:
         if error.code in (401, 403):
             raise ValueError("Сервер не принял код. Получите новый командой /frameflow") from None
+        if error.code == 400:
+            return True  # the server does not know this event type: skip it, do not block the rest
         raise
 
 
