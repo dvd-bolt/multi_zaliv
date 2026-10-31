@@ -49,6 +49,12 @@ def tick():
 
         dispatch_one(db)
         db.commit()
+        try:
+            from .notify import flush
+
+            flush(db)
+        except Exception:
+            db.rollback()  # A notification problem must never stop publishing.
         job = db.scalar(select(Job).where(Job.status == "queued").order_by(Job.created))
         if not job:
             return

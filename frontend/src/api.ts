@@ -85,6 +85,7 @@ export type State = {
   settings: Settings;
   worker: boolean;
   google_configured: boolean;
+  telegram_configured?: boolean;
 };
 export type Metric = {
   id: string;

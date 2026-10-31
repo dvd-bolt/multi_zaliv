@@ -434,6 +434,7 @@ export default function App() {
   useEffect(() => {
     if (view !== 'editor') setPlaying(false);
   }, [view]);
+  const [telegramCode, setTelegramCode] = useState('');
   const run: Run = async (task, success) => {
     if (mutationPending.current) return;
     mutationPending.current = true;
@@ -2015,6 +2016,45 @@ export default function App() {
                       {data.google_configured ? 'Конфигурация сохранена' : 'Не настроено'}
                     </span>
                   </div>
+                  <hr className="e-divider" />
+                  <h3>Уведомления в Telegram</h3>
+                  <p className="e-muted e-small">
+                    Бот пишет «опубликовано» со ссылкой, ошибки и «нужно войти заново». Код подключения:
+                    команда /frameflow в боте. Ключ хранится в Windows DPAPI.
+                  </p>
+                  {data.telegram_configured ? (
+                    <div className="e-row">
+                      <span className="e-badge good">Подключено</span>
+                      <Button
+                        disabled={busy}
+                        onClick={() =>
+                          void run(() => api('/telegram', 'DELETE'), 'Уведомления в Telegram отключены')
+                        }
+                      >
+                        Отключить
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="e-row">
+                      <input
+                        className="e-field"
+                        placeholder="https://…#код из бота"
+                        value={telegramCode}
+                        onChange={(e) => setTelegramCode(e.target.value)}
+                      />
+                      <Button
+                        disabled={busy || !telegramCode.trim()}
+                        onClick={() =>
+                          void run(async () => {
+                            await api('/telegram', 'POST', { code: telegramCode.trim() });
+                            setTelegramCode('');
+                          }, 'Подключено: в Telegram пришло проверочное сообщение')
+                        }
+                      >
+                        Подключить
+                      </Button>
+                    </div>
+                  )}
                   <hr className="e-divider" />
                   <h3>Локальные данные</h3>
                   <p className="e-small e-muted">

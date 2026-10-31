@@ -72,6 +72,7 @@ class Job(Base):
     created: Mapped[str] = mapped_column(String, default=now)
     updated: Mapped[str] = mapped_column(String, default=now)
     upload_started_at: Mapped[str | None] = mapped_column(String, nullable=True)
+    notified_status: Mapped[str | None] = mapped_column(String, nullable=True)
 
 
 class Metric(Base):
@@ -174,6 +175,13 @@ def migrate():
             if "auto_publish" not in columns:
                 conn.execute(text("ALTER TABLE jobs ADD COLUMN auto_publish BOOLEAN NOT NULL DEFAULT 0"))
             conn.execute(text("INSERT INTO schema_migrations VALUES (6)"))
+        if version < 7:
+            columns = [row[1] for row in conn.execute(text("PRAGMA table_info(jobs)"))]
+            if "notified_status" not in columns:
+                conn.execute(text("ALTER TABLE jobs ADD COLUMN notified_status VARCHAR"))
+            # Existing outcomes are history: do not send a burst of old notifications after the update.
+            conn.execute(text("UPDATE jobs SET notified_status = status"))
+            conn.execute(text("INSERT INTO schema_migrations VALUES (7)"))
     with Session.begin() as db:
         if not db.get(Setting, "application"):
             db.add(Setting(key="application", value=DEFAULTS.copy()))

@@ -13,10 +13,11 @@ from fastapi.exception_handlers import request_validation_exception_handler
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 from sqlalchemy import select, text
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from . import vault
+from . import notify, vault
 from .browser_pairing import (
     BRIDGE_PATHS,
     begin_browser,
@@ -192,6 +193,7 @@ def state():
             "worker": alive,
             "heartbeat": heartbeat,
             "google_configured": bool(vault.get("google_client")),
+            "telegram_configured": bool(notify.connection()),
         }
 
 
@@ -764,6 +766,31 @@ def update_settings(request: SettingsUpdate):
         item = db.get(Setting, "application")
         item.value = {**settings(db), **request.model_dump(exclude_none=True)}
         return item.value
+
+
+class TelegramConnect(BaseModel):
+    code: str
+
+
+@app.post("/api/telegram")
+def telegram_connect(request: TelegramConnect):
+    """Check the code from the bot with a test message, then keep it in the DPAPI vault."""
+    try:
+        conn = notify.parse(request.code)
+        if not notify.post(conn, {"event": {"type": "test"}}):
+            raise ValueError("Сервер не ответил. Проверьте интернет и попробуйте ещё раз")
+    except ValueError as error:
+        raise HTTPException(400, str(error)) from None
+    except Exception:
+        raise HTTPException(502, "Не удалось связаться с сервером бота") from None
+    vault.put(notify.KEY, conn)
+    return {"ok": True}
+
+
+@app.delete("/api/telegram")
+def telegram_disconnect():
+    vault.remove(notify.KEY)
+    return {"ok": True}
 
 
 @app.get("/api/metrics")
