@@ -5,14 +5,14 @@ button.addEventListener('click',async()=>{
  button.disabled=true;
  try {
   const code=document.querySelector('#code').value.trim();
-  if(!/^[A-Za-z0-9_-]{32}$/.test(code))throw Error('Скопируйте действующий код подключения из SurvivalFlow.');
+  if(!/^[A-Za-z0-9_-]{32}$/.test(code))throw Error('Скопируйте действующий код подключения из FrameFlow.');
   const port=Number(document.querySelector('#port').value);
   if(!Number.isInteger(port)||port<1024||port>65535)throw Error('Проверьте порт локальной программы.');
   const base=`http://127.0.0.1:${port}`;
   const post=async(path,body)=>{
    let response;
-   try{response=await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(10000)});}catch{throw Error('Нет связи с SurvivalFlow. Запустите программу и начните подключение.');}
-   let data;try{data=await response.json();}catch{throw Error('На этом порту не отвечает SurvivalFlow.');}
+   try{response=await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(10000)});}catch{throw Error('Нет связи с FrameFlow. Запустите программу и начните подключение.');}
+   let data;try{data=await response.json();}catch{throw Error('На этом порту не отвечает FrameFlow.');}
    if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:'Проверьте код подключения.');
    return data;
   };
@@ -35,7 +35,7 @@ button.addEventListener('click',async()=>{
   const proof=await sign(code,`client|${clientNonce}|${reply.server_nonce}|${await sha(payload)}`);
   const saved=await post('/api/browser-pairing/submit',{code_id:codeId,client_nonce:clientNonce,server_nonce:reply.server_nonce,payload,proof});
   document.querySelector('#code').value='';
-  message(`Найден @${saved.handle}. Вернитесь в SurvivalFlow и подтвердите сохранение этого аккаунта.`);
+  message(`Найден @${saved.handle}. Вернитесь в FrameFlow и подтвердите сохранение этого аккаунта.`);
  }catch(error){message(error.message || 'Не удалось подключить аккаунт.',true);}
  finally{button.disabled=false;}
 });

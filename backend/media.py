@@ -278,7 +278,7 @@ def render(source, banner, banner_media, output, config, length, progress, cance
         "-map_metadata",
         "-1",
         "-metadata",
-        f"comment=SurvivalFlow {output.stem}",
+        f"comment=FrameFlow {output.stem}",
         "-movflags",
         "+faststart",
         "-progress",

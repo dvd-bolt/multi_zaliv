@@ -65,7 +65,7 @@ from .schemas import (
 )
 from .tiktok_login import begin_tiktok, confirm_login, return_to_tiktok
 
-app = FastAPI(title="SurvivalFlow", docs_url="/api/docs", redoc_url=None)
+app = FastAPI(title="FrameFlow", docs_url="/api/docs", redoc_url=None)
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost", "testserver"])
 
 
@@ -75,7 +75,7 @@ async def protect_local_api(request: Request, call_next):
     bridge = request.url.path in BRIDGE_PATHS
     if bridge:
         if not extension_origin(origin) or request.method not in ("POST", "OPTIONS"):
-            return JSONResponse({"detail": "Нужен запрос расширения SurvivalFlow"}, status_code=403)
+            return JSONResponse({"detail": "Нужен запрос расширения FrameFlow"}, status_code=403)
         if request.method == "OPTIONS":
             response = Response(status_code=204)
         elif len(await request.body()) > 262144:
@@ -369,6 +369,7 @@ def health():
         "tools": tools,
         "free_gb": round(shutil.disk_usage(DATA).free / 2**30, 1),
         "application": "SurvivalFlow",
+        "product_name": "FrameFlow",
         "data_directory": str(DATA),
         "pid": os.getpid(),
     }
@@ -532,7 +533,7 @@ def create_jobs(request: Enqueue):
             ensure_queue_worker()
         except (OSError, RuntimeError):
             result["worker_warning"] = (
-                "Задания сохранены, но рабочий процесс не запустился. Перезапустите SurvivalFlow."
+                "Задания сохранены, но рабочий процесс не запустился. Перезапустите FrameFlow."
             )
     return result
 
@@ -561,7 +562,7 @@ def export(key: str, download: bool = True):
         if not path or not Path(path).exists():
             raise HTTPException(404, "Экспорт пока не готов")
         return FileResponse(
-            path, media_type="video/mp4", filename=f"SurvivalFlow-{job.id[:8]}.mp4" if download else None
+            path, media_type="video/mp4", filename=f"FrameFlow-{job.id[:8]}.mp4" if download else None
         )
 
 
@@ -852,7 +853,7 @@ def metrics_template():
     return Response(
         buffer.getvalue().encode("utf-8-sig"),
         media_type="text/csv; charset=utf-8",
-        headers={"Content-Disposition": "attachment; filename=survivalflow-metrics.csv"},
+        headers={"Content-Disposition": "attachment; filename=frameflow-metrics.csv"},
     )
 
 

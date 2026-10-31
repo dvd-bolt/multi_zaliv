@@ -60,7 +60,7 @@ def ensure_services():
         health.get("application") != "SurvivalFlow"
         or Path(health.get("data_directory", "")).resolve() != DATA
     ):
-        raise RuntimeError("Этот порт занят другой программой или другим экземпляром SurvivalFlow")
+        raise RuntimeError("Этот порт занят другой программой или другим экземпляром FrameFlow")
     # Do not trust a recent heartbeat after a rapid stop/restart. The worker's OS lock
     # safely rejects an extra launch when another worker is actually still running.
     with (log_dir / "worker.log").open("ab") as output:
@@ -86,4 +86,4 @@ if __name__ == "__main__":
     except Exception as error:
         import ctypes
 
-        ctypes.windll.user32.MessageBoxW(0, str(error), "SurvivalFlow — запуск", 16)
+        ctypes.windll.user32.MessageBoxW(0, str(error), "FrameFlow — запуск", 16)

@@ -102,7 +102,7 @@ def begin_youtube(account_id):
                 port=0,
                 timeout_seconds=180,
                 authorization_prompt_message="",
-                success_message="SurvivalFlow: вход завершён. Можно закрыть эту вкладку.",
+                success_message="FrameFlow: вход завершён. Можно закрыть эту вкладку.",
             )
             from googleapiclient.discovery import build
 

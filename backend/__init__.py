@@ -1,1 +1,1 @@
-"""SurvivalFlow local application."""
+"""FrameFlow local application."""

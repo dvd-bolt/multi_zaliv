@@ -636,10 +636,10 @@ export default function App() {
   if (!data)
     return (
       <div className="boot">
-        <h1>SurvivalFlow</h1>
+        <h1>FrameFlow</h1>
         <p>
           {connectionLost
-            ? 'Нет связи с локальным сервером. Запустите SurvivalFlow.'
+            ? 'Нет связи с локальным сервером. Запустите FrameFlow.'
             : message || 'Подключение к локальному серверу…'}
         </p>
       </div>
@@ -753,7 +753,7 @@ export default function App() {
         <header className="e-head">
           <div className="e-row">
             <span className="e-logo">
-              survival<b>flow</b>
+              frame<b>flow</b>
             </span>
             <span className="e-badge">LOCAL · 0.1</span>
             <span className="e-project" title={data.settings.project_name}>
@@ -1790,7 +1790,7 @@ export default function App() {
                         );
                         const link = document.createElement('a');
                         link.href = url;
-                        link.download = 'survivalflow-channels.csv';
+                        link.download = 'frameflow-channels.csv';
                         link.click();
                         setTimeout(() => URL.revokeObjectURL(url), 1000);
                       }}
@@ -2600,7 +2600,7 @@ export default function App() {
                   <>
                     <p>
                       Открыт обычный Chrome. Войдите в нужный TikTok и откройте «Профиль». Нажмите
-                      расширение SurvivalFlow в Chrome и вставьте этот код.
+                      расширение FrameFlow в Chrome и вставьте этот код.
                     </p>
                     <Field label="Код подключения Chrome">
                       <input
@@ -2687,7 +2687,7 @@ export default function App() {
                     <p>
                       {currentAccount.auth === 'waiting'
                         ? 'Войдите в TikTok через QR-код либо привязанные телефон/почту. После входа откройте «Профиль», вернитесь сюда и подтвердите аккаунт. Окно браузера пока не закрывайте. Вход через Google в этом окне может быть заблокирован.'
-                        : 'TikTok откроется вкладкой в вашем обычном Chrome с привычной авторизацией. Для передачи сессии в SurvivalFlow используется небольшое расширение — установка один раз.'}
+                        : 'TikTok откроется вкладкой в вашем обычном Chrome с привычной авторизацией. Для передачи сессии в FrameFlow используется небольшое расширение — установка один раз.'}
                     </p>
                     <Button
                       primary
@@ -2695,7 +2695,7 @@ export default function App() {
                       onClick={() =>
                         void run(
                           () => api(`/accounts/${currentAccount.id}/connect`, 'POST'),
-                          'Завершите вход в окне TikTok и вернитесь в SurvivalFlow',
+                          'Завершите вход в окне TikTok и вернитесь в FrameFlow',
                         )
                       }
                     >

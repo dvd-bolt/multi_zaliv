@@ -1,4 +1,4 @@
-"""Explicit session transfer from the user's Chrome extension to local SurvivalFlow."""
+"""Explicit session transfer from the user's Chrome extension to local FrameFlow."""
 
 import hashlib
 import hmac

@@ -16,4 +16,4 @@ try {
     npm.cmd run build
     if ($LASTEXITCODE -ne 0) { throw 'Не собран интерфейс' }
 } finally { Pop-Location }
-Write-Host 'Установка завершена. Откройте Start SurvivalFlow.cmd.'
+Write-Host 'Установка завершена. Откройте Start FrameFlow.cmd.'

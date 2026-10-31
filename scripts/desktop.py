@@ -8,7 +8,7 @@ from ctypes import wintypes
 
 from backend.config import DATA, PORT, ROOT
 
-TITLE = "SurvivalFlow" if PORT == 8765 else f"SurvivalFlow · {PORT}"
+TITLE = "FrameFlow" if PORT == 8765 else f"FrameFlow · {PORT}"
 
 
 class DesktopState:
@@ -102,6 +102,6 @@ def open_window(base):
         )
     except Exception as error:
         raise RuntimeError(
-            "Не удалось открыть окно SurvivalFlow. Требуется Microsoft Edge WebView2 Runtime. "
+            "Не удалось открыть окно FrameFlow. Требуется Microsoft Edge WebView2 Runtime. "
             "Подробности: " + str(error)
         ) from error

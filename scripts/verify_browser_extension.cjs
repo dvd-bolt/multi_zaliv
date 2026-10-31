@@ -25,7 +25,7 @@ fs.closeSync(log);
   context.on('page',p=>p.on('pageerror',e=>errors.push(e.message)));
   const manager=await context.newPage();
   await manager.goto('chrome://extensions');
-  const item=manager.locator('extensions-item').filter({hasText:'SurvivalFlow'});
+  const item=manager.locator('extensions-item').filter({hasText:'FrameFlow'});
   await item.waitFor();
   const extensionId=await item.getAttribute('id');
   assert(/^[a-p]{32}$/.test(extensionId));
@@ -57,7 +57,7 @@ fs.closeSync(log);
   // The popup is opened as a background page for testing. Keep TikTok the active
   // tab, exactly as it is when the user opens a real Chrome action popup.
   await popup.evaluate(()=>document.querySelector('#connect').click());
-  await popup.waitForFunction(()=>document.querySelector('#status').textContent.includes('Вернитесь в SurvivalFlow')||document.querySelector('#status').dataset.error==='true');
+  await popup.waitForFunction(()=>document.querySelector('#status').textContent.includes('Вернитесь в FrameFlow')||document.querySelector('#status').dataset.error==='true');
   assert.equal(await popup.locator('#status').getAttribute('data-error'),'false',await popup.locator('#status').innerText());
   assert((await popup.locator('#status').innerText()).includes('@cartoon.chrome'));
   assert.equal(await popup.locator('#code').inputValue(),'');
