@@ -187,6 +187,10 @@ export default function Stats(p: Props) {
         likes: typeof likes === 'number' ? likes : null,
         comments: typeof comments === 'number' ? comments : null,
         growth: v !== null && before ? v - views(before)! : null,
+        newComments:
+          typeof comments === 'number' && typeof before?.values.comments === 'number'
+            ? comments - before.values.comments
+            : null,
         day1: Date.now() - published(job) >= DAY && at24 ? views(at24) : null,
         er:
           v && typeof likes === 'number'
@@ -197,9 +201,12 @@ export default function Stats(p: Props) {
       };
     })
     .sort((a, b) => (b.views ?? -1) - (a.views ?? -1));
-  const total = (pf: 'tiktok' | 'youtube', key: 'views' | 'likes' | 'growth') => {
+  const total = (
+    pf: 'tiktok' | 'youtube' | 'all',
+    key: 'views' | 'likes' | 'growth' | 'comments' | 'newComments',
+  ) => {
     const values = rows
-      .filter((r) => r.job.account.platform === pf && r[key] !== null)
+      .filter((r) => (pf === 'all' || r.job.account.platform === pf) && r[key] !== null)
       .map((r) => r[key]!);
     return values.length ? values.reduce((a, b) => a + b, 0) : null;
   };
@@ -303,9 +310,18 @@ export default function Stats(p: Props) {
                 </div>
               ))}
             <div className="st-kpi">
+              <span>Комментарии</span>
+              <strong>{short(total('all', 'comments'))}</strong>
+              <small className={(total('all', 'newComments') ?? 0) > 0 ? 'up' : ''}>
+                {total('all', 'newComments') !== null
+                  ? `${total('all', 'newComments')! >= 0 ? '+' : ''}${fmt(total('all', 'newComments'))} за сутки`
+                  : 'прирост — нужен снимок суточной давности'}
+              </small>
+            </div>
+            <div className="st-kpi">
               <span>Вовлечённость</span>
               <strong>{avgEr === null ? '—' : avgEr.toFixed(1) + '%'}</strong>
-              <small>(лайки + комментарии) / просмотры</small>
+              <small>(лайки + комм.) / просмотры</small>
             </div>
             <div className="st-kpi">
               <span>Роликов на площадках</span>
@@ -368,6 +384,7 @@ export default function Stats(p: Props) {
                   <th>За сутки</th>
                   <th>Первые 24 ч</th>
                   <th>Лайки</th>
+                  <th>Комм.</th>
                   <th>ER</th>
                   <th>Возраст</th>
                   <th style={{ width: 70 }}>Динамика</th>
@@ -403,6 +420,10 @@ export default function Stats(p: Props) {
                     </td>
                     <td>{fmt(r.day1)}</td>
                     <td>{fmt(r.likes)}</td>
+                    <td>
+                      {fmt(r.comments)}
+                      {(r.newComments ?? 0) > 0 && <small className="st-up">+{fmt(r.newComments)}</small>}
+                    </td>
                     <td>{r.er === null ? '—' : r.er.toFixed(1) + '%'}</td>
                     <td>{age(Date.now() - published(r.job))}</td>
                     <td>
