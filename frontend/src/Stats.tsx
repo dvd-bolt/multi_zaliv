@@ -152,7 +152,7 @@ function Spark({ values }: { values: number[] }) {
   );
 }
 
-type SortKey = 'views' | 'growth' | 'day1' | 'likes' | 'comments' | 'er' | 'age';
+type SortKey = 'views' | 'speed' | 'growth' | 'day1' | 'likes' | 'comments' | 'er' | 'age';
 const sortValue = (
   r: Record<Exclude<SortKey, 'age'>, number | null> & { job: Job },
   key: SortKey,
@@ -184,6 +184,8 @@ export default function Stats(p: Props) {
       const list = history(job.id);
       const lastAt = last ? Date.parse(last.captured) : 0;
       const before = [...list].reverse().find((m) => Date.parse(m.captured) <= lastAt - DAY);
+      const hours = (from: Metric, to: Metric) =>
+        Math.max(1, (Date.parse(to.captured) - Date.parse(from.captured)) / 3_600_000);
       const at24 = list.filter((m) => Date.parse(m.captured) <= published(job) + DAY).pop();
       const v = views(last),
         likes = last?.values.likes ?? null,
@@ -194,6 +196,12 @@ export default function Stats(p: Props) {
         likes: typeof likes === 'number' ? likes : null,
         comments: typeof comments === 'number' ? comments : null,
         growth: v !== null && before ? v - views(before)! : null,
+        // Views per hour inside the growth window: snapshots are not always exactly 24 h apart.
+        rate: v !== null && before && last ? (v - views(before)!) / hours(before, last) : null,
+        speed:
+          v !== null && last
+            ? v / Math.max(1, (Date.parse(last.captured) - published(job)) / 3_600_000)
+            : null,
         newComments:
           typeof comments === 'number' && typeof before?.values.comments === 'number'
             ? comments - before.values.comments
@@ -208,6 +216,21 @@ export default function Stats(p: Props) {
       };
     })
     .sort((a, b) => (b.views ?? -1) - (a.views ?? -1));
+  // Labels compare a video with the others: 🔥 grows at least twice as fast as the median
+  // (and by 100+ views a day), 🧊 is older than 2 days and gained under 1% of its views a day.
+  const rates = rows
+    .map((r) => r.rate)
+    .filter((x): x is number => x !== null)
+    .sort((a, b) => a - b);
+  const median = rates.length ? rates[Math.floor((rates.length - 1) / 2)] : null;
+  const trend = (r: (typeof rows)[number]): 'hot' | 'stalled' | null => {
+    if (r.rate === null || r.views === null) return null;
+    const daily = r.rate * 24;
+    if (rates.length >= 2 && median !== null && daily >= 100 && r.rate >= median * 2) return 'hot';
+    if (Date.now() - published(r.job) >= 2 * DAY && daily < Math.max(20, r.views * 0.01))
+      return 'stalled';
+    return null;
+  };
   const total = (
     pf: 'tiktok' | 'youtube' | 'all',
     key: 'views' | 'likes' | 'growth' | 'comments' | 'newComments',
@@ -410,6 +433,11 @@ export default function Stats(p: Props) {
                 <tr>
                   <th style={{ width: '30%' }}>Ролик</th>
                   {head('views', 'Просмотры', 'Сортировать по просмотрам')}
+                  {head(
+                    'speed',
+                    'В час',
+                    'Просмотров в час с момента публикации — честно сравнивает ролики разного возраста',
+                  )}
                   {head('growth', 'За сутки', 'Кто быстрее растёт сейчас')}
                   {head('day1', 'Первые 24 ч', 'Как стартовали ролики')}
                   {head('likes', 'Лайки', 'Сортировать по лайкам')}
@@ -431,6 +459,22 @@ export default function Stats(p: Props) {
                           {PLATFORM[r.job.account.platform]}
                         </span>{' '}
                         {r.job.account.name}
+                        {trend(r) === 'hot' && (
+                          <span
+                            className="st-trend hot"
+                            title="За сутки растёт минимум вдвое быстрее типичного ролика"
+                          >
+                            🔥 растёт
+                          </span>
+                        )}
+                        {trend(r) === 'stalled' && (
+                          <span
+                            className="st-trend stalled"
+                            title="Старше 2 дней и за сутки набрал меньше 1% своих просмотров"
+                          >
+                            🧊 встал
+                          </span>
+                        )}
                         {r.job.url && (
                           <>
                             {' · '}
@@ -444,6 +488,9 @@ export default function Stats(p: Props) {
                     <td>
                       <b>{fmt(r.views)}</b>
                     </td>
+                    <td title={r.speed === null ? '' : `${r.speed.toFixed(1)} просмотров в час`}>
+                      {r.speed === null ? '—' : fmt(Math.round(r.speed))}
+                    </td>
                     <td className={r.growth ? 'st-up' : ''}>
                       {r.growth === null ? '—' : '+' + fmt(r.growth)}
                     </td>
@@ -451,7 +498,9 @@ export default function Stats(p: Props) {
                     <td>{fmt(r.likes)}</td>
                     <td>
                       {fmt(r.comments)}
-                      {(r.newComments ?? 0) > 0 && <small className="st-up">+{fmt(r.newComments)}</small>}
+                      {(r.newComments ?? 0) > 0 && (
+                        <small className="st-up">+{fmt(r.newComments)}</small>
+                      )}
                     </td>
                     <td>{r.er === null ? '—' : r.er.toFixed(1) + '%'}</td>
                     <td>{age(Date.now() - published(r.job))}</td>
@@ -470,8 +519,9 @@ export default function Stats(p: Props) {
             </table>
             <Pages page={page} set={setPage} total={rows.length} size={6} />
             <p className="stats-note">
-              Нажмите на заголовок колонки, чтобы отсортировать: «За сутки» — кто растёт быстрее
-              сейчас. «Первые 24 ч» — просмотры на снимке не позже суток после публикации.
+              Нажмите на заголовок колонки, чтобы отсортировать. «В час» — просмотры, делённые на
+              часы с публикации. «За сутки» — кто растёт сейчас; 🔥 — вдвое быстрее типичного
+              ролика, 🧊 — старше 2 дней и прибавил за сутки меньше 1%.
             </p>
           </>
         ) : (
