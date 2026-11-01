@@ -152,11 +152,18 @@ function Spark({ values }: { values: number[] }) {
   );
 }
 
+type SortKey = 'views' | 'growth' | 'day1' | 'likes' | 'comments' | 'er' | 'age';
+const sortValue = (
+  r: Record<Exclude<SortKey, 'age'>, number | null> & { job: Job },
+  key: SortKey,
+) => (key === 'age' ? Date.now() - published(r.job) : r[key]);
+
 export default function Stats(p: Props) {
   const [tab, setTab] = useState<Tab>('overview');
   const [platform, setPlatform] = useState<'all' | 'tiktok' | 'youtube'>('all');
   const [days, setDays] = useState(14);
   const [page, setPage] = useState(0);
+  const [sort, setSort] = useState<{ key: SortKey; desc: boolean }>({ key: 'views', desc: true });
   const jobs = useMemo(
     () =>
       p.data.jobs.filter(
@@ -213,6 +220,28 @@ export default function Stats(p: Props) {
   const engaged = rows.filter((r) => r.er !== null);
   const avgEr = engaged.length ? engaged.reduce((a, r) => a + r.er!, 0) / engaged.length : null;
   const best = rows.find((r) => r.views !== null);
+  const sorted = [...rows].sort((a, b) => {
+    const x = sortValue(a, sort.key),
+      y = sortValue(b, sort.key);
+    // Rows without data stay at the bottom in both directions.
+    if (x === null || y === null) return x === null ? (y === null ? 0 : 1) : -1;
+    return sort.desc ? y - x : x - y;
+  });
+  const head = (key: SortKey, label: string, hint: string) => (
+    <th aria-sort={sort.key === key ? (sort.desc ? 'descending' : 'ascending') : 'none'}>
+      <button
+        className={'st-sort' + (sort.key === key ? ' on' : '')}
+        title={`${hint}. Нажмите ещё раз, чтобы перевернуть порядок`}
+        onClick={() => {
+          setSort((s) => ({ key, desc: s.key === key ? !s.desc : true }));
+          setPage(0);
+        }}
+      >
+        {label}
+        <span>{sort.key === key ? (sort.desc ? '▼' : '▲') : '↕'}</span>
+      </button>
+    </th>
+  );
   const updated = rows.reduce<string | null>(
     (d, r) => (r.captured && (!d || r.captured > d) ? r.captured : d),
     null,
@@ -380,18 +409,18 @@ export default function Stats(p: Props) {
               <thead>
                 <tr>
                   <th style={{ width: '30%' }}>Ролик</th>
-                  <th>Просмотры</th>
-                  <th>За сутки</th>
-                  <th>Первые 24 ч</th>
-                  <th>Лайки</th>
-                  <th>Комм.</th>
-                  <th>ER</th>
-                  <th>Возраст</th>
+                  {head('views', 'Просмотры', 'Сортировать по просмотрам')}
+                  {head('growth', 'За сутки', 'Кто быстрее растёт сейчас')}
+                  {head('day1', 'Первые 24 ч', 'Как стартовали ролики')}
+                  {head('likes', 'Лайки', 'Сортировать по лайкам')}
+                  {head('comments', 'Комм.', 'Сортировать по комментариям')}
+                  {head('er', 'ER', 'Сортировать по вовлечённости')}
+                  {head('age', 'Возраст', 'Сначала старые')}
                   <th style={{ width: 70 }}>Динамика</th>
                 </tr>
               </thead>
               <tbody>
-                {rows.slice(page * 6, page * 6 + 6).map((r) => (
+                {sorted.slice(page * 6, page * 6 + 6).map((r) => (
                   <tr key={r.job.id}>
                     <td>
                       <b className="truncate" title={r.job.asset_name}>
@@ -441,8 +470,8 @@ export default function Stats(p: Props) {
             </table>
             <Pages page={page} set={setPage} total={rows.length} size={6} />
             <p className="stats-note">
-              «Первые 24 ч» — просмотры на снимке не позже суток после публикации: так ролики
-              сравниваются на одинаковом возрасте.
+              Нажмите на заголовок колонки, чтобы отсортировать: «За сутки» — кто растёт быстрее
+              сейчас. «Первые 24 ч» — просмотры на снимке не позже суток после публикации.
             </p>
           </>
         ) : (
