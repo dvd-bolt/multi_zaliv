@@ -1,0 +1,84 @@
+{
+  "fixture": "synthetic, no remote writes",
+  "checks": [
+    {
+      "name": "channels",
+      "width": 1024,
+      "height": 600,
+      "dialog": null
+    },
+    {
+      "name": "all-videos-first",
+      "width": 1024,
+      "height": 600,
+      "dialog": {
+        "top": 32.71875,
+        "bottom": 567.265625,
+        "left": 202,
+        "right": 822,
+        "scroll": false
+      }
+    },
+    {
+      "name": "all-videos-page2",
+      "width": 1024,
+      "height": 600,
+      "dialog": {
+        "top": 32.71875,
+        "bottom": 567.265625,
+        "left": 202,
+        "right": 822,
+        "scroll": false
+      }
+    },
+    {
+      "name": "statistics-manual-videos",
+      "width": 1024,
+      "height": 600,
+      "dialog": null
+    },
+    {
+      "name": "connections",
+      "width": 1024,
+      "height": 600,
+      "dialog": null
+    },
+    {
+      "name": "cover-settings",
+      "width": 1024,
+      "height": 600,
+      "dialog": {
+        "top": 138.90625,
+        "bottom": 461.078125,
+        "left": 292,
+        "right": 732,
+        "scroll": false
+      }
+    },
+    {
+      "name": "job-cover-error",
+      "width": 1024,
+      "height": 600,
+      "dialog": {
+        "top": 148.203125,
+        "bottom": 451.78125,
+        "left": 292,
+        "right": 732,
+        "scroll": false
+      }
+    },
+    {
+      "name": "reupload-confirmation",
+      "width": 1024,
+      "height": 600,
+      "dialog": {
+        "top": 183.609375,
+        "bottom": 416.390625,
+        "left": 292,
+        "right": 732,
+        "scroll": false
+      }
+    }
+  ],
+  "errors": []
+}

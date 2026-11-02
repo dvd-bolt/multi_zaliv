@@ -887,6 +887,17 @@
 #sf-editors .ed .e-settings .e-field {
   background: var(--e-surface);
 }
+#sf-editors .ed .e-settings-tabs {
+  max-width: 720px;
+  margin-bottom: 12px;
+}
+#sf-editors .ed .e-settings-tabs button[aria-pressed="true"] {
+  color: var(--e-accent);
+  background: var(--e-raised);
+}
+#sf-editors .ed .e-stats-push-toggle {
+  grid-column: 1 / -1;
+}
 #sf-editors .ed .e-dialog-layer {
   position: absolute;
   inset: 0;
@@ -1499,3 +1510,9 @@ body {
 #sf-editors .ed .e-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
 #sf-editors .ed .e-tags span { font-size: 10px; color: var(--e-accent); border: 1px solid color-mix(in srgb, var(--e-accent) 40%, var(--e-line)); border-radius: 10px; padding: 1px 7px; }
 #sf-editors .ed .e-tagline { color: var(--e-accent); margin: -2px 0 2px; display: block; max-width: 100%; }
+.channel-videos-dialog { width: min(620px, calc(100vw - 40px)); }
+#sf-editors .ed .channel-videos-dialog .e-dialog { width: 100%; }
+.channel-videos { min-height: 100px; margin: 10px 0; }
+.channel-videos article { border-top: 1px solid var(--e-line); padding: 9px 0 2px; }
+.channel-videos article a { min-width: 0; flex: 1; }
+.channel-videos article p { margin: 4px 0; }

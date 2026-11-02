@@ -95,7 +95,7 @@ class Enqueue(BaseModel):
 
 
 class JobAction(BaseModel):
-    action: Literal["retry", "cancel", "approve", "resume", "reconcile", "test_upload"]
+    action: Literal["retry", "cancel", "approve", "resume", "reconcile", "test_upload", "reupload"]
     external_id: str | None = Field(None, max_length=120)
 
 
@@ -115,6 +115,10 @@ class SettingsUpdate(BaseModel):
     project_name: str | None = Field(None, min_length=1, max_length=80)
     youtube_category: Literal["1", "24", "23", "22"] | None = None
     one_per_platform: bool | None = None
+    youtube_thumbnail: bool | None = None
+    thumbnail_model: (
+        Literal["gemini-3.1-flash-image", "gemini-2.5-flash-image", "gemini-3-pro-image"] | None
+    ) = None
 
 
 class TikTokConfirmation(BaseModel):

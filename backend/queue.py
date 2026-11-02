@@ -140,6 +140,54 @@ def recover(db):
 
 
 def action(db, job, request):
+    if request.action == "reupload":
+        from .youtube_library import owned_service
+
+        variant = db.get(Variant, job.variant_id)
+        account = db.get(Account, variant.account_id)
+        if not job.external_id or job.status not in (
+            "published",
+            "platform_processing",
+            "rejected",
+            "unknown",
+        ):
+            raise ValueError("Повтор доступен для ранее отправленного YouTube-ролика с известным ID")
+        try:
+            service, _ = owned_service(account)
+            items = service.videos().list(part="id,status", id=job.external_id).execute()["items"]
+        except Exception:
+            raise ValueError(
+                "Не удалось проверить удаление. Повтор заблокирован; проверьте подключение YouTube"
+            ) from None
+        if items:
+            raise ValueError("Этот ролик ещё существует на YouTube. Повтор заблокирован во избежание дубля")
+        from .db import ChannelVideo
+
+        remote = db.get(ChannelVideo, (account.id, job.external_id))
+        if remote:
+            remote.present, remote.updated = False, now()
+        fingerprint = variant.fingerprint
+        variant.fingerprint = fingerprint + ":deleted:" + job.id
+        job.status, job.approved, job.updated = "deleted", False, now()
+        job.error = "Отсутствие ролика подтверждено через API владельца; создано отдельное задание повтора"
+        db.flush()
+        replacement = Variant(
+            asset_id=variant.asset_id,
+            account_id=variant.account_id,
+            banner_id=variant.banner_id,
+            fingerprint=fingerprint,
+            config=variant.config.copy(),
+            output=variant.output,
+        )
+        db.add(replacement)
+        db.flush()
+        db.add(
+            Job(
+                variant_id=replacement.id,
+                status="ready" if replacement.output and Path(replacement.output).is_file() else "queued",
+            )
+        )
+        return
     if request.action == "cancel":
         if job.status not in (
             "queued",

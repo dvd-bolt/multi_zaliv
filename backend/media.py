@@ -50,8 +50,17 @@ def probe(path: Path):
         "start_time": start_time,
         "container_start": float(container.get("start_time") or 0),
         "codec": video.get("codec_name"),
+        "has_alpha": str(video.get("tags", {}).get("alpha_mode", "")) == "1"
+        or video.get("pix_fmt", "").startswith(("yuva", "rgba", "bgra", "argb", "abgr", "gbrap")),
         "format": data.get("format", {}).get("format_name"),
     }
+
+
+def decoder_options(media):
+    # FFmpeg's native VP8/VP9 decoders discard WebM's separate alpha plane.
+    # Choose libvpx even for older saved metadata without a has_alpha field.
+    decoder = {"vp8": "libvpx", "vp9": "libvpx-vp9"}.get(media.get("codec"))
+    return ["-c:v", decoder] if decoder else []
 
 
 def inspect(path, kind, asset_id):
@@ -95,6 +104,7 @@ def _inspect(path, kind, asset_id):
             "-loglevel",
             "error",
             "-y",
+            *decoder_options(info),
             "-i",
             str(path),
             "-frames:v",
@@ -247,6 +257,7 @@ def render(source, banner, banner_media, output, config, length, progress, cance
         args += ["-loop", "1"]
     elif config.get("banner_end") == "loop":
         args += ["-stream_loop", "-1"]
+    args += decoder_options(banner_media)
     args += [
         "-i",
         str(banner),

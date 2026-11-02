@@ -73,6 +73,17 @@ class Job(Base):
     updated: Mapped[str] = mapped_column(String, default=now)
     upload_started_at: Mapped[str | None] = mapped_column(String, nullable=True)
     notified_status: Mapped[str | None] = mapped_column(String, nullable=True)
+    thumbnail: Mapped[dict] = mapped_column(JSON, default=dict)
+
+
+class ChannelVideo(Base):
+    __tablename__ = "channel_videos"
+    account_id: Mapped[str] = mapped_column(ForeignKey("accounts.id"), primary_key=True)
+    external_id: Mapped[str] = mapped_column(String, primary_key=True)
+    details: Mapped[dict] = mapped_column(JSON, default=dict)
+    history: Mapped[list] = mapped_column(JSON, default=list)
+    present: Mapped[bool] = mapped_column(Boolean, default=True)
+    updated: Mapped[str] = mapped_column(String, default=now)
 
 
 class Metric(Base):
@@ -144,6 +155,8 @@ DEFAULTS = {
     "youtube_category": "1",
     # One video goes to one TikTok and one YouTube: BUBA pays for a video once, copies only compete.
     "one_per_platform": True,
+    "youtube_thumbnail": True,
+    "thumbnail_model": "gemini-3.1-flash-image",
 }
 
 
@@ -186,6 +199,12 @@ def migrate():
             # Existing outcomes are history: do not send a burst of old notifications after the update.
             conn.execute(text("UPDATE jobs SET notified_status = status"))
             conn.execute(text("INSERT INTO schema_migrations VALUES (7)"))
+        if version < 8:
+            ChannelVideo.__table__.create(conn, checkfirst=True)
+            columns = [row[1] for row in conn.execute(text("PRAGMA table_info(jobs)"))]
+            if "thumbnail" not in columns:
+                conn.execute(text("ALTER TABLE jobs ADD COLUMN thumbnail JSON NOT NULL DEFAULT '{}'"))
+            conn.execute(text("INSERT INTO schema_migrations VALUES (8)"))
     with Session.begin() as db:
         if not db.get(Setting, "application"):
             db.add(Setting(key="application", value=DEFAULTS.copy()))

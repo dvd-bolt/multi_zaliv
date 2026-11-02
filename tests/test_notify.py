@@ -141,7 +141,7 @@ def test_migration_marks_existing_outcomes_as_already_reported(jobs):
     set_status(jobs["asset"], ["published", "failed", "rendering"])
     with engine.begin() as conn:
         conn.execute(text("UPDATE jobs SET notified_status = NULL"))
-        conn.execute(text("DELETE FROM schema_migrations WHERE version = 7"))
+        conn.execute(text("DELETE FROM schema_migrations WHERE version >= 7"))
     migrate()
     with Session() as db:
         statuses = {db.get(Job, f"job{n}-" + jobs["asset"][:6]).notified_status for n in range(3)}

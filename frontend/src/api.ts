@@ -55,6 +55,8 @@ export type Account = {
   auth?: string;
 };
 export type Job = {
+  external_only?: boolean;
+  thumbnail?: { status?: string; file?: string; model?: string; error?: string; updated?: string };
   id: string;
   external_id: string | null;
   status: string;
@@ -86,8 +88,11 @@ export type Settings = {
   notifications: boolean;
   youtube_category?: '1' | '24' | '23' | '22';
   one_per_platform?: boolean;
+  youtube_thumbnail?: boolean;
+  thumbnail_model?: string;
 };
 export type State = {
+  channel_statistics?: { jobs: Job[]; missing: string[] };
   default_hashtags: string[];
   genres?: Record<string, { label: string; tags: string[] }>;
   assets: Asset[];
@@ -97,6 +102,14 @@ export type State = {
   worker: boolean;
   google_configured: boolean;
   telegram_configured?: boolean;
+  stats_push?: {
+    enabled: boolean;
+    attempted_at: string | null;
+    last_success: string | null;
+    result:
+      'ok' | 'auth_error' | 'not_ready' | 'server_error' | 'network_error' | 'too_large' | null;
+    http_status: number | null;
+  };
 };
 export type Metric = {
   id: string;

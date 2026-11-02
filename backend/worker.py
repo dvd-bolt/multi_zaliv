@@ -2,6 +2,7 @@
 
 import atexit
 import json
+import logging
 import msvcrt
 import os
 import threading
@@ -19,6 +20,21 @@ from .queue import recover
 
 HEARTBEAT_LOCK = threading.Lock()
 RECOVERY_NEEDED = threading.Event()
+
+
+def metrics():
+    from . import stats_push
+    from .platforms import refresh_metrics
+
+    with Session.begin() as db:
+        result = refresh_metrics(db)
+    with Session() as db:
+        try:
+            stats_push.push(db)
+        except Exception:
+            db.rollback()
+            logging.getLogger(__name__).warning("Не удалось отправить снимок статистики; метрики сохранены")
+    return result
 
 
 def heartbeat():
@@ -152,12 +168,6 @@ def main():
         while True:
             heartbeat()
             time.sleep(3)
-
-    def metrics():
-        from .platforms import refresh_metrics
-
-        with Session.begin() as db:
-            refresh_metrics(db)
 
     from .maintenance import backup_database
 

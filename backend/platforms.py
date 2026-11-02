@@ -11,7 +11,7 @@ import httpx
 from sqlalchemy import func, select, update
 
 from . import vault
-from .db import Account, Job, Metric, Session, Variant, now, settings
+from .db import Account, Job, Metric, Session, Setting, Variant, now, settings
 
 SCOPES = [
     "https://www.googleapis.com/auth/youtube.upload",
@@ -67,7 +67,7 @@ def youtube_service(account):
 
     token = vault.get(account.id)
     if not token:
-        raise ValueError("Подключите YouTube через Google OAuth")
+        raise AccountIdentityError("Подключите YouTube через Google OAuth")
     credentials = Credentials.from_authorized_user_info(token, SCOPES)
     if credentials.expired and credentials.refresh_token:
         credentials.refresh(Request())
@@ -75,6 +75,29 @@ def youtube_service(account):
 
         vault.put(account.id, json.loads(credentials.to_json()))
     return build("youtube", "v3", credentials=credentials, cache_discovery=False)
+
+
+def youtube_preflight_failure(error):
+    """Safe diagnostics only for errors proven to occur before videos.insert is executed."""
+    from google.auth.exceptions import RefreshError
+    from googleapiclient.errors import HttpError
+
+    if isinstance(error, RefreshError):
+        return "Сохранённый вход Google истёк или отозван. Подключите YouTube заново.", True
+    if isinstance(error, AccountIdentityError):
+        return str(error), True
+    if isinstance(error, HttpError):
+        import json
+
+        try:
+            reasons = {e.get("reason") for e in json.loads(error.content).get("error", {}).get("errors", [])}
+        except (ValueError, TypeError, AttributeError):
+            reasons = set()
+        if reasons & {"quotaExceeded", "dailyLimitExceeded"}:
+            return "YouTube Data API отклонил проверку доступа: исчерпана квота. Повторите позже.", False
+        if error.resp.status in (401, 403):
+            return "YouTube отклонил доступ. Подключите канал заново и проверьте разрешения Google.", True
+    return "Не удалось подготовить отправку YouTube. Проверьте подключение, сеть и доступность MP4.", False
 
 
 def begin_youtube(account_id):
@@ -293,6 +316,7 @@ def dispatch_one(db):
             db.rollback()
             continue
         db.commit()  # Persist uncertainty BEFORE touching a remote service.
+        youtube_write_started = False
         try:
             if account.platform == "youtube":
                 from googleapiclient.http import MediaFileUpload
@@ -301,7 +325,7 @@ def dispatch_one(db):
                 service = youtube_service(account)
                 identity = service.channels().list(part="id", mine=True).execute()["items"]
                 if not any(item["id"] == account.external_id for item in identity):
-                    raise ValueError("Авторизован другой канал")
+                    raise AccountIdentityError("Авторизован другой канал. Подключите нужный YouTube-канал.")
                 request = service.videos().insert(
                     part="snippet,status",
                     body={
@@ -324,6 +348,7 @@ def dispatch_one(db):
                     media_body=MediaFileUpload(variant.output, chunksize=8 * 1024 * 1024, resumable=True),
                 )
                 response = None
+                youtube_write_started = True
                 while response is None:
                     _, response = request.next_chunk(num_retries=0)
                 external_id = response.get("id")
@@ -331,6 +356,12 @@ def dispatch_one(db):
                     raise ValueError("Платформа не вернула ID")
                 job.external_id, job.url = external_id, "https://www.youtube.com/watch?v=" + external_id
                 job.status = "platform_processing"
+                job.updated = now()
+                db.commit()  # Save the video result before attempting the independent thumbnail write.
+                if settings(db).get("youtube_thumbnail"):
+                    from .youtube_covers import generate_and_attach
+
+                    generate_and_attach(db, job, variant, service)
             else:
                 from .tiktok_upload import BeforePublishError, upload
 
@@ -384,10 +415,20 @@ def dispatch_one(db):
                 job.external_id, job.url, job.status = result.external_id, result.url, result.status
                 job.error = "TikTok принял публикацию и вернул ID. Обработка и фактическая видимость пока не подтверждены."
                 account.method = "browser_verified"
-        except Exception:
-            # Never retry automatically after a possibly completed remote write.
-            job.status = "unknown"
-            job.error = "Результат отправки неизвестен. Проверьте канал вручную перед дальнейшими действиями."
+        except Exception as error:
+            if account.platform == "youtube" and not youtube_write_started:
+                detail, needs_auth = youtube_preflight_failure(error)
+                job.status = "waiting_auth" if needs_auth else "ready"
+                job.approved, job.upload_started_at = False, None
+                job.error = detail + " Отправка видео не начиналась. После исправления подтвердите отправку."
+                if needs_auth:
+                    account.connected = False
+            else:
+                # Never retry automatically after a possibly completed remote write.
+                job.status = "unknown"
+                job.error = (
+                    "Результат отправки неизвестен. Проверьте канал вручную перед дальнейшими действиями."
+                )
         job.updated = now()
         db.commit()
         return
@@ -395,60 +436,66 @@ def dispatch_one(db):
 
 def refresh_metrics(db):
     result = {"updated": 0, "unavailable": 0}
+    from .youtube_library import sync
+
+    for account in db.scalars(
+        select(Account).where(Account.platform == "youtube", Account.connected.is_(True))
+    ).all():
+        try:
+            result["updated"] += sync(db, account)
+        except Exception:
+            result["unavailable"] += 1
+            key = "youtube_sync_" + account.id
+            store = db.get(Setting, key)
+            value = {
+                **(store.value if store else {}),
+                "error": "Не удалось обновить канал. Проверьте подключение YouTube и квоту API",
+            }
+            if store:
+                store.value = value
+            else:
+                db.add(Setting(key=key, value=value))
     with db.no_autoflush:
         for job in db.scalars(select(Job).where(Job.external_id.is_not(None))).all():
             account = db.get(Account, db.get(Variant, job.variant_id).account_id)
+            if account.platform == "youtube":
+                continue
             try:
-                if account.platform == "youtube":
-                    items = (
-                        youtube_service(account)
-                        .videos()
-                        .list(part="statistics", id=job.external_id)
-                        .execute()["items"]
+                token = vault.get(account.id + "_metrics")
+                if not token:
+                    from .tiktok_public import metrics
+
+                    values = metrics(account.external_id, job.external_id)
+                    source = "TikTok public page"
+                else:
+                    response = httpx.post(
+                        "https://open.tiktokapis.com/v2/video/query/",
+                        params={"fields": "id,view_count,like_count,comment_count,share_count"},
+                        headers={"Authorization": "Bearer " + token["access_token"]},
+                        json={"filters": {"video_ids": [job.external_id]}},
+                        timeout=20,
                     )
-                    if not items:
+                    response.raise_for_status()
+                    videos = response.json().get("data", {}).get("videos", [])
+                    if len(videos) != 1 or videos[0]["id"] != job.external_id:
                         raise ValueError("Нет данных")
-                    stats = items[0]["statistics"]
                     values = {
-                        k: int(stats[remote]) if remote in stats else None
-                        for k, remote in (
-                            ("views", "viewCount"),
-                            ("likes", "likeCount"),
-                            ("comments", "commentCount"),
+                        key: videos[0].get(remote)
+                        for key, remote in (
+                            ("views", "view_count"),
+                            ("likes", "like_count"),
+                            ("comments", "comment_count"),
+                            ("shares", "share_count"),
                         )
                     }
-                    source = "YouTube Data API"
-                else:
-                    token = vault.get(account.id + "_metrics")
-                    if not token:
-                        from .tiktok_public import metrics
-
-                        values = metrics(account.external_id, job.external_id)
-                        source = "TikTok public page"
-                    else:
-                        response = httpx.post(
-                            "https://open.tiktokapis.com/v2/video/query/",
-                            params={"fields": "id,view_count,like_count,comment_count,share_count"},
-                            headers={"Authorization": "Bearer " + token["access_token"]},
-                            json={"filters": {"video_ids": [job.external_id]}},
-                            timeout=20,
-                        )
-                        response.raise_for_status()
-                        videos = response.json().get("data", {}).get("videos", [])
-                        if len(videos) != 1 or videos[0]["id"] != job.external_id:
-                            raise ValueError("Нет данных")
-                        values = {
-                            key: videos[0].get(remote)
-                            for key, remote in (
-                                ("views", "view_count"),
-                                ("likes", "like_count"),
-                                ("comments", "comment_count"),
-                                ("shares", "share_count"),
-                            )
-                        }
-                        source = "TikTok Display API"
+                    source = "TikTok Display API"
                 db.add(Metric(job_id=job.id, values=values, source=source))
                 result["updated"] += 1
             except Exception:
                 result["unavailable"] += 1
+    store = db.get(Setting, "metrics_refresh")
+    if store:
+        store.value = result.copy()
+    else:
+        db.add(Setting(key="metrics_refresh", value=result.copy()))
     return result

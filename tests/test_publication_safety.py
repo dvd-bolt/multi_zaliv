@@ -5,7 +5,7 @@ from sqlalchemy import delete, select
 
 from backend import platforms
 from backend.config import DATA
-from backend.db import Account, Asset, Job, Metric, Session, Variant, uid
+from backend.db import Account, Asset, ChannelVideo, Job, Metric, Session, Setting, Variant, uid
 
 
 @pytest.fixture
@@ -43,6 +43,8 @@ def publication():
         db.add(Job(id=keys[3], variant_id=keys[2], status="scheduled", approved=True))
     yield keys
     with Session.begin() as db:
+        db.execute(delete(ChannelVideo).where(ChannelVideo.account_id == keys[0]))
+        db.execute(delete(Setting).where(Setting.key == "youtube_sync_" + keys[0]))
         db.execute(delete(Metric).where(Metric.job_id == keys[3]))
         db.execute(delete(Job).where(Job.id == keys[3]))
         db.execute(delete(Variant).where(Variant.id == keys[2]))
@@ -69,9 +71,33 @@ class FakeYouTube:
     def videos(self):
         return self
 
+    def playlistItems(self):
+        return self
+
     def list(self, **kw):
         if kw.get("mine"):
-            return Result({"items": [{"id": "UC_TEST"}]})
+            return Result(
+                {"items": [{"id": "UC_TEST", "contentDetails": {"relatedPlaylists": {"uploads": "UU_TEST"}}}]}
+            )
+        if "playlistId" in kw:
+            return Result({"items": [{"contentDetails": {"videoId": "VIDEO_TEST"}}]})
+        if "snippet,status,statistics,contentDetails" == kw["part"]:
+            return Result(
+                {
+                    "items": [
+                        {
+                            "id": "VIDEO_TEST",
+                            "snippet": {
+                                "title": "Test",
+                                "channelId": "UC_TEST",
+                                "publishedAt": "2026-11-01T00:00:00Z",
+                            },
+                            "status": {"privacyStatus": "private"},
+                            "statistics": {"viewCount": "0", "likeCount": "2"},
+                        }
+                    ]
+                }
+            )
         if kw["part"] == "statistics":
             return Result({"items": [{"statistics": {"viewCount": "0", "likeCount": "2"}}]})
         return Result({"items": [{"status": {"uploadStatus": "processed"}}]})
@@ -97,6 +123,32 @@ def test_lost_response_is_unknown_and_not_retried(publication, monkeypatch):
         platforms.dispatch_one(db)
         db.commit()
     assert service.uploads == 1
+
+
+@pytest.mark.parametrize("failure", ["expired", "missing", "network"])
+def test_youtube_preflight_failure_is_not_an_unknown_upload(publication, monkeypatch, failure):
+    from google.auth.exceptions import RefreshError
+
+    calls = []
+
+    def unavailable(_):
+        calls.append(True)
+        if failure == "expired":
+            raise RefreshError("PRIVATE-OAUTH-PAYLOAD", {"error": "invalid_grant"})
+        if failure == "missing":
+            raise platforms.AccountIdentityError("Подключите YouTube через Google OAuth")
+        raise ConnectionError("PRIVATE-NETWORK-PAYLOAD")
+
+    monkeypatch.setattr(platforms, "youtube_service", unavailable)
+    with Session() as db:
+        platforms.dispatch_one(db)
+        job = db.get(Job, publication[3])
+        assert job.status == ("ready" if failure == "network" else "waiting_auth")
+        assert not job.approved and job.external_id is None and job.upload_started_at is None
+        assert "Отправка видео не начиналась" in job.error and "PRIVATE" not in job.error
+        assert db.get(Account, publication[0]).connected == (failure == "network")
+        platforms.dispatch_one(db)
+    assert len(calls) == 1
 
 
 def test_youtube_id_processing_visibility_and_snapshot_values(publication, monkeypatch):

@@ -26,4 +26,5 @@ def legacy_non_campaign_mode():
             **settings(db),
             "buba_required": False,
             "one_per_platform": False,
+            "youtube_thumbnail": False,
         }

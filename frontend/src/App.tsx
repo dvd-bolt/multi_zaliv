@@ -38,6 +38,7 @@ import {
   type State,
 } from './api';
 import Stats from './Stats';
+import ChannelVideos from './ChannelVideos';
 import { GeminiSettings, useGemini } from './Gemini';
 
 import { latestMetrics, channelSummaries, channelsReport } from './statistics';
@@ -69,6 +70,7 @@ const label: Record<string, string> = {
   unknown: 'Результат неизвестен',
   missed: 'Время пропущено',
   rejected: 'Отклонён платформой',
+  deleted: 'Удалён с YouTube',
 };
 const visibility: Record<string, string> = {
   private: 'Только я',
@@ -450,6 +452,7 @@ export default function App() {
     if (view !== 'editor') setPlaying(false);
   }, [view]);
   const [telegramCode, setTelegramCode] = useState('');
+  const [settingsTab, setSettingsTab] = useState('general');
   const run: Run = async (task, success) => {
     if (mutationPending.current) return;
     mutationPending.current = true;
@@ -710,12 +713,15 @@ export default function App() {
       (statsPlatform === 'all' || a.platform === statsPlatform),
   );
   const statsIds = new Set(statsAccounts.map((a) => a.id));
-  const jobsById = new Map(data.jobs.map((j) => [j.id, j]));
+  const statisticsJobs = [...data.jobs, ...(data.channel_statistics?.jobs ?? [])].filter(
+    (j) => j.status !== 'deleted' && !data.channel_statistics?.missing.includes(j.id),
+  );
+  const jobsById = new Map(statisticsJobs.map((j) => [j.id, j]));
   const metricRows = latestMetrics(metrics).filter((m) => {
     const job = jobsById.get(m.job_id);
     return job && statsIds.has(job.account.id);
   });
-  const summaries = channelSummaries(statsAccounts, data.jobs, metricRows);
+  const summaries = channelSummaries(statsAccounts, statisticsJobs, metricRows);
   const uploadJson = async (file: File | undefined, path: string, method = 'PUT') => {
     if (!file) return;
     await run(async () => {
@@ -1741,6 +1747,16 @@ export default function App() {
                                               ? 'Автопубликация ещё не проверена'
                                               : a.platform}
                             </span>
+                            {a.platform === 'youtube' && (
+                              <Button
+                                onClick={() => {
+                                  setCurrentAccount(a);
+                                  setModal('channel-videos');
+                                }}
+                              >
+                                Все видео
+                              </Button>
+                            )}
                             <Button
                               onClick={() => {
                                 setCurrentAccount(a);
@@ -1847,204 +1863,282 @@ export default function App() {
                     Блокировать нарушения БУБА
                   </label>
                 </div>
+                <div className="e-tabs e-settings-tabs" aria-label="Разделы настроек">
+                  {[
+                    ['general', 'Программа'],
+                    ['connections', 'Подключения'],
+                    ['storage', 'Данные'],
+                  ].map(([key, label]) => (
+                    <button
+                      key={key}
+                      aria-pressed={settingsTab === key}
+                      onClick={() => setSettingsTab(key)}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
                 <div className="e-settings">
-                  <Field label="Название пакета">
-                    <input
-                      className="e-field"
-                      defaultValue={data.settings.project_name}
-                      maxLength={80}
-                      onBlur={(e) => {
-                        if (e.target.value !== data.settings.project_name)
-                          void run(() =>
-                            api('/settings', 'PATCH', {
-                              project_name: e.target.value,
-                            }),
-                          );
-                      }}
-                    />
-                  </Field>
-                  <Field label="Часовой пояс">
-                    <select
-                      className="e-field"
-                      value={data.settings.timezone}
-                      onChange={(e) =>
-                        void run(() =>
-                          api('/settings', 'PATCH', {
-                            timezone: e.target.value,
-                          }),
-                        )
-                      }
-                    >
-                      <option>Europe/Moscow</option>
-                      <option>UTC</option>
-                    </select>
-                  </Field>
-                  <Field label="Качество экспорта">
-                    <select
-                      className="e-field"
-                      value={data.settings.quality}
-                      onChange={(e) =>
-                        void run(() =>
-                          api('/settings', 'PATCH', {
-                            quality: e.target.value,
-                          }),
-                        )
-                      }
-                    >
-                      <option value="high">Высокое · CRF 20</option>
-                      <option value="balanced">Сбалансированное · CRF 23</option>
-                    </select>
-                  </Field>
-                  <Field label="Интервал публикаций на аккаунт, мин">
-                    <input
-                      className="e-field"
-                      type="number"
-                      min="0"
-                      max="180"
-                      defaultValue={data.settings.interval}
-                      onBlur={(e) =>
-                        void run(() =>
-                          api('/settings', 'PATCH', {
-                            interval: Number(e.target.value),
-                          }),
-                        )
-                      }
-                    />
-                  </Field>
-                  <Field label="YouTube · категория роликов">
-                    <select
-                      className="e-field"
-                      value={data.settings.youtube_category ?? '1'}
-                      onChange={(e) =>
-                        void run(
-                          () =>
-                            api('/settings', 'PATCH', {
-                              youtube_category: e.target.value,
-                            }),
-                          'Категория YouTube сохранена',
-                        )
-                      }
-                    >
-                      <option value="1">Фильмы и анимация</option>
-                      <option value="24">Развлечения</option>
-                      <option value="23">Юмор</option>
-                      <option value="22">Люди и блоги</option>
-                    </select>
-                  </Field>
-                  <label className="e-check">
-                    <input
-                      type="checkbox"
-                      checked={data.settings.one_per_platform !== false}
-                      onChange={(e) =>
-                        void run(
-                          () =>
-                            api('/settings', 'PATCH', {
-                              one_per_platform: e.target.checked,
-                            }),
-                          'Правило каналов сохранено',
-                        )
-                      }
-                    />
-                    Один ролик — один TikTok и один YouTube
-                  </label>
-                  <h3>Подключение Google</h3>
-                  <p className="e-muted e-small">
-                    OAuth Desktop app · YouTube Data API v3 · добавьте свой аккаунт в тестовые
-                    пользователи Google Cloud.
-                  </p>
-                  <div className="e-row">
-                    <Button disabled={busy} onClick={() => clientRef.current?.click()}>
-                      <Upload size={13} />
-                      Импорт OAuth JSON
-                    </Button>
-                    <Button onClick={() => setModal('gemini')}>Gemini · ИИ</Button>
-                    <span className={'e-badge' + (data.google_configured ? ' good' : '')}>
-                      {data.google_configured ? 'Конфигурация сохранена' : 'Не настроено'}
-                    </span>
-                  </div>
-                  <hr className="e-divider" />
-                  <h3>Уведомления в Telegram</h3>
-                  <p className="e-muted e-small">
-                    Бот пишет «опубликовано» со ссылкой, ошибки и «нужно войти заново». Код
-                    подключения: команда /frameflow в боте. Ключ хранится в Windows DPAPI.
-                  </p>
-                  {data.telegram_configured ? (
-                    <div className="e-row">
-                      <span className="e-badge good">Подключено</span>
-                      <Button
-                        disabled={busy}
-                        onClick={() =>
-                          void run(
-                            () => api('/telegram', 'DELETE'),
-                            'Уведомления в Telegram отключены',
-                          )
-                        }
-                      >
-                        Отключить
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="e-row">
-                      <input
-                        className="e-field"
-                        placeholder="https://…#код из бота"
-                        value={telegramCode}
-                        onChange={(e) => setTelegramCode(e.target.value)}
-                      />
-                      <Button
-                        disabled={busy || !telegramCode.trim()}
-                        onClick={() =>
-                          void run(async () => {
-                            await api('/telegram', 'POST', {
-                              code: telegramCode.trim(),
-                            });
-                            setTelegramCode('');
-                          }, 'Подключено: в Telegram пришло проверочное сообщение')
-                        }
-                      >
-                        Подключить
-                      </Button>
-                    </div>
+                  {settingsTab === 'general' && (
+                    <>
+                      <Field label="Название пакета">
+                        <input
+                          className="e-field"
+                          defaultValue={data.settings.project_name}
+                          maxLength={80}
+                          onBlur={(e) => {
+                            if (e.target.value !== data.settings.project_name)
+                              void run(() =>
+                                api('/settings', 'PATCH', {
+                                  project_name: e.target.value,
+                                }),
+                              );
+                          }}
+                        />
+                      </Field>
+                      <Field label="Часовой пояс">
+                        <select
+                          className="e-field"
+                          value={data.settings.timezone}
+                          onChange={(e) =>
+                            void run(() =>
+                              api('/settings', 'PATCH', {
+                                timezone: e.target.value,
+                              }),
+                            )
+                          }
+                        >
+                          <option>Europe/Moscow</option>
+                          <option>UTC</option>
+                        </select>
+                      </Field>
+                      <Field label="Качество экспорта">
+                        <select
+                          className="e-field"
+                          value={data.settings.quality}
+                          onChange={(e) =>
+                            void run(() =>
+                              api('/settings', 'PATCH', {
+                                quality: e.target.value,
+                              }),
+                            )
+                          }
+                        >
+                          <option value="high">Высокое · CRF 20</option>
+                          <option value="balanced">Сбалансированное · CRF 23</option>
+                        </select>
+                      </Field>
+                      <Field label="Интервал публикаций на аккаунт, мин">
+                        <input
+                          className="e-field"
+                          type="number"
+                          min="0"
+                          max="180"
+                          defaultValue={data.settings.interval}
+                          onBlur={(e) =>
+                            void run(() =>
+                              api('/settings', 'PATCH', {
+                                interval: Number(e.target.value),
+                              }),
+                            )
+                          }
+                        />
+                      </Field>
+                      <Field label="YouTube · категория роликов">
+                        <select
+                          className="e-field"
+                          value={data.settings.youtube_category ?? '1'}
+                          onChange={(e) =>
+                            void run(
+                              () =>
+                                api('/settings', 'PATCH', {
+                                  youtube_category: e.target.value,
+                                }),
+                              'Категория YouTube сохранена',
+                            )
+                          }
+                        >
+                          <option value="1">Фильмы и анимация</option>
+                          <option value="24">Развлечения</option>
+                          <option value="23">Юмор</option>
+                          <option value="22">Люди и блоги</option>
+                        </select>
+                      </Field>
+                      <label className="e-check">
+                        <input
+                          type="checkbox"
+                          checked={data.settings.one_per_platform !== false}
+                          onChange={(e) =>
+                            void run(
+                              () =>
+                                api('/settings', 'PATCH', {
+                                  one_per_platform: e.target.checked,
+                                }),
+                              'Правило каналов сохранено',
+                            )
+                          }
+                        />
+                        Один ролик — один TikTok и один YouTube
+                      </label>
+                    </>
                   )}
-                  <hr className="e-divider" />
-                  <h3>Локальные данные</h3>
-                  <p className="e-small e-muted">
-                    Исходники, экспорты и база — в папке data рядом с программой. Резервная копия
-                    содержит базу; видео и защищённые секреты копируются отдельно.
-                  </p>
-                  <div className="e-row">
-                    <Button
-                      disabled={busy}
-                      onClick={() =>
-                        void run(async () => {
-                          const result = await api<{ path: string }>('/backup', 'POST');
-                          setMessage('Резервная копия: ' + result.path);
-                          setError(false);
-                        })
-                      }
-                    >
-                      <Save size={13} />
-                      Копия базы
-                    </Button>
-                    <Button
-                      disabled={busy}
-                      onClick={() =>
-                        void run(async () => {
-                          const result = await api<{
-                            ok: boolean;
-                            free_gb: number;
-                          }>('/health');
-                          if (!result.ok)
-                            throw new Error('Не найдены FFmpeg или ffprobe. Выполните установку.');
-                          setMessage(`FFmpeg / ffprobe доступны. Свободно ${result.free_gb} ГБ.`);
-                          setError(false);
-                        })
-                      }
-                    >
-                      Проверить окружение
-                    </Button>
-                    <Button onClick={() => setModal('cleanup')}>Очистка экспортов</Button>
-                  </div>
+                  {settingsTab === 'connections' && (
+                    <>
+                      <h3>Подключение Google</h3>
+                      <p className="e-muted e-small">
+                        OAuth Desktop app · YouTube Data API v3 · добавьте свой аккаунт в тестовые
+                        пользователи Google Cloud.
+                      </p>
+                      <div className="e-row">
+                        <Button disabled={busy} onClick={() => clientRef.current?.click()}>
+                          <Upload size={13} />
+                          Импорт OAuth JSON
+                        </Button>
+                        <Button onClick={() => setModal('gemini')}>Gemini · ИИ</Button>
+                        <Button onClick={() => setModal('youtube-covers')}>Обложки YouTube</Button>
+                        <span className={'e-badge' + (data.google_configured ? ' good' : '')}>
+                          {data.google_configured ? 'Конфигурация сохранена' : 'Не настроено'}
+                        </span>
+                      </div>
+                      <hr className="e-divider" />
+                      <h3>Уведомления в Telegram</h3>
+                      <p className="e-muted e-small">
+                        Бот пишет «опубликовано» со ссылкой, ошибки и «нужно войти заново». Код
+                        подключения: команда /frameflow в боте. Ключ хранится в Windows DPAPI.
+                      </p>
+                      {data.telegram_configured ? (
+                        <div className="e-row">
+                          <span className="e-badge good">Подключено</span>
+                          <Button
+                            disabled={busy}
+                            onClick={() =>
+                              void run(
+                                () => api('/telegram', 'DELETE'),
+                                'Уведомления в Telegram отключены',
+                              )
+                            }
+                          >
+                            Отключить
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="e-row">
+                          <input
+                            className="e-field"
+                            placeholder="https://…#код из бота"
+                            value={telegramCode}
+                            onChange={(e) => setTelegramCode(e.target.value)}
+                          />
+                          <Button
+                            disabled={busy || !telegramCode.trim()}
+                            onClick={() =>
+                              void run(async () => {
+                                await api('/telegram', 'POST', {
+                                  code: telegramCode.trim(),
+                                });
+                                setTelegramCode('');
+                              }, 'Подключено: в Telegram пришло проверочное сообщение')
+                            }
+                          >
+                            Подключить
+                          </Button>
+                        </div>
+                      )}
+                      <label className="e-check e-stats-push-toggle">
+                        <input
+                          type="checkbox"
+                          disabled={busy || !data.telegram_configured}
+                          checked={data.stats_push?.enabled ?? !!data.telegram_configured}
+                          onChange={(e) =>
+                            void run(
+                              () => api('/stats-push', 'PATCH', { enabled: e.target.checked }),
+                              'Отправка статистики настроена',
+                            )
+                          }
+                        />
+                        Отправлять статистику на сервер
+                      </label>
+                      <p className="e-small e-muted" role="status">
+                        Статистика отправляется на сервер:{' '}
+                        {(() => {
+                          const push = data.stats_push;
+                          const time = (value: string) =>
+                            new Date(value).toLocaleString('ru-RU', {
+                              timeZone: 'Europe/Moscow',
+                              day: '2-digit',
+                              month: '2-digit',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            }) + ' МСК';
+                          const previous = push?.last_success
+                            ? `последний раз ${time(push.last_success)}`
+                            : 'ещё не отправлялась';
+                          const errors: Record<string, string> = {
+                            auth_error: 'сервер не принял код',
+                            not_ready: 'сервер ещё не обновлён (404)',
+                            server_error: `ошибка сервера (${push?.http_status ?? '—'})`,
+                            network_error: 'ошибка сети',
+                            too_large: 'снимок больше 1 МБ',
+                          };
+                          const outcome =
+                            push?.result && push.result !== 'ok'
+                              ? `${previous} / ${errors[push.result]}${push.attempted_at ? ` · ${time(push.attempted_at)}` : ''}`
+                              : previous;
+                          return !data.telegram_configured
+                            ? 'нужно подключение Telegram'
+                            : !push?.enabled
+                              ? `выключено · ${outcome}`
+                              : outcome;
+                        })()}
+                      </p>
+                    </>
+                  )}
+                  {settingsTab === 'storage' && (
+                    <>
+                      <h3>Локальные данные</h3>
+                      <p className="e-small e-muted">
+                        Исходники, экспорты и база — в папке data рядом с программой. Резервная
+                        копия содержит базу; видео и защищённые секреты копируются отдельно.
+                      </p>
+                      <div className="e-row">
+                        <Button
+                          disabled={busy}
+                          onClick={() =>
+                            void run(async () => {
+                              const result = await api<{ path: string }>('/backup', 'POST');
+                              setMessage('Резервная копия: ' + result.path);
+                              setError(false);
+                            })
+                          }
+                        >
+                          <Save size={13} />
+                          Копия базы
+                        </Button>
+                        <Button
+                          disabled={busy}
+                          onClick={() =>
+                            void run(async () => {
+                              const result = await api<{
+                                ok: boolean;
+                                free_gb: number;
+                              }>('/health');
+                              if (!result.ok)
+                                throw new Error(
+                                  'Не найдены FFmpeg или ffprobe. Выполните установку.',
+                                );
+                              setMessage(
+                                `FFmpeg / ffprobe доступны. Свободно ${result.free_gb} ГБ.`,
+                              );
+                              setError(false);
+                            })
+                          }
+                        >
+                          Проверить окружение
+                        </Button>
+                        <Button onClick={() => setModal('cleanup')}>Очистка экспортов</Button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </section>
             )}
@@ -2191,7 +2285,7 @@ export default function App() {
                 value={historyJob}
                 onChange={(e) => setHistoryJob(e.target.value)}
               >
-                {data.jobs.map((j) => (
+                {statisticsJobs.map((j) => (
                   <option key={j.id} value={j.id}>
                     {j.asset_name} · {j.account.name}
                   </option>
@@ -2485,7 +2579,7 @@ export default function App() {
                       if (result.worker_warning) throw new Error(result.worker_warning);
                       if (!result.created.length && !result.activated.length)
                         throw new Error(
-                          'Такие варианты уже есть в очереди или опубликованы. Повторная отправка не создана.',
+                          'Такие варианты уже есть в очереди или опубликованы. Если ролик удалён с YouTube: откройте «Подробнее → Ролик удалён — загрузить заново».',
                         );
                     },
                     autoPublish
@@ -2874,6 +2968,93 @@ export default function App() {
             </div>
           </Modal>
         )}
+        {modal === 'channel-videos' && currentAccount && (
+          <Modal title="Все видео YouTube" onClose={close} className="channel-videos-dialog">
+            <ChannelVideos
+              account={currentAccount}
+              changed={async () => {
+                await Promise.all([refresh(), api<Metric[]>('/metrics').then(setMetrics)]);
+              }}
+            />
+          </Modal>
+        )}
+        {modal === 'youtube-covers' && (
+          <Modal
+            title="Обложки YouTube"
+            onClose={close}
+            busy={busy}
+            error={error ? message : undefined}
+          >
+            <label className="e-check">
+              <input
+                type="checkbox"
+                disabled={busy}
+                checked={data.settings.youtube_thumbnail !== false}
+                onChange={(e) =>
+                  void run(() => api('/settings', 'PATCH', { youtube_thumbnail: e.target.checked }))
+                }
+              />
+              Генерировать и добавлять обложку при загрузке на YouTube
+            </label>
+            <Field label="Модель Google для изображений">
+              <select
+                className="e-field"
+                disabled={busy}
+                value={data.settings.thumbnail_model ?? 'gemini-3.1-flash-image'}
+                onChange={(e) =>
+                  void run(() => api('/settings', 'PATCH', { thumbnail_model: e.target.value }))
+                }
+              >
+                <option value="gemini-3.1-flash-image">Gemini 3.1 Flash Image</option>
+                <option value="gemini-2.5-flash-image">Gemini 2.5 Flash Image</option>
+                <option value="gemini-3-pro-image">Gemini 3 Pro Image</option>
+              </select>
+            </Field>
+            <p className="e-small e-muted">
+              Используется ключ из настроек Gemini. В Google передаются три кадра исходника и
+              название; запрос оплачивается по тарифу вашего Google API. Обложка сохраняется в JPEG
+              1280×720.
+            </p>
+            <p className="e-small e-muted">
+              Для своих обложек нужны разрешения канала YouTube. Если загрузка обложки отклонена,
+              видео сохраняет свой ID, а обложку можно повторить отдельно в задании.
+            </p>
+            <Button onClick={() => setModal('gemini')}>Настроить ключ Gemini</Button>
+          </Modal>
+        )}
+        {modal === 'reupload' && currentJob && (
+          <Modal
+            title="Повтор после удаления с YouTube"
+            onClose={close}
+            busy={busy}
+            error={error ? message : undefined}
+          >
+            <p>
+              Материал: <b>{currentJob.asset_name}</b>
+              <br />
+              Канал: <b>{currentJob.account.name}</b>
+              <br />
+              Видимость: <b>{visibility[currentJob.config.visibility]}</b>
+            </p>
+            <p className="e-small">
+              Программа проверит старый ID через API владельца. Если ролик отсутствует, создаст
+              новое задание с тем же MP4. История старой отправки сохранится. Новую отправку нужно
+              подтвердить в очереди.
+            </p>
+            <Button
+              primary
+              disabled={busy}
+              onClick={() =>
+                void run(async () => {
+                  await api(`/jobs/${currentJob.id}/action`, 'POST', { action: 'reupload' });
+                  setModal('');
+                }, 'Удаление подтверждено. Новое задание добавлено в очередь для проверки и отправки')
+              }
+            >
+              Проверить удаление и создать повтор
+            </Button>
+          </Modal>
+        )}
         {modal === 'job' && currentJob && (
           <Modal busy={busy} error={error ? message : undefined} title="Задание" onClose={close}>
             <p>
@@ -2887,6 +3068,32 @@ export default function App() {
               {label[data.jobs.find((j) => j.id === currentJob.id)?.status ?? currentJob.status]}
             </p>
             {currentJob.error && <p className="job-error">{currentJob.error}</p>}
+            {currentJob.thumbnail?.status && (
+              <p className="e-small">
+                Обложка:{' '}
+                {currentJob.thumbnail.status === 'uploaded'
+                  ? 'установлена на YouTube'
+                  : currentJob.thumbnail.status === 'generating'
+                    ? 'генерируется; видео уже отправлено'
+                    : currentJob.thumbnail.status === 'ready'
+                      ? 'создана, ожидает установки'
+                      : currentJob.thumbnail.error}
+                {currentJob.thumbnail.file && (
+                  <>
+                    {' '}
+                    ·{' '}
+                    <a
+                      className="text-link"
+                      href={`/api/jobs/${currentJob.id}/cover`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Посмотреть JPEG ↗
+                    </a>
+                  </>
+                )}
+              </p>
+            )}
             {currentJob.has_output && (
               <p>
                 <Button onClick={() => setModal('export-preview')}>Посмотреть MP4</Button>{' '}
@@ -2909,6 +3116,34 @@ export default function App() {
               </p>
             )}
             <div className="e-row">
+              {currentJob.account.platform === 'youtube' &&
+                currentJob.external_id &&
+                ['published', 'platform_processing'].includes(currentJob.status) && (
+                  <Button
+                    disabled={busy}
+                    onClick={() =>
+                      void run(async () => {
+                        const result = await api<{ status: string; error?: string }>(
+                          `/jobs/${currentJob.id}/cover`,
+                          'POST',
+                        );
+                        if (result.status !== 'uploaded')
+                          throw new Error(result.error || 'Обложка не установлена');
+                      }, 'Обложка установлена. Видео повторно не загружалось')
+                    }
+                  >
+                    Добавить / повторить обложку
+                  </Button>
+                )}
+              {currentJob.account.platform === 'youtube' &&
+                currentJob.external_id &&
+                ['published', 'platform_processing', 'rejected', 'unknown'].includes(
+                  currentJob.status,
+                ) && (
+                  <Button onClick={() => setModal('reupload')}>
+                    Ролик удалён — загрузить заново
+                  </Button>
+                )}
               {currentJob.account.platform === 'tiktok' &&
                 ['unknown', 'platform_processing'].includes(currentJob.status) && (
                   <Button

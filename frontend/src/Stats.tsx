@@ -166,10 +166,14 @@ export default function Stats(p: Props) {
   const [sort, setSort] = useState<{ key: SortKey; desc: boolean }>({ key: 'views', desc: true });
   const jobs = useMemo(
     () =>
-      p.data.jobs.filter(
-        (j) => j.external_id && (platform === 'all' || j.account.platform === platform),
+      [...p.data.jobs, ...(p.data.channel_statistics?.jobs ?? [])].filter(
+        (j) =>
+          j.external_id &&
+          j.status !== 'deleted' &&
+          !p.data.channel_statistics?.missing.includes(j.id) &&
+          (platform === 'all' || j.account.platform === platform),
       ),
-    [p.data.jobs, platform],
+    [p.data.jobs, p.data.channel_statistics, platform],
   );
   const ids = new Set(jobs.map((j) => j.id));
   const snapshots = p.metrics.filter((m) => ids.has(m.job_id));
@@ -459,6 +463,7 @@ export default function Stats(p: Props) {
                           {PLATFORM[r.job.account.platform]}
                         </span>{' '}
                         {r.job.account.name}
+                        {r.job.external_only && ' · загружено вручную'}
                         {trend(r) === 'hot' && (
                           <span
                             className="st-trend hot"

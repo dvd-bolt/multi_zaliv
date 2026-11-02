@@ -1,0 +1,79 @@
+{
+  "checks": [
+    {
+      "name": "general",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflow": [],
+      "outside": []
+    },
+    {
+      "name": "connections-first-send",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflow": [],
+      "outside": []
+    },
+    {
+      "name": "connections-ok",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflow": [],
+      "outside": []
+    },
+    {
+      "name": "connections-not_ready",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflow": [],
+      "outside": []
+    },
+    {
+      "name": "connections-network_error",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflow": [],
+      "outside": []
+    },
+    {
+      "name": "connections-auth_error",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflow": [],
+      "outside": []
+    },
+    {
+      "name": "storage",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflow": [],
+      "outside": []
+    },
+    {
+      "name": "editor",
+      "width": 1024,
+      "height": 600,
+      "scrollWidth": 1024,
+      "scrollHeight": 600,
+      "overflow": [],
+      "outside": []
+    }
+  ],
+  "errors": [],
+  "isolated": true,
+  "externalRequests": false
+}

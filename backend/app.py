@@ -17,7 +17,7 @@ from pydantic import BaseModel
 from sqlalchemy import select, text
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from . import notify, vault
+from . import notify, stats_push, vault
 from .browser_pairing import (
     BRIDGE_PATHS,
     begin_browser,
@@ -157,6 +157,7 @@ def job_data(db, job):
                 "created",
                 "updated",
                 "upload_started_at",
+                "thumbnail",
             )
         },
         "account": public_account(account),
@@ -169,6 +170,8 @@ def job_data(db, job):
 
 @app.get("/api/state")
 def state():
+    from .youtube_library import external_statistics
+
     with Session() as db:
         heartbeat = None
         try:
@@ -196,6 +199,8 @@ def state():
             "heartbeat": heartbeat,
             "google_configured": bool(vault.get("google_client")),
             "telegram_configured": bool(notify.connection()),
+            "stats_push": stats_push.status(db),
+            "channel_statistics": {k: v for k, v in external_statistics(db).items() if k != "metrics"},
         }
 
 
@@ -833,17 +838,96 @@ def telegram_disconnect():
 
 @app.get("/api/metrics")
 def metrics():
+    from .youtube_library import external_statistics
+
     with Session() as db:
         return [
             {"id": m.id, "job_id": m.job_id, "captured": m.captured, "values": m.values, "source": m.source}
             for m in db.scalars(select(Metric).order_by(Metric.captured)).all()
-        ]
+        ] + external_statistics(db)["metrics"]
+
+
+@app.get("/api/accounts/{key}/videos")
+def channel_videos(key: str):
+    from .youtube_library import library
+
+    with Session() as db:
+        account = require(db, Account, key)
+        if account.platform != "youtube":
+            raise ValueError("Полный список пока доступен для YouTube")
+        return library(db, account)
+
+
+@app.post("/api/accounts/{key}/videos/refresh")
+def channel_videos_refresh(key: str):
+    from .youtube_library import sync
+
+    with Session.begin() as db:
+        try:
+            count = sync(db, require(db, Account, key))
+        except (ValueError, HTTPException):
+            raise
+        except Exception:
+            raise ValueError("Не удалось получить видео канала. Проверьте подключение YouTube и квоту API") from None
+        return {"updated": count}
+
+
+@app.get("/api/jobs/{key}/cover")
+def youtube_cover_file(key: str):
+    with Session() as db:
+        job = require(db, Job, key)
+        filename = job.thumbnail.get("file", "")
+        if not filename or Path(filename).name != filename:
+            raise HTTPException(404, "Обложка ещё не создана")
+        path = DATA / "thumbnails" / filename
+        if not path.is_file():
+            raise HTTPException(404, "Файл обложки не найден")
+        return FileResponse(path, media_type="image/jpeg")
+
+
+@app.post("/api/jobs/{key}/cover")
+def youtube_cover_retry(key: str):
+    from .youtube_covers import attach, prepare
+    from .youtube_library import owned_service
+
+    with Session() as db:
+        job = require(db, Job, key)
+        variant = db.get(Variant, job.variant_id)
+        account = db.get(Account, variant.account_id)
+        if not job.external_id or job.status not in ("published", "platform_processing"):
+            raise ValueError("Сначала дождитесь ID отправленного ролика")
+        try:
+            service, _ = owned_service(account)
+            items = service.videos().list(part="snippet", id=job.external_id).execute()["items"]
+            if not items or items[0]["snippet"]["channelId"] != account.external_id:
+                raise ValueError("Ролик не найден в выбранном канале")
+            path, model = prepare(db, variant)
+            attach(db, job, service, path, model)
+        except ValueError:
+            raise
+        except Exception:
+            raise ValueError("Не удалось подготовить обложку. Проверьте подключение YouTube и Gemini") from None
+        return job.thumbnail
+
+
+class StatsPushOptions(BaseModel):
+    enabled: bool
+
+
+@app.patch("/api/stats-push")
+def stats_push_options(request: StatsPushOptions):
+    with Session.begin() as db:
+        stats_push.configure(db, request.enabled)
+        return {"ok": True}
 
 
 @app.post("/api/metrics/refresh")
 def update_metrics():
     with Session.begin() as db:
-        return refresh_metrics(db)
+        result = refresh_metrics(db)
+    with Session() as db:
+        stats_push.push_safely(db)
+    return result
 
 
 @app.post("/api/metrics/import")
@@ -892,6 +976,8 @@ def import_metrics(file: Annotated[UploadFile, File()]):
                     Metric(job_id=job.id, captured=timestamp, values=values, source="Импорт CSV пользователя")
                 )
                 db.flush()
+    with Session() as db:
+        stats_push.push_safely(db)
     return {"imported": len(rows)}
 
 
