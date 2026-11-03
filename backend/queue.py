@@ -6,7 +6,7 @@ from pathlib import Path
 from sqlalchemy import select, update
 
 from .db import Account, Asset, Job, Variant, now, settings
-from .media import variation
+from .media import asset_pauses, variation
 from .schemas import Edit
 
 
@@ -43,7 +43,7 @@ def enqueue(db, request):
             from .buba import REVIEW
 
             asset.edit = {**asset.edit, "buba_review": {key: True for key in REVIEW}}
-        config = Edit.model_validate(asset.edit).effective(asset.media["duration"])
+        config = Edit.model_validate(asset.edit).effective(asset.media["duration"], asset_pauses(asset))
         banner = db.get(Asset, config["banner_id"]) if config["banner_id"] else None
         if config["banner_id"] and (banner is None or banner.kind != "banner"):
             raise ValueError("Баннер не найден")

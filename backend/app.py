@@ -46,7 +46,7 @@ from .db import (
 )
 from .hashtags import DEFAULT_HASHTAGS, GENRES
 from .maintenance import backup_database, cleanup_exports
-from .media import builtin_banner, inspect
+from .media import asset_pauses, builtin_banner, inspect
 from .platforms import AUTH, begin_youtube, cancelling_auth, import_tiktok, refresh_metrics
 from .queue import action, enqueue
 from .schemas import (
@@ -212,7 +212,7 @@ def buba_check(request: BubaCheck):
         source = require(db, Asset, request.asset_id)
         if source.kind != "video":
             raise ValueError("Выберите исходное видео")
-        config = request.edit.effective(source.media["duration"])
+        config = request.edit.effective(source.media["duration"], asset_pauses(source, save=False))
         banner = require(db, Asset, request.edit.banner_id) if request.edit.banner_id else None
         return report(source.media, banner.media if banner else None, config)
 
@@ -447,6 +447,8 @@ def new_video_edit(db, media):
         "banner_id",
         "banner_text",
         "freeze_video",
+        "freeze_motion",
+        "ad_pause",
         "banner_audio",
         "banner_height",
         "x",
@@ -478,6 +480,9 @@ def new_video_edit(db, media):
         {
             "buba_mode": True,
             "auto_hashtags": True,
+            # The ad lands between phrases and the held frame keeps moving (retention, 03.11.2026).
+            "ad_pause": True,
+            "freeze_motion": True,
             **preset,
             "timing": "middle",
             "start": 0,
@@ -524,7 +529,7 @@ def save_edit(key: str, request: Edit):
         asset = require(db, Asset, key)
         if asset.kind != "video":
             raise ValueError("Настройки доступны только для видео")
-        request.effective(asset.media["duration"])
+        request.effective(asset.media["duration"], asset_pauses(asset))
         if request.banner_id and require(db, Asset, request.banner_id).kind != "banner":
             raise ValueError("Выберите баннер")
         asset.edit = request.model_dump()

@@ -53,6 +53,7 @@ def probe(path: Path):
         "has_alpha": str(video.get("tags", {}).get("alpha_mode", "")) == "1"
         or video.get("pix_fmt", "").startswith(("yuva", "rgba", "bgra", "argb", "abgr", "gbrap")),
         "format": data.get("format", {}).get("format_name"),
+        "fps": frame_rate(video),
     }
 
 
@@ -61,6 +62,79 @@ def decoder_options(media):
     # Choose libvpx even for older saved metadata without a has_alpha field.
     decoder = {"vp8": "libvpx", "vp9": "libvpx-vp9"}.get(media.get("codec"))
     return ["-c:v", decoder] if decoder else []
+
+
+def asset_pauses(asset, save=True):
+    """Speech pauses of a source video; computed once for videos imported before this feature."""
+    media = asset.media or {}
+    if "pauses" in media or not media.get("has_audio"):
+        return media.get("pauses") or []
+    try:
+        pauses = speech_pauses(Path(asset.path))
+    except (ValueError, OSError):
+        return []
+    if save:
+        asset.media = {**media, "pauses": pauses}
+    return pauses
+
+
+def frame_rate(video):
+    for key in ("avg_frame_rate", "r_frame_rate"):
+        top, _, bottom = str(video.get(key) or "").partition("/")
+        try:
+            rate = float(top) / float(bottom or 1)
+        except (ValueError, ZeroDivisionError):
+            continue
+        if 1 <= rate <= 120:
+            return round(rate, 3)
+    return 30.0
+
+
+def speech_pauses(path, step=0.05, drop=12, shortest=0.25):
+    """Quiet stretches between phrases: [start, end] in seconds.
+
+    Loudness is measured every 50 ms. A pause is a run quieter than the loud parts of the
+    track (80th percentile) by `drop` dB, so constant music or ambience under the voice
+    does not hide pauses.
+    """
+    samples = int(8000 * step)
+    output = command(
+        [
+            binary("ffmpeg"),
+            "-hide_banner",
+            "-nostats",
+            "-i",
+            str(path),
+            "-vn",
+            "-af",
+            f"aresample=8000,asetnsamples=n={samples}:p=0,astats=metadata=1:reset=1,"
+            "ametadata=print:key=lavfi.astats.Overall.RMS_level:file=-",
+            "-f",
+            "null",
+            "-",
+        ],
+        timeout=300,
+    ).decode(errors="replace")
+    levels = []
+    for line in output.splitlines():
+        if "RMS_level=" in line:
+            value = line.rsplit("=", 1)[1]
+            levels.append(-120.0 if value in ("-inf", "inf", "nan") else max(-120.0, float(value)))
+    if len(levels) < 10:
+        return []
+    loud = sorted(levels)[int(len(levels) * 0.8)]
+    if loud <= -60:
+        return []
+    quiet = loud - drop
+    pauses, begin = [], None
+    for index, level in enumerate(levels + [0.0]):
+        if level < quiet and index < len(levels):
+            begin = index if begin is None else begin
+        elif begin is not None:
+            if (index - begin) * step >= shortest:
+                pauses.append([round(begin * step, 2), round(index * step, 2)])
+            begin = None
+    return pauses
 
 
 def inspect(path, kind, asset_id):
@@ -114,6 +188,11 @@ def _inspect(path, kind, asset_id):
             str(DATA / "thumbnails" / f"{asset_id}.png"),
         ]
     )
+    if info["has_audio"]:
+        try:
+            info["pauses"] = speech_pauses(path)
+        except ValueError:
+            info["pauses"] = []
     return info
 
 
@@ -195,17 +274,42 @@ def render(source, banner, banner_media, output, config, length, progress, cance
     source_info = probe(source)
     base = f"[0:v]{filters}[base];"
     audio_map = "0:a?"
-    if freeze:
+    if freeze and config.get("freeze_motion"):
+        # A held frame with a slow push-in: the picture keeps moving while the ad plays.
+        fps = source_info.get("fps") or 30.0
+        frames = max(1, round(duration * fps))
+        push = (
+            f"[still]trim=start={start},setpts=PTS-STARTPTS,trim=end_frame=1,"
+            f"scale={w * 2}:{h * 2},"
+            f"zoompan=z='1+0.06*on/{frames}':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':"
+            f"d={frames}:s={w}x{h}:fps={fps},setsar=1,"
+            f"trim=duration={duration},setpts=PTS-STARTPTS[held];"
+        )
         if start == 0:
-            base = f"[0:v]{filters},tpad=start_mode=clone:start_duration={duration}[base];"
+            base = (
+                f"[0:v]{filters},split[still][post];"
+                + push
+                + "[post]setpts=PTS-STARTPTS[tail];[held][tail]concat=n=2:v=1:a=0[base];"
+            )
         else:
             base = (
-                f"[0:v]{filters},split[pre][post];"
-                f"[pre]trim=end={start},setpts=PTS-STARTPTS,"
-                f"tpad=stop_mode=clone:stop_duration={duration}[held];"
-                f"[post]trim=start={start},setpts=PTS-STARTPTS[tail];"
-                "[held][tail]concat=n=2:v=1:a=0[base];"
+                f"[0:v]{filters},split=3[pre][still][post];"
+                f"[pre]trim=end={start},setpts=PTS-STARTPTS[head];"
+                + push
+                + f"[post]trim=start={start},setpts=PTS-STARTPTS[tail];"
+                "[head][held][tail]concat=n=3:v=1:a=0[base];"
             )
+    elif freeze and start == 0:
+        base = f"[0:v]{filters},tpad=start_mode=clone:start_duration={duration}[base];"
+    elif freeze:
+        base = (
+            f"[0:v]{filters},split[pre][post];"
+            f"[pre]trim=end={start},setpts=PTS-STARTPTS,"
+            f"tpad=stop_mode=clone:stop_duration={duration}[held];"
+            f"[post]trim=start={start},setpts=PTS-STARTPTS[tail];"
+            "[held][tail]concat=n=2:v=1:a=0[base];"
+        )
+    if freeze:
         if source_info["has_audio"]:
             audio_map = "[a]"
             if start == 0:

@@ -16,6 +16,27 @@ class BubaReview(BaseModel):
     no_promotion: bool = False
 
 
+def pause_window(length: float) -> float:
+    """How far the ad may move from the exact middle to land between phrases."""
+    return min(3.0, max(0.0, length) * 0.05)
+
+
+def ad_start(length: float, pauses) -> tuple[float, bool]:
+    """Start the ad at the point of a speech pause closest to the middle.
+
+    Returns (start, found). Without a pause inside the window the exact middle is kept.
+    """
+    middle, window, edge = length / 2, pause_window(length), 0.08
+    best = None
+    for begin, end in pauses or []:
+        if end - begin < 2 * edge:
+            continue
+        point = min(max(middle, begin + edge), end - edge)
+        if abs(point - middle) <= window and (best is None or abs(point - middle) < abs(best - middle)):
+            best = point
+    return (round(best, 3), True) if best is not None else (middle, False)
+
+
 class Filters(BaseModel):
     brightness: float = Field(0, ge=-15, le=15, allow_inf_nan=False)
     contrast: float = Field(100, ge=80, le=120, allow_inf_nan=False)
@@ -33,6 +54,8 @@ class Edit(BaseModel):
     start: float = Field(0, ge=0)
     duration: float = Field(2.5, gt=0, le=120)
     freeze_video: bool = False
+    freeze_motion: bool = False
+    ad_pause: bool = False
     banner_audio: bool = False
     banner_height: float | None = Field(None, ge=5, le=100, allow_inf_nan=False)
     buba_mode: bool = False
@@ -69,9 +92,11 @@ class Edit(BaseModel):
             raise ValueError("Освободите место в описании для автоматических хэштегов")
         return self
 
-    def effective(self, length: float):
+    def effective(self, length: float, pauses=None):
         data = self.model_dump()
         data["start"] = length / 2 if self.timing == "middle" else self.start
+        if self.timing == "middle" and self.ad_pause:
+            data["start"], data["pause_found"] = ad_start(length, pauses)
         if not all(math.isfinite(v) for v in (length, data["start"], self.duration)):
             raise ValueError("Некорректная длительность видео")
         if self.freeze_video and not 0 <= data["start"] < length:

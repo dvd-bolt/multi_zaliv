@@ -21,6 +21,12 @@ def with_hashtag(caption):
     return caption.rstrip() + ("\n" if caption.strip() else "") + TAG
 
 
+def pause_window(length):
+    from .schemas import pause_window as window
+
+    return window(length)
+
+
 def banner_size(config, media):
     w, h = (1080, 1920) if config.get("format") == "1080" else (720, 1280)
     width = max(2, int(w * config.get("width", 84) / 100) // 2 * 2)
@@ -59,9 +65,44 @@ def report(media, banner, config):
             issue("area", f"Баннер занимает {area:.1f}% площади кадра; нужно минимум 25%")
         if abs(config.get("x", 50) - 50) > 0.01 or abs(config.get("y", 50) - 50) > 0.01:
             issue("center", "Баннер должен быть ровно по центру: X=50%, Y=50%")
-        start = media["duration"] / 2 if config.get("timing") == "middle" else config.get("start", 0)
-        if abs(start - media["duration"] / 2) > 0.1:
+        start = config.get("start", 0)
+        if config.get("timing") == "middle" and not config.get("ad_pause"):
+            start = media["duration"] / 2
+        shift = start - media["duration"] / 2
+        if (
+            config.get("timing") == "middle"
+            and config.get("ad_pause")
+            and abs(shift) <= pause_window(media["duration"]) + 0.01
+        ):
+            if abs(shift) > 0.1:
+                issue(
+                    "middle_shift",
+                    f"Реклама сдвинута к паузе речи на {abs(shift):.1f} с "
+                    f"{'раньше' if shift < 0 else 'позже'} середины. "
+                    "Правила БУБА требуют «в середине»; допуск модерации не опубликован.",
+                    "warning",
+                )
+            if config.get("pause_found") is False:
+                issue(
+                    "pause_missing",
+                    "Рядом с серединой не найдено паузы в речи: реклама стоит ровно в середине.",
+                    "warning",
+                )
+        elif abs(shift) > 0.1:
             issue("middle", "До двух минут баннер должен быть посередине")
+        if (
+            banner
+            and banner.get("has_audio")
+            and config.get("banner_audio")
+            and media.get("has_audio")
+            and not config.get("freeze_video")
+        ):
+            issue(
+                "speech_muted",
+                f"Звук рекламы заглушит речь ролика на {config.get('duration', 0):.1f} с. "
+                "Включите стоп-кадр, чтобы фраза не обрывалась.",
+                "warning",
+            )
         if config.get("opacity", 100) < 100:
             issue("opacity", "Сделайте баннер полностью непрозрачным")
         if banner and banner.get("has_audio") and not config.get("banner_audio"):

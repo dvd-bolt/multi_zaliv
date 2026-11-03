@@ -28,6 +28,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import {
+  adStart,
   api,
   type Account,
   type Asset,
@@ -546,7 +547,12 @@ export default function App() {
   const close = () => {
     if (!busy) setModal('');
   };
-  const start = draft?.timing === 'middle' ? (asset?.media.duration ?? 0) / 2 : (draft?.start ?? 0);
+  const start =
+    draft?.timing === 'middle'
+      ? draft.ad_pause
+        ? adStart(asset?.media.duration ?? 0, asset?.media.pauses)
+        : (asset?.media.duration ?? 0) / 2
+      : (draft?.start ?? 0);
   const freezePreview = !!draft?.freeze_video && !showOriginal;
   const bannerDuration = draft?.duration ?? 0;
   const previewLength = (asset?.media.duration ?? 0) + (freezePreview ? bannerDuration : 0);
@@ -2224,6 +2230,28 @@ export default function App() {
             <p>
               Видео и его звук приостанавливаются, затем продолжаются с того же места. Длительность
               ролика увеличивается на время баннера.
+            </p>
+            <label className="e-row">
+              <input
+                type="checkbox"
+                checked={!!draft.freeze_motion}
+                disabled={!draft.freeze_video}
+                onChange={(e) => patch({ freeze_motion: e.target.checked })}
+              />
+              Медленный наезд камеры на стоп-кадре
+            </label>
+            <label className="e-row">
+              <input
+                type="checkbox"
+                checked={!!draft.ad_pause}
+                disabled={draft.timing !== 'middle'}
+                onChange={(e) => patch({ ad_pause: e.target.checked })}
+              />
+              Рекламу — в паузу речи рядом с серединой
+            </label>
+            <p>
+              Реклама начинается между фразами, не дальше 3 с от середины, и не обрывает речь. Если
+              паузы нет — ровно в середине.
             </p>
             <Field label="После конца анимации">
               <select

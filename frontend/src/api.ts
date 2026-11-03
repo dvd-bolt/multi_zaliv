@@ -5,6 +5,8 @@ export type Edit = {
   start: number;
   duration: number;
   freeze_video: boolean;
+  freeze_motion: boolean;
+  ad_pause: boolean;
   banner_audio: boolean;
   banner_height: number | null;
   buba_mode: boolean;
@@ -42,6 +44,7 @@ export type Asset = {
     duration: number;
     has_audio: boolean;
     image?: boolean;
+    pauses?: [number, number][];
   };
   edit: Edit;
 };
@@ -158,3 +161,21 @@ export type Payout = {
   progress: number;
   phase: 'choose' | 'collecting' | 'ready' | 'submitted' | 'paid' | 'rejected' | 'expired';
 };
+
+/** Same choice as backend/schemas.py ad_start: a speech pause closest to the middle. */
+export function adStart(length: number, pauses: [number, number][] | undefined) {
+  const middle = length / 2;
+  const window = Math.min(3, Math.max(0, length) * 0.05);
+  const edge = 0.08;
+  let best: number | null = null;
+  for (const [begin, end] of pauses ?? []) {
+    if (end - begin < 2 * edge) continue;
+    const point = Math.min(Math.max(middle, begin + edge), end - edge);
+    if (
+      Math.abs(point - middle) <= window &&
+      (best === null || Math.abs(point - middle) < Math.abs(best - middle))
+    )
+      best = point;
+  }
+  return best ?? middle;
+}

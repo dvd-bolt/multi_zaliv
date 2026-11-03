@@ -201,6 +201,9 @@ export function CampaignPanel({
                 timing: 'middle',
                 opacity: 100,
                 banner_audio: !!banner?.media.has_audio,
+                freeze_video: draft.freeze_video || !!banner?.media.has_audio,
+                freeze_motion: true,
+                ad_pause: true,
                 duration: Math.min(120, Math.max(0.1, banner?.media.duration || draft.duration)),
               })
             }
