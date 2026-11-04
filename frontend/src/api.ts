@@ -45,6 +45,8 @@ export type Asset = {
     has_audio: boolean;
     image?: boolean;
     pauses?: [number, number][];
+    /** Visible (non-transparent) banner box in source pixels: x, y, w, h. */
+    visible?: [number, number, number, number] | null;
   };
   edit: Edit;
 };

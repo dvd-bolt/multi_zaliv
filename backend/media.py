@@ -64,6 +64,94 @@ def decoder_options(media):
     return ["-c:v", decoder] if decoder else []
 
 
+def visible_box(path: Path, info, threshold=16, frames=120):
+    """Bounding box of the banner pixels a viewer can see: [x, y, w, h] in source pixels.
+
+    Banners often ship with transparent margins or glow padding. Their frame then
+    covers 25% of the video while the visible advert covers noticeably less. The box
+    is the union over sampled frames, so an animation that grows is not cut off.
+    None means the whole frame is visible (no alpha) or nothing could be measured.
+    """
+    width, height = info["width"], info["height"]
+    box = None
+
+    def merge(found):
+        nonlocal box
+        if found:
+            box = (
+                found
+                if box is None
+                else (
+                    min(box[0], found[0]),
+                    min(box[1], found[1]),
+                    max(box[2], found[2]),
+                    max(box[3], found[3]),
+                )
+            )
+
+    def opaque(alpha):
+        return alpha.point(lambda v: 255 if v > threshold else 0).getbbox()
+
+    if info.get("image"):
+        with Image.open(path) as image:
+            if "A" not in image.getbands() and "transparency" not in image.info:
+                return None
+            for index in range(min(getattr(image, "n_frames", 1), frames)):
+                image.seek(index)
+                merge(opaque(image.convert("RGBA").getchannel("A")))
+    else:
+        if not info.get("has_alpha"):
+            return None
+        rate = max(0.5, min(10.0, frames / max(info.get("duration") or 1, 0.1)))
+        raw = command(
+            [
+                binary("ffmpeg"),
+                "-hide_banner",
+                "-loglevel",
+                "error",
+                *decoder_options(info),
+                "-i",
+                str(path),
+                "-vf",
+                f"fps={rate:.3f},format=rgba,alphaextract",
+                "-frames:v",
+                str(frames),
+                "-f",
+                "rawvideo",
+                "-pix_fmt",
+                "gray",
+                "-",
+            ],
+            timeout=180,
+        )
+        size = width * height
+        for offset in range(0, len(raw) - size + 1, size):
+            merge(opaque(Image.frombytes("L", (width, height), raw[offset : offset + size])))
+    if box is None:
+        return None
+    # Even offsets and sizes keep the crop exact for 4:2:0 chroma.
+    left, top = box[0] // 2 * 2, box[1] // 2 * 2
+    right, bottom = min(width, (box[2] + 1) // 2 * 2), min(height, (box[3] + 1) // 2 * 2)
+    if right - left < 2 or bottom - top < 2 or (left, top, right, bottom) == (0, 0, width, height):
+        return None
+    return [left, top, right - left, bottom - top]
+
+
+def asset_visible(asset, save=True):
+    """Visible banner box; measured once for banners imported before this feature."""
+    media = asset.media or {}
+    if asset.kind != "banner" or "visible" in media:
+        return media
+    try:
+        visible = visible_box(Path(asset.path), media)
+    except (ValueError, OSError, UnidentifiedImageError):
+        return media
+    media = {**media, "visible": visible}
+    if save:
+        asset.media = media
+    return media
+
+
 def asset_pauses(asset, save=True):
     """Speech pauses of a source video; computed once for videos imported before this feature."""
     media = asset.media or {}
@@ -164,6 +252,7 @@ def _inspect(path, kind, asset_id):
                 "image": True,
                 "animated": getattr(image, "n_frames", 1) > 1,
             }
+            info["visible"] = visible_box(path, info)
             image.seek(0)
             image.thumbnail((320, 320))
             image.convert("RGBA").save(DATA / "thumbnails" / f"{asset_id}.png")
@@ -188,6 +277,8 @@ def _inspect(path, kind, asset_id):
             str(DATA / "thumbnails" / f"{asset_id}.png"),
         ]
     )
+    if kind == "banner":
+        info["visible"] = visible_box(path, info)
     if info["has_audio"]:
         try:
             info["pauses"] = speech_pauses(path)
@@ -343,8 +434,10 @@ def render(source, banner, banner_media, output, config, length, progress, cance
         if config.get("banner_height") is not None
         else f"scale={banner_width}:{h}:force_original_aspect_ratio=decrease:force_divisible_by=2"
     )
+    visible = banner_media.get("visible")
+    banner_crop = f"crop={visible[2]}:{visible[3]}:{visible[0]}:{visible[1]}," if visible else ""
     graph = base + (
-        f"[1:v]{banner_scale},format=rgba,"
+        f"[1:v]format=rgba,{banner_crop}{banner_scale},format=rgba,"
         f"colorchannelmixer=aa={config['opacity'] / 100},trim=duration={duration},"
         f"setpts=PTS-STARTPTS+{start}/TB[bn];[base][bn]overlay="
         f"x='max(0,min(W-w,W*{config['x'] / 100}-w/2))':"

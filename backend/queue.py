@@ -6,7 +6,7 @@ from pathlib import Path
 from sqlalchemy import select, update
 
 from .db import Account, Asset, Job, Variant, now, settings
-from .media import asset_pauses, variation
+from .media import asset_pauses, asset_visible, variation
 from .schemas import Edit
 
 
@@ -47,6 +47,9 @@ def enqueue(db, request):
         banner = db.get(Asset, config["banner_id"]) if config["banner_id"] else None
         if config["banner_id"] and (banner is None or banner.kind != "banner"):
             raise ValueError("Баннер не найден")
+        if banner:
+            # Measure before rendering: the worker crops by this box and checks rely on it.
+            asset_visible(banner)
         if request.auto_publish:
             from .buba import require_config_ready
 

@@ -184,8 +184,9 @@ export function CampaignPanel({
       {tab === 'Баннер' && (
         <>
           <p>
-            Ширина 100%, высота 26%, центр, полная длина рекламы. Пропорции немного изменятся,
-            содержимое останется целиком.
+            Ширина 100%, высота 28%, центр, полная длина рекламы. Прозрачные поля баннера
+            обрезаются, видимая реклама займёт 28% кадра — запас над порогом 25%. Пропорции немного
+            изменятся, содержимое останется целиком.
           </p>
           <button
             className="e-button primary"
@@ -195,7 +196,7 @@ export function CampaignPanel({
                 buba_mode: true,
                 caption: tag(draft.caption),
                 width: 100,
-                banner_height: 26,
+                banner_height: 28,
                 x: 50,
                 y: 50,
                 timing: 'middle',
@@ -208,7 +209,7 @@ export function CampaignPanel({
               })
             }
           >
-            Подогнать баннер до 26%
+            Подогнать баннер до 28%
           </button>
           <label className="e-label">
             Высота, % (меняет пропорции)

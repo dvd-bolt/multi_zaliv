@@ -46,7 +46,7 @@ from .db import (
 )
 from .hashtags import DEFAULT_HASHTAGS, GENRES
 from .maintenance import backup_database, cleanup_exports
-from .media import asset_pauses, builtin_banner, inspect
+from .media import asset_pauses, asset_visible, builtin_banner, inspect
 from .platforms import AUTH, begin_youtube, cancelling_auth, import_tiktok, refresh_metrics
 from .queue import action, enqueue
 from .schemas import (
@@ -214,7 +214,9 @@ def buba_check(request: BubaCheck):
             raise ValueError("Выберите исходное видео")
         config = request.edit.effective(source.media["duration"], asset_pauses(source, save=False))
         banner = require(db, Asset, request.edit.banner_id) if request.edit.banner_id else None
-        return report(source.media, banner.media if banner else None, config)
+        banner_media = asset_visible(banner) if banner else None
+        db.commit()
+        return report(source.media, banner_media, config)
 
 
 @app.get("/api/jobs/{key}/buba")

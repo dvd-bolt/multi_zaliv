@@ -34,6 +34,9 @@ def banner_size(config, media):
         height = max(2, int(h * config["banner_height"] / 100) // 2 * 2)
     else:
         mw, mh = media.get("width", 960), media.get("height", 180)
+        if media.get("visible"):
+            # Rendering crops transparent margins first, so the visible box keeps the aspect.
+            mw, mh = media["visible"][2], media["visible"][3]
         ratio = min(width / mw, h / mh)
         width = max(2, int(mw * ratio) // 2 * 2)
         height = max(2, int(mh * ratio) // 2 * 2)
@@ -63,6 +66,20 @@ def report(media, banner, config):
             issue("animated", "Нужен анимационный баннер: видео или анимированный GIF")
         if area < 25:
             issue("area", f"Баннер занимает {area:.1f}% площади кадра; нужно минимум 25%")
+        elif area < 27:
+            issue(
+                "area_margin",
+                f"Баннер {area:.1f}% — у самого порога. Скруглённые углы и полупрозрачные края "
+                "видны модератору меньше; поставьте высоту 28%.",
+                "warning",
+            )
+        if banner and "visible" not in banner:
+            issue(
+                "visible_unknown",
+                "Видимая область баннера не измерена: прозрачные поля файла могут уменьшить "
+                "реальную площадь. Создайте новый MP4 — FrameFlow измерит баннер.",
+                "warning",
+            )
         if abs(config.get("x", 50) - 50) > 0.01 or abs(config.get("y", 50) - 50) > 0.01:
             issue("center", "Баннер должен быть ровно по центру: X=50%, Y=50%")
         start = config.get("start", 0)
@@ -122,7 +139,9 @@ def report(media, banner, config):
                 issue("review_" + key, label)
         issue(
             "manual_limits",
-            "Проверка измеряет рамку баннера, а не видимую площадь его прозрачных пикселей. Содержание, права и итоговый вид требуют просмотра человеком.",
+            "Прозрачные поля по краям баннера обрезаются и не входят в площадь, но прозрачные "
+            "углы и дыры внутри видимой рамки учитываются. Содержание, права и итоговый вид "
+            "требуют просмотра человеком.",
             "warning",
         )
     return {

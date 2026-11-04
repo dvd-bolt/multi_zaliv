@@ -6,6 +6,7 @@ import {
   useId,
   useRef,
   useState,
+  type CSSProperties,
   type ReactElement,
   type ReactNode,
 } from 'react';
@@ -686,13 +687,28 @@ export default function App() {
     height: 180,
     has_audio: false,
   };
+  // Export crops transparent margins first; the preview shows the same visible box.
+  const visible = 'visible' in overlayMedia ? overlayMedia.visible : null;
+  const overlayRatio = visible ? visible[2] / visible[3] : overlayMedia.width / overlayMedia.height;
   const overlayWidth = draft
     ? draft.banner_height
       ? draft.width
-      : Math.min(draft.width, (100 * (overlayMedia.width / overlayMedia.height)) / (9 / 16))
+      : Math.min(draft.width, (100 * overlayRatio) / (9 / 16))
     : 84;
-  const overlayHeight =
-    draft?.banner_height ?? (overlayWidth * (9 / 16)) / (overlayMedia.width / overlayMedia.height);
+  const overlayHeight = draft?.banner_height ?? (overlayWidth * (9 / 16)) / overlayRatio;
+  const bannerFill: CSSProperties | undefined = visible
+    ? {
+        position: 'absolute',
+        maxWidth: 'none',
+        width: `${(100 * overlayMedia.width) / visible[2]}%`,
+        height: `${(100 * overlayMedia.height) / visible[3]}%`,
+        left: `${(-100 * visible[0]) / visible[2]}%`,
+        top: `${(-100 * visible[1]) / visible[3]}%`,
+        objectFit: 'fill',
+      }
+    : draft?.banner_height
+      ? { height: '100%', objectFit: 'fill' }
+      : undefined;
   const targets = draft?.targets ?? [];
   const queueSources = allSources ? videos : asset ? [asset] : [];
   const queueAccounts = data.accounts.filter((a) => targets.includes(a.id));
@@ -976,7 +992,9 @@ export default function App() {
                                 left: `${Math.max(overlayWidth / 2, Math.min(100 - overlayWidth / 2, draft.x))}%`,
                                 top: `${Math.max(overlayHeight / 2, Math.min(100 - overlayHeight / 2, draft.y))}%`,
                                 width: `${overlayWidth}%`,
-                                height: draft.banner_height ? `${draft.banner_height}%` : undefined,
+                                height:
+                                  draft.banner_height || visible ? `${overlayHeight}%` : undefined,
+                                overflow: visible ? 'hidden' : undefined,
                                 opacity: draft.opacity / 100,
                               }}
                               onPointerDown={(e) => {
@@ -1000,22 +1018,14 @@ export default function App() {
                               {draft.banner_id ? (
                                 banners.find((b) => b.id === draft.banner_id)?.media.image ? (
                                   <img
-                                    style={
-                                      draft.banner_height
-                                        ? { height: '100%', objectFit: 'fill' }
-                                        : undefined
-                                    }
+                                    style={bannerFill}
                                     src={`/api/assets/${draft.banner_id}/file`}
                                     alt="Баннер"
                                     draggable={false}
                                   />
                                 ) : (
                                   <video
-                                    style={
-                                      draft.banner_height
-                                        ? { height: '100%', objectFit: 'fill' }
-                                        : undefined
-                                    }
+                                    style={bannerFill}
                                     ref={bannerVideo}
                                     src={`/api/assets/${draft.banner_id}/file`}
                                     playsInline
