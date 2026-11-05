@@ -143,6 +143,9 @@ def save_login(key, attempt, handle, state, auth_method="interactive_profile_con
                 wrote_secret = True
                 account.external_id, account.name = handle, "@" + handle
                 account.connected, account.method = True, "browser_login"
+                from .preflight import forget
+
+                forget(db, key)
         except Exception:
             if wrote_secret:
                 if previous is None:

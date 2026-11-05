@@ -115,8 +115,19 @@ class Enqueue(BaseModel):
     asset_ids: list[str] = Field(min_length=1, max_length=30)
     account_ids: list[str] = Field(min_length=1, max_length=30)
     scheduled: str | None = None
+    # Per-channel time (best-time advice); a channel without an entry uses `scheduled`.
+    schedules: dict[str, str] = Field(default_factory=dict, max_length=30)
     auto_publish: bool = False
     buba_confirmed: bool = False
+    # Author comment posted after publication; {название} is replaced with the video title.
+    comment: str | None = Field(None, max_length=500)
+    comment_pin: bool = True
+    # TikTok: name of a sound from the account's Favorites added quietly under the voice.
+    tiktok_sound: str | None = Field(None, max_length=100)
+
+
+class Preflight(BaseModel):
+    account_ids: list[str] = Field(min_length=1, max_length=30)
 
 
 class JobAction(BaseModel):
@@ -141,6 +152,7 @@ class SettingsUpdate(BaseModel):
     youtube_category: Literal["1", "24", "23", "22"] | None = None
     one_per_platform: bool | None = None
     youtube_thumbnail: bool | None = None
+    tiktok_copyright: Literal["off", "warn", "strict"] | None = None
     thumbnail_model: (
         Literal["gemini-3.1-flash-image", "gemini-2.5-flash-image", "gemini-3-pro-image"] | None
     ) = None

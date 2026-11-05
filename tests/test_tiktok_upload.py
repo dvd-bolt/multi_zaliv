@@ -1,5 +1,6 @@
 """Local-only real Chromium fixtures: no TikTok requests or real publication."""
 
+import os
 import time
 from pathlib import Path
 
@@ -35,7 +36,11 @@ VIDEO_ID = "7456123456789012345"
 @pytest.fixture(scope="module")
 def browser():
     with sync_playwright() as pw:
-        b = pw.chromium.launch(channel="chrome", headless=True)
+        # Windows uses installed Chrome; a Linux checkout may point to any Chromium binary instead.
+        executable = os.environ.get("SURVIVALFLOW_TEST_CHROMIUM")
+        b = pw.chromium.launch(
+            **({"executable_path": executable} if executable else {"channel": "chrome"}), headless=True
+        )
         yield b
         b.close()
 
@@ -227,7 +232,7 @@ def test_worker_requires_explicit_trial_and_never_retries(job, monkeypatch, outc
     assert client.post(f"/api/jobs/{jid}/action", json={"action": "test_upload"}).status_code == 200
     calls = []
 
-    def upload(token, source, config, expected, *, before_post):
+    def upload(token, source, config, expected, *, before_post, **_):
         calls.append(True)
         assert expected == "cartoon.test" and Path(source).is_file()
         if outcome in ("auth", "prepare"):

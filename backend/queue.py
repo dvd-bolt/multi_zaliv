@@ -10,13 +10,28 @@ from .media import asset_pauses, asset_visible, variation
 from .schemas import Edit
 
 
+def future(value):
+    date = datetime.fromisoformat(value)
+    if date.tzinfo is None or date <= datetime.now(UTC):
+        raise ValueError("Укажите будущее время с часовым поясом")
+    return date.astimezone(UTC).isoformat()
+
+
+def job_extras(request, account):
+    """Per-job options outside the variant fingerprint: changing them never duplicates a render."""
+    extras = {}
+    text = (request.comment or "").strip()
+    if text:
+        extras["comment"] = {"text": text, "pin": request.comment_pin, "status": "pending"}
+    sound = (request.tiktok_sound or "").strip()
+    if sound and account.platform == "tiktok":
+        extras["sound"] = {"name": sound}
+    return extras
+
+
 def enqueue(db, request):
-    scheduled = None
-    if request.scheduled:
-        date = datetime.fromisoformat(request.scheduled)
-        if date.tzinfo is None or date <= datetime.now(UTC):
-            raise ValueError("Укажите будущее время с часовым поясом")
-        scheduled = date.astimezone(UTC).isoformat()
+    scheduled = future(request.scheduled) if request.scheduled else None
+    schedules = {key: future(value) for key, value in request.schedules.items() if value}
     accounts = [db.get(Account, key) for key in dict.fromkeys(request.account_ids)]
     if any(a is None or not a.enabled for a in accounts):
         raise ValueError("Выбранный аккаунт недоступен")
@@ -57,6 +72,7 @@ def enqueue(db, request):
             if config["visibility"] == "unlisted" and any(a.platform == "tiktok" for a in accounts):
                 raise ValueError("Для TikTok выберите «Открытый доступ» или «Только я»")
         for slot, account in enumerate(accounts):
+            planned = schedules.get(account.id, scheduled)
             variant_config = variation(config, account.id, slot, len(accounts))
             variant_config["quality"] = settings(db)["quality"]
             fingerprint = hashlib.sha256(
@@ -77,9 +93,15 @@ def enqueue(db, request):
                 ):
                     # The queue click explicitly authorizes this same immutable variant.
                     # Never revive a possibly sent, cancelled or failed publication here.
-                    if not job.approved or not job.auto_publish or job.scheduled != scheduled:
-                        job.approved, job.scheduled, job.error = True, scheduled, None
-                        job.auto_publish = True
+                    extras = job_extras(request, account)
+                    if (
+                        not job.approved
+                        or not job.auto_publish
+                        or job.scheduled != planned
+                        or (job.extras or {}) != extras
+                    ):
+                        job.approved, job.scheduled, job.error = True, planned, None
+                        job.auto_publish, job.extras = True, extras
                         if job.status not in ("queued", "rendering"):
                             job.status = (
                                 "scheduled" if variant.output and Path(variant.output).is_file() else "queued"
@@ -98,9 +120,10 @@ def enqueue(db, request):
             db.flush()
             job = Job(
                 variant_id=variant.id,
-                scheduled=scheduled,
+                scheduled=planned,
                 approved=request.auto_publish,
                 auto_publish=request.auto_publish,
+                extras=job_extras(request, account),
             )
             db.add(job)
             db.flush()

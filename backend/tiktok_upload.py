@@ -1,7 +1,8 @@
 """TikTok web upload: verified identity/privacy, one post click, no retries.
 
-DOM selector references: wkaisertexas/tiktok-uploader (MIT), 1.2.0.
-We do not use its stealth browser, swallowed privacy errors or fallback clicks.
+DOM selector references: wkaisertexas/tiktok-uploader (MIT), 1.2.0; sound panel and copyright check:
+haziq-exe/TikTokAutoUploader (MIT). We do not use their stealth browsers, captcha solvers, swallowed
+privacy errors or fallback post clicks.
 """
 
 import json
@@ -42,6 +43,120 @@ class UploadResult:
     url: str
     status: str = "platform_processing"
     review_pending: bool | None = None
+    checks: dict | None = None
+
+
+# Sound added under the narrator: share of the slider width for the added track (TikTok default ≈ 50 %).
+SOUND_LEVEL = 0.1
+COPYRIGHT_WAIT = 120
+COPYRIGHT_OK = re.compile(r"^(No issues found\.?|Проблем не обнаружено\.?|Нарушений не найдено\.?)$", re.I)
+COPYRIGHT_BAD = re.compile(r"(Copyright issues detected|Обнаружены проблемы с авторскими правами)", re.I)
+
+
+def add_sound(page, frame, name):
+    """Add a sound from the account's Favorites quietly under the original audio.
+
+    Returns a note for the job. Any failure closes the editor without saving: the video is then
+    published without the sound, never with a loud track over the narrator.
+    """
+    root = frame
+    opener = root.locator("button:has-text('Sounds'), button:has-text('Звуки')")
+    if not opener.count():
+        root = page
+        opener = page.locator("button:has-text('Sounds'), button:has-text('Звуки')")
+    if not opener.count():
+        return {
+            "sound": "unavailable",
+            "sound_detail": "TikTok не показал кнопку «Звуки» — опубликовано без звука.",
+        }
+    opener.last.click(timeout=10000)
+    try:
+        tab = page.locator(
+            'button:has-text("Favorites"), button:has-text("Избранное"), button#favourite, '
+            "div.TUXTabBar-item#favourite button"
+        )
+        tab.first.click(timeout=15000)
+        cards = page.locator('div[class*="MusicPanelMusicItem__content"]')
+        cards.first.wait_for(timeout=30000)
+        page.wait_for_timeout(1500)
+        words = [w.casefold() for w in name.split() if w.strip()]
+        chosen = None
+        for index in range(min(cards.count(), 100)):
+            card = cards.nth(index)
+            text = " ".join(card.inner_text(timeout=3000).split()).casefold()
+            if words and all(word in text for word in words):
+                chosen = card
+                break
+        if chosen is None:
+            raise LookupError("нет в Избранном")
+        chosen.hover()
+        chosen.click()
+        chosen.locator("button").last.click(timeout=10000)
+        page.wait_for_timeout(1500)
+        sliders = page.locator("input.scaleInput")
+        if sliders.count() < 2:
+            icon = page.locator('img[src^="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjEiIGhlaWdodD0iMjAi"]')
+            if icon.count():
+                icon.last.click(timeout=10000)
+                page.wait_for_timeout(700)
+        if sliders.count() < 2:
+            raise LookupError("нет регулятора громкости")
+        box = sliders.nth(1).bounding_box()
+        if not box:
+            raise LookupError("регулятор громкости скрыт")
+        page.mouse.click(box["x"] + box["width"] * SOUND_LEVEL, box["y"] + box["height"] / 2)
+        page.wait_for_timeout(700)
+        page.locator("button:has-text('Save'), button:has-text('Сохранить')").first.click(timeout=10000)
+        page.wait_for_timeout(1500)
+        return {"sound": "added", "sound_detail": f"Добавлен звук «{name}» из Избранного, громкость ~10 %."}
+    except Exception as error:
+        for label in ("Cancel", "Отмена", "Discard", "Не сохранять"):
+            button = page.locator(f"button:has-text('{label}')")
+            if button.count() and button.first.is_visible():
+                button.first.click(timeout=5000)
+                break
+        else:
+            page.keyboard.press("Escape")
+        page.wait_for_timeout(1000)
+        reason = str(error) if isinstance(error, LookupError) else "редактор звука не ответил"
+        return {
+            "sound": "skipped",
+            "sound_detail": f"Звук «{name}» не добавлен ({reason}) — опубликовано без него.",
+        }
+
+
+def copyright_check(page, frame, mode, wait=None):
+    """TikTok's own copyright check before posting. Detected issues always stop the publication;
+    an unfinished check stops it only in strict mode."""
+    toggle = frame.locator('div[data-e2e="copyright_container"] span[data-part="thumb"]')
+    if not toggle.count():
+        toggle = page.locator('div[data-e2e="copyright_container"] span[data-part="thumb"]')
+    if not toggle.count():
+        if mode == "strict":
+            raise BeforePublishError("TikTok не показал проверку авторских прав. Публикация не нажималась.")
+        return {
+            "copyright": "unavailable",
+            "copyright_detail": "Проверка авторских прав недоступна в TikTok.",
+        }
+    toggle.first.click(timeout=10000)
+    end = time.monotonic() + (COPYRIGHT_WAIT if wait is None else wait)
+    while time.monotonic() < end:
+        page.wait_for_timeout(2000)
+        if page.get_by_text(COPYRIGHT_BAD).count():
+            raise BeforePublishError(
+                "TikTok нашёл проблему с авторскими правами (обычно музыка). Публикация не нажималась: "
+                "замените звук или отключите проверку в настройках."
+            )
+        if page.get_by_text(COPYRIGHT_OK).count():
+            return {"copyright": "ok", "copyright_detail": "TikTok: проблем с авторскими правами не найдено."}
+    if mode == "strict":
+        raise BeforePublishError(
+            "Проверка авторских прав TikTok не завершилась вовремя. Публикация не нажималась."
+        )
+    return {
+        "copyright": "timeout",
+        "copyright_detail": "Проверка авторских прав не завершилась вовремя — опубликовано.",
+    }
 
 
 def studio_candidates(payload, caption, duration, started, ended):
@@ -252,10 +367,13 @@ def set_caption(page, description, caption):
         raise BeforePublishError("Редактор TikTok не сохранил нужное описание. Публикация не нажималась.")
 
 
-def upload_on_page(page, source, config, expected, *, before_post=lambda: None, timeout=180):
+def upload_on_page(
+    page, source, config, expected, *, before_post=lambda: None, timeout=180, sound=None, copyright="off"
+):
     """Operates on an authenticated Playwright page; injection seam is for local fixtures only."""
     clicked = False
     responses = []
+    checks = {}
     phase = "проверка аккаунта"
     try:
         identity(page, expected)
@@ -315,6 +433,25 @@ def upload_on_page(page, source, config, expected, *, before_post=lambda: None, 
             page.wait_for_timeout(500)
         else:
             raise BeforePublishError("TikTok не завершил обработку файла. Публикация не нажималась.")
+
+        def ready():
+            limit = time.monotonic() + timeout
+            while time.monotonic() < limit:
+                if post.is_enabled() and post.get_attribute("data-disabled") != "true":
+                    return
+                page.wait_for_timeout(500)
+            raise BeforePublishError(
+                "TikTok не подготовил ролик после звука/проверки. Публикация не нажималась."
+            )
+
+        if sound:
+            phase = "добавление звука"
+            checks.update(add_sound(page, frame, sound))
+            ready()
+        if copyright in ("warn", "strict"):
+            phase = "проверка авторских прав"
+            checks.update(copyright_check(page, frame, copyright))
+            ready()
         # Abort on any session switch since checking own navigation. No user profile is reused.
         if not signature or session_signature(page.context) != signature:
             raise BeforePublishError(
@@ -364,14 +501,16 @@ def upload_on_page(page, source, config, expected, *, before_post=lambda: None, 
                         page, expected, caption, probe(Path(source))["duration"], post_started
                     )
                     if found:
-                        return found
+                        return UploadResult(**{**found.__dict__, "checks": checks or None})
             except Exception:
                 pass
             raise PublicationUncertain(
                 "TikTok не вернул однозначный ID. Проверьте профиль перед повтором; автоматического повтора нет."
             )
         external_id = responses[0]
-        return UploadResult(external_id, f"https://www.tiktok.com/@{expected}/video/{external_id}")
+        return UploadResult(
+            external_id, f"https://www.tiktok.com/@{expected}/video/{external_id}", checks=checks or None
+        )
     except (BeforePublishError, PublicationUncertain):
         raise
     except Exception as error:
@@ -417,14 +556,16 @@ def browser_page(token, *, headless=False):
                 pass  # Cleanup cannot turn an acknowledged post into a safe retry.
 
 
-def upload(token, source, config, expected, *, before_post=lambda: None):
+def upload(token, source, config, expected, *, before_post=lambda: None, sound=None, copyright="off"):
     if not Path(source).is_file():
         raise BeforePublishError("Готовый MP4 отсутствует; повторите обработку")
     if config.get("visibility") not in PRIVACY:
         raise BeforePublishError("TikTok поддерживает «Открытый доступ» и «Только я»")
     try:
         with browser_page(token) as page:
-            return upload_on_page(page, source, config, expected, before_post=before_post)
+            return upload_on_page(
+                page, source, config, expected, before_post=before_post, sound=sound, copyright=copyright
+            )
     except (BeforePublishError, PublicationUncertain):
         raise
     except Exception as error:

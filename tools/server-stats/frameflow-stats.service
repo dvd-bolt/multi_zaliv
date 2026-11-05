@@ -1,0 +1,11 @@
+[Unit]
+Description=FrameFlow: public TikTok/YouTube statistics snapshot (yt-dlp)
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=cloudebot
+WorkingDirectory=/opt/frameflow/stats
+ExecStart=/opt/frameflow/stats/.venv/bin/python /opt/frameflow/stats/collect.py
+TimeoutStartSec=15min
+Nice=10

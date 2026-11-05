@@ -58,6 +58,25 @@ export type Account = {
   external_id: string | null;
   method: string;
   auth?: string;
+  /** Last read-only sign-in check: ok, auth (sign-in proven unusable) or error (check failed). */
+  preflight?: { status: 'ok' | 'auth' | 'error'; detail: string; checked: string } | null;
+};
+export type BestTime = {
+  time: string;
+  hour: number;
+  mode: 'best' | 'explore' | 'default';
+  reason: string;
+  confident: boolean;
+  videos: number;
+};
+export type AuthorComment = {
+  text: string;
+  pin: boolean;
+  status: 'pending' | 'posting' | 'posted' | 'pin_manual' | 'skipped' | 'failed';
+  detail?: string;
+  pin_url?: string;
+  pinned?: boolean;
+  text_sent?: string;
 };
 export type Job = {
   external_only?: boolean;
@@ -80,6 +99,16 @@ export type Job = {
   updated: string;
   created: string;
   upload_started_at?: string | null;
+  extras?: {
+    comment?: AuthorComment;
+    sound?: { name: string };
+    tiktok_checks?: {
+      sound?: string;
+      sound_detail?: string;
+      copyright?: string;
+      copyright_detail?: string;
+    };
+  };
 };
 export type Settings = {
   buba_required: boolean;
@@ -95,6 +124,7 @@ export type Settings = {
   one_per_platform?: boolean;
   youtube_thumbnail?: boolean;
   thumbnail_model?: string;
+  tiktok_copyright?: 'off' | 'warn' | 'strict';
 };
 export type State = {
   channel_statistics?: { jobs: Job[]; missing: string[] };

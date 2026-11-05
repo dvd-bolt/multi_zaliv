@@ -17,7 +17,7 @@ from pydantic import BaseModel
 from sqlalchemy import select, text
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from . import notify, stats_push, vault
+from . import notify, preflight, stats_push, vault
 from .browser_pairing import (
     BRIDGE_PATHS,
     begin_browser,
@@ -61,6 +61,7 @@ from .schemas import (
     GeminiKey,
     GeminiOptions,
     JobAction,
+    Preflight,
     SettingsUpdate,
     TikTokConfirmation,
 )
@@ -158,6 +159,7 @@ def job_data(db, job):
                 "updated",
                 "upload_started_at",
                 "thumbnail",
+                "extras",
             )
         },
         "account": public_account(account),
@@ -191,7 +193,8 @@ def state():
                 ).all()
             ],
             "accounts": [
-                {**public_account(a), "auth": AUTH.get(a.id)} for a in db.scalars(select(Account)).all()
+                {**public_account(a), "auth": AUTH.get(a.id), "preflight": preflight.stored(db, a.id)}
+                for a in db.scalars(select(Account)).all()
             ],
             "jobs": [job_data(db, j) for j in db.scalars(select(Job).order_by(Job.created.desc())).all()],
             "settings": settings(db),
@@ -604,6 +607,22 @@ def add_account(request: AccountCreate):
         db.add(account)
         db.flush()
         return public_account(account)
+
+
+@app.post("/api/accounts/preflight")
+def check_sign_in(request: Preflight):
+    """Read-only sign-in check of the chosen accounts; TikTok opens a hidden browser (up to ~40 s each)."""
+    with Session() as db:
+        return preflight.check_accounts(db, request.account_ids)
+
+
+@app.get("/api/best-time")
+def best_time(accounts: str):
+    """Suggested next publication time per channel from its own first-day views."""
+    from .best_time import advice
+
+    with Session() as db:
+        return advice(db, [key for key in accounts.split(",") if key][:30])
 
 
 @app.post("/api/accounts/{key}/connect")

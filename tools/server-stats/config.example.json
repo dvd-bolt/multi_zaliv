@@ -1,0 +1,49 @@
+{
+ "sources": [
+  {
+   "platform": "tiktok",
+   "account": "@labsclode",
+   "url": "https://www.tiktok.com/@labsclode"
+  },
+  {
+   "platform": "tiktok",
+   "account": "@orange_moon_code",
+   "url": "https://www.tiktok.com/@orange_moon_code"
+  },
+  {
+   "platform": "youtube",
+   "account": "labs clode",
+   "url": "https://www.youtube.com/@labsclode/shorts"
+  },
+  {
+   "platform": "youtube",
+   "account": "journal",
+   "url": "https://www.youtube.com/@journal-t5m/shorts"
+  }
+ ],
+ "exact_youtube_days": 14,
+ "keep_days": 90,
+ "competitors": [
+  {
+   "platform": "youtube",
+   "account": "ВЫЖИВИ",
+   "url": "https://www.youtube.com/channel/UC-VkEHibvU7kfKTuSWFJR5g/shorts"
+  },
+  {
+   "platform": "youtube",
+   "account": "UggDRock",
+   "url": "https://www.youtube.com/@UggDRock/shorts"
+  },
+  {
+   "platform": "youtube",
+   "account": "Странный Аттрактор",
+   "url": "https://www.youtube.com/channel/UCrTLaCNfP8moTUsV8d8p7bw/shorts"
+  }
+ ],
+ "competitor_videos": 30,
+ "niche_queries": [
+  "что делать если выживание",
+  "правила выживания анимация",
+  "что будет если ты"
+ ]
+}

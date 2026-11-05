@@ -1,0 +1,44 @@
+{
+  "synthetic": true,
+  "checks": {
+    "queue-dialog": {
+      "top": 115.125,
+      "bottom": 484.875,
+      "scroll": false
+    },
+    "queue-best-time": {
+      "top": 90.234375,
+      "bottom": 509.765625,
+      "scroll": false
+    },
+    "queue-comment-sound": {
+      "top": 87.046875,
+      "bottom": 512.953125,
+      "scroll": false
+    },
+    "queue-with-options": {
+      "top": 90.234375,
+      "bottom": 509.765625,
+      "scroll": false
+    },
+    "queue-sign-in-failed": {
+      "top": 205.40625,
+      "bottom": 394.59375,
+      "scroll": false
+    },
+    "job-comment-pin": {
+      "top": 148.203125,
+      "bottom": 451.78125,
+      "scroll": false
+    },
+    "queue-six-channels": {
+      "top": 52.453125,
+      "bottom": 547.546875,
+      "scroll": false
+    },
+    "channels": {
+      "overflow": false
+    }
+  },
+  "errors": []
+}

@@ -17,6 +17,16 @@ SCOPES = [
     "https://www.googleapis.com/auth/youtube.upload",
     "https://www.googleapis.com/auth/youtube.readonly",
 ]
+# Posting the author's comment. Requested at new sign-ins only: refreshing an old token with a scope it
+# was never granted fails with invalid_scope and would stop uploads of every existing channel.
+COMMENT_SCOPE = "https://www.googleapis.com/auth/youtube.force-ssl"
+LOGIN_SCOPES = [*SCOPES, COMMENT_SCOPE]
+
+
+def granted_scopes(token):
+    return list((token or {}).get("scopes") or SCOPES)
+
+
 AUTH = {}
 AUTH_LOCK = threading.Lock()
 AUTH_TICKETS = {}
@@ -68,7 +78,7 @@ def youtube_service(account):
     token = vault.get(account.id)
     if not token:
         raise AccountIdentityError("Подключите YouTube через Google OAuth")
-    credentials = Credentials.from_authorized_user_info(token, SCOPES)
+    credentials = Credentials.from_authorized_user_info(token, granted_scopes(token))
     if credentials.expired and credentials.refresh_token:
         credentials.refresh(Request())
         import json
@@ -116,10 +126,14 @@ def begin_youtube(account_id):
     def login():
         try:
             import json
+            import os
 
             from google_auth_oauthlib.flow import InstalledAppFlow
 
-            flow = InstalledAppFlow.from_client_config(client, SCOPES)
+            # Google lets the user untick optional permissions; without this a declined comment
+            # permission would fail the whole sign-in instead of only disabling author comments.
+            os.environ.setdefault("OAUTHLIB_RELAX_TOKEN_SCOPE", "1")
+            flow = InstalledAppFlow.from_client_config(client, LOGIN_SCOPES)
             credentials = flow.run_local_server(
                 host="127.0.0.1",
                 port=0,
@@ -143,9 +157,15 @@ def begin_youtube(account_id):
                 )
                 if duplicate:
                     raise AccountIdentityError("Этот канал уже подключён в другой записи")
-                vault.put(account_id, json.loads(credentials.to_json()))
+                saved = json.loads(credentials.to_json())
+                if getattr(credentials, "granted_scopes", None):
+                    saved["scopes"] = list(credentials.granted_scopes)
+                vault.put(account_id, saved)
                 account.name = items[0]["snippet"]["title"]
                 account.external_id, account.connected, account.method = items[0]["id"], True, "oauth"
+                from .preflight import forget
+
+                forget(db, account_id)
                 AUTH[account_id] = "connected"
         except AccountIdentityError as error:
             auth_result(account_id, ticket, "error: " + str(error))
@@ -245,6 +265,14 @@ def dispatch_one(db):
             continue
         if not account.connected:
             job.status = "waiting_auth"
+            continue
+        from .preflight import blocked
+
+        if blocked(db, account):
+            # A read-only check proved the sign-in unusable; never start an upload into it.
+            if job.status != "waiting_auth":
+                job.status, job.updated = "waiting_auth", now()
+                job.error = "Проверка перед публикацией не подтвердила вход. Ролик не отправлялся."
             continue
         if (
             account.platform == "tiktok"
@@ -390,6 +418,8 @@ def dispatch_one(db):
                         variant.config,
                         expected,
                         before_post=checkpoint,
+                        sound=((job.extras or {}).get("sound") or {}).get("name"),
+                        copyright=settings(db).get("tiktok_copyright", "warn"),
                     )
                 except BeforePublishError as error:
                     # Adapter proves it never clicked publish. Explicit reapproval is required.
@@ -413,6 +443,8 @@ def dispatch_one(db):
                 if duplicate:
                     raise ValueError("ID уже учтён у другого задания; требуется ручная проверка")
                 job.external_id, job.url, job.status = result.external_id, result.url, result.status
+                if result.checks:
+                    job.extras = {**(job.extras or {}), "tiktok_checks": result.checks}
                 job.error = "TikTok принял публикацию и вернул ID. Обработка и фактическая видимость пока не подтверждены."
                 account.method = "browser_verified"
         except Exception as error:

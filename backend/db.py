@@ -74,6 +74,8 @@ class Job(Base):
     upload_started_at: Mapped[str | None] = mapped_column(String, nullable=True)
     notified_status: Mapped[str | None] = mapped_column(String, nullable=True)
     thumbnail: Mapped[dict] = mapped_column(JSON, default=dict)
+    # Options outside the variant fingerprint: author comment, TikTok sound and their results.
+    extras: Mapped[dict] = mapped_column(JSON, default=dict)
 
 
 class ChannelVideo(Base):
@@ -157,6 +159,8 @@ DEFAULTS = {
     "one_per_platform": True,
     "youtube_thumbnail": True,
     "thumbnail_model": "gemini-3.1-flash-image",
+    # TikTok copyright check before posting: off | warn (stop on issues) | strict (also stop if unfinished).
+    "tiktok_copyright": "warn",
 }
 
 
@@ -205,6 +209,11 @@ def migrate():
             if "thumbnail" not in columns:
                 conn.execute(text("ALTER TABLE jobs ADD COLUMN thumbnail JSON NOT NULL DEFAULT '{}'"))
             conn.execute(text("INSERT INTO schema_migrations VALUES (8)"))
+        if version < 9:
+            columns = [row[1] for row in conn.execute(text("PRAGMA table_info(jobs)"))]
+            if "extras" not in columns:
+                conn.execute(text("ALTER TABLE jobs ADD COLUMN extras JSON NOT NULL DEFAULT '{}'"))
+            conn.execute(text("INSERT INTO schema_migrations VALUES (9)"))
     with Session.begin() as db:
         if not db.get(Setting, "application"):
             db.add(Setting(key="application", value=DEFAULTS.copy()))

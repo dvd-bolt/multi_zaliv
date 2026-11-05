@@ -1437,6 +1437,39 @@ body {
 #sf-editors .ed .queue-dialog .e-dialog .e-row:last-child {
   margin-top: 12px;
 }
+#sf-editors .ed .queue-dialog .queue-options {
+  margin: 6px 0;
+  min-width: 0;
+}
+#sf-editors .ed .queue-dialog .queue-options .truncate {
+  flex: 1;
+  min-width: 0;
+}
+#sf-editors .ed .queue-times {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3px 12px;
+  padding: 0;
+  margin: 4px 0;
+  list-style: none;
+  font-size: 11px;
+  color: var(--e-muted);
+}
+#sf-editors .ed .queue-times li {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+#sf-editors .ed .queue-times .truncate {
+  flex: 1;
+  min-width: 0;
+}
+#sf-editors .ed .queue-times b {
+  color: var(--e-text);
+  font-weight: 600;
+  flex-shrink: 0;
+}
 
 /* ---- Статистика v2 ---- */
 #sf-editors .ed .st { overflow: auto; }

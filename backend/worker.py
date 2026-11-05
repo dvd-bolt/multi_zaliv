@@ -181,6 +181,16 @@ def main():
     scheduler.add_job(
         scheduled_scans, "interval", minutes=15, executor="comments", max_instances=1, coalesce=True
     )
+    from .author_comment import process as author_comments
+    from .preflight import scheduled_checks
+
+    scheduler.add_job(
+        author_comments, "interval", minutes=3, executor="comments", max_instances=1, coalesce=True
+    )
+
+    scheduler.add_job(
+        scheduled_checks, "interval", minutes=5, executor="comments", max_instances=1, coalesce=True
+    )
     scheduler.add_job(tick, "interval", seconds=2, max_instances=1, coalesce=True)
     scheduler.add_job(metrics, "interval", hours=1, max_instances=1, coalesce=True)
     scheduler.add_job(backup_database, "interval", hours=24, max_instances=1, coalesce=True)

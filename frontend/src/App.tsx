@@ -33,6 +33,7 @@ import {
   api,
   type Account,
   type Asset,
+  type BestTime,
   type Edit,
   type Job,
   type Metric,
@@ -297,6 +298,12 @@ export default function App() {
   const [bubaConfirmed, setBubaConfirmed] = useState(false);
   const [queueSelectionPage, setQueueSelectionPage] = useState(0);
   const [queueError, setQueueError] = useState('');
+  // Best-time advice per channel and per-job options (author comment, TikTok sound).
+  const [schedules, setSchedules] = useState<Record<string, BestTime>>({});
+  const [authorComment, setAuthorComment] = useState(''),
+    [commentPin, setCommentPin] = useState(true),
+    [tiktokSound, setTiktokSound] = useState(''),
+    [checkingSignIn, setCheckingSignIn] = useState(false);
   const statsAccount = 'all',
     statsPlatform = 'all';
   const [browserPairing, setBrowserPairing] = useState<{
@@ -1763,6 +1770,33 @@ export default function App() {
                                               ? 'Автопубликация ещё не проверена'
                                               : a.platform}
                             </span>
+                            {a.connected && (
+                              <Button
+                                disabled={busy}
+                                title={
+                                  a.preflight
+                                    ? `${a.preflight.detail} (${new Date(a.preflight.checked).toLocaleString('ru-RU')})`
+                                    : 'Проверить, что сохранённый вход действует. Ничего не публикуется.'
+                                }
+                                onClick={() =>
+                                  void run(async () => {
+                                    const result = await api<
+                                      Record<string, { status: string; detail: string }>
+                                    >('/accounts/preflight', 'POST', { account_ids: [a.id] });
+                                    if (result[a.id]?.status !== 'ok')
+                                      throw new Error(
+                                        result[a.id]?.detail ?? 'Проверка не выполнена',
+                                      );
+                                  }, `${a.name}: вход действует`)
+                                }
+                              >
+                                {a.preflight?.status === 'auth'
+                                  ? '⚠ Вход'
+                                  : a.preflight?.status === 'ok'
+                                    ? '✓ Вход'
+                                    : 'Проверить вход'}
+                              </Button>
+                            )}
                             {a.platform === 'youtube' && (
                               <Button
                                 onClick={() => {
@@ -1978,6 +2012,22 @@ export default function App() {
                           <option value="24">Развлечения</option>
                           <option value="23">Юмор</option>
                           <option value="22">Люди и блоги</option>
+                        </select>
+                      </Field>
+                      <Field label="TikTok · проверка авторских прав перед публикацией">
+                        <select
+                          className="e-field"
+                          value={data.settings.tiktok_copyright ?? 'warn'}
+                          onChange={(e) =>
+                            void run(
+                              () => api('/settings', 'PATCH', { tiktok_copyright: e.target.value }),
+                              'Проверка авторских прав сохранена',
+                            )
+                          }
+                        >
+                          <option value="warn">Включена: остановить при нарушении</option>
+                          <option value="strict">Строгая: остановить, если не завершилась</option>
+                          <option value="off">Выключена</option>
                         </select>
                       </Field>
                       <label className="e-check">
@@ -2484,6 +2534,48 @@ export default function App() {
             </Button>
           </Modal>
         )}
+        {modal === 'enqueue-extra' && (
+          <Modal title="Комментарий автора и звук" onClose={() => setModal('enqueue')}>
+            <Field label="Комментарий после публикации (необязательно)">
+              <textarea
+                className="e-field"
+                rows={3}
+                maxLength={500}
+                value={authorComment}
+                placeholder="Например: А вы бы открыли {название}? Пишите в комментариях"
+                onChange={(e) => setAuthorComment(e.target.value)}
+              />
+            </Field>
+            <p className="e-small e-muted">
+              {'{название}'} заменится названием ролика. Публикуется один раз, когда ролик стал
+              публичным. YouTube: нужен повторный вход в канал с разрешением на комментарии.
+            </p>
+            <label className="e-check">
+              <input
+                type="checkbox"
+                checked={commentPin}
+                onChange={(e) => setCommentPin(e.target.checked)}
+              />
+              Закрепить (TikTok — сам; YouTube — ссылка в задании, закрепление в 2 клика)
+            </label>
+            <Field label="TikTok · звук из «Избранного» (необязательно)">
+              <input
+                className="e-field"
+                maxLength={100}
+                value={tiktokSound}
+                placeholder="Название трека, как в «Избранном» TikTok"
+                onChange={(e) => setTiktokSound(e.target.value)}
+              />
+            </Field>
+            <p className="e-small e-muted">
+              Трек добавляется тихо (~10 %) под голос диктора. Если трек не найден — ролик выйдет
+              без него. Добавьте трек в «Избранное» в приложении TikTok заранее.
+            </p>
+            <Button primary onClick={() => setModal('enqueue')}>
+              Готово
+            </Button>
+          </Modal>
+        )}
         {modal === 'enqueue-error' && (
           <Modal title="Автозалив · проверь параметры" onClose={close}>
             <p role="alert" style={{ overflowWrap: 'anywhere' }}>
@@ -2558,6 +2650,70 @@ export default function App() {
                 onChange={(e) => setSchedule(e.target.value)}
               />
             </Field>
+            <div className="e-row queue-options">
+              <Button
+                disabled={busy || !targets.length}
+                title="Подобрать время для каждого канала по его статистике за первые сутки"
+                onClick={() =>
+                  void run(async () => {
+                    setSchedules(
+                      await api<Record<string, BestTime>>(
+                        `/best-time?accounts=${targets.join(',')}`,
+                      ),
+                    );
+                  }, 'Время подобрано по статистике каналов')
+                }
+              >
+                Лучшее время
+              </Button>
+              <Button disabled={busy} onClick={() => setModal('enqueue-extra')}>
+                Комментарий и звук…
+              </Button>
+              <span className="e-small e-muted truncate">
+                {[
+                  authorComment.trim() && (commentPin ? 'комментарий 📌' : 'комментарий'),
+                  tiktokSound.trim() && 'звук TikTok',
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </span>
+            </div>
+            {targets.some((key) => schedules[key]) && (
+              <ul className="queue-times" aria-label="Время по каналам">
+                {queueAccounts
+                  .filter((a) => schedules[a.id])
+                  .slice(0, 6)
+                  .map((a) => (
+                    <li key={a.id} title={schedules[a.id].reason}>
+                      <span>{a.platform === 'youtube' ? 'YT' : 'TT'}</span>
+                      <span className="truncate">{a.name}</span>
+                      <b>
+                        {new Date(schedules[a.id].time).toLocaleString('ru-RU', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          timeZone: data.settings.timezone === 'UTC' ? 'UTC' : 'Europe/Moscow',
+                        })}
+                      </b>
+                      <span className="e-small e-muted">
+                        {schedules[a.id].mode === 'best'
+                          ? schedules[a.id].confident
+                            ? 'лучший час'
+                            : 'лучший час · мало данных'
+                          : schedules[a.id].mode === 'explore'
+                            ? 'проба часа'
+                            : 'по умолчанию'}
+                      </span>
+                    </li>
+                  ))}
+                <li>
+                  <button type="button" className="text-link" onClick={() => setSchedules({})}>
+                    Сбросить — одно время для всех
+                  </button>
+                </li>
+              </ul>
+            )}
             <p>
               {autoPublish
                 ? 'Рендер сразу, затем отправка по времени. Без времени — после готовности. Повторного подтверждения нет.'
@@ -2596,6 +2752,31 @@ export default function App() {
                   void run(
                     async () => {
                       await save();
+                      if (autoPublish) {
+                        // Read-only sign-in check of every chosen channel before anything is queued.
+                        setCheckingSignIn(true);
+                        try {
+                          const checks = await api<
+                            Record<string, { status: string; detail: string }>
+                          >('/accounts/preflight', 'POST', { account_ids: targets });
+                          const failed = Object.entries(checks).filter(
+                            ([, c]) => c.status === 'auth',
+                          );
+                          if (failed.length)
+                            throw new Error(
+                              'Автозалив не запущен, вход не подтверждён. ' +
+                                failed
+                                  .map(
+                                    ([key, c]) =>
+                                      `${data.accounts.find((a) => a.id === key)?.name ?? key} — ${c.detail.replace(/\.$/, '')}`,
+                                  )
+                                  .join('; ') +
+                                '. Переподключите канал в разделе «Каналы» и запустите снова.',
+                            );
+                        } finally {
+                          setCheckingSignIn(false);
+                        }
+                      }
                       const result = await api<{
                         created: string[];
                         existing: string[];
@@ -2606,6 +2787,14 @@ export default function App() {
                         account_ids: targets,
                         auto_publish: autoPublish,
                         buba_confirmed: bubaConfirmed,
+                        schedules: Object.fromEntries(
+                          targets
+                            .filter((key) => schedules[key])
+                            .map((key) => [key, schedules[key].time]),
+                        ),
+                        comment: authorComment.trim() || null,
+                        comment_pin: commentPin,
+                        tiktok_sound: tiktokSound.trim() || null,
                         scheduled: schedule
                           ? new Date(
                               schedule + (data.settings.timezone === 'UTC' ? 'Z' : '+03:00'),
@@ -2627,9 +2816,11 @@ export default function App() {
                 }
               >
                 {autoPublish
-                  ? gemini.running
-                    ? 'Ждём описание ИИ…'
-                    : 'Запустить автозалив'
+                  ? checkingSignIn
+                    ? 'Проверяю вход в каналы…'
+                    : gemini.running
+                      ? 'Ждём описание ИИ…'
+                      : 'Запустить автозалив'
                   : 'Создать MP4'}
               </Button>
             </div>
@@ -3130,6 +3321,45 @@ export default function App() {
                     </a>
                   </>
                 )}
+              </p>
+            )}
+            {currentJob.extras?.comment && (
+              <p className="e-small">
+                Комментарий автора:{' '}
+                {
+                  {
+                    pending: 'опубликуется после выхода ролика',
+                    posting: 'отправляется',
+                    posted: currentJob.extras.comment.pinned
+                      ? 'опубликован и закреплён'
+                      : 'опубликован',
+                    pin_manual: 'опубликован, осталось закрепить',
+                    skipped: 'не публикуется',
+                    failed: 'не удалось',
+                  }[currentJob.extras.comment.status]
+                }
+                {currentJob.extras.comment.detail && ` — ${currentJob.extras.comment.detail}`}
+                {currentJob.extras.comment.pin_url && (
+                  <>
+                    {' '}
+                    <a
+                      className="text-link"
+                      href={currentJob.extras.comment.pin_url}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Открыть и закрепить ↗
+                    </a>
+                  </>
+                )}
+              </p>
+            )}
+            {(currentJob.extras?.tiktok_checks || currentJob.extras?.sound) && (
+              <p className="e-small">
+                {currentJob.extras?.tiktok_checks?.sound_detail ??
+                  (currentJob.extras?.sound && `Звук TikTok: «${currentJob.extras.sound.name}»`)}
+                {currentJob.extras?.tiktok_checks?.copyright_detail &&
+                  ` ${currentJob.extras.tiktok_checks.copyright_detail}`}
               </p>
             )}
             {currentJob.has_output && (

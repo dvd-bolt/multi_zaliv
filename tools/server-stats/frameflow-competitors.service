@@ -1,0 +1,11 @@
+[Unit]
+Description=FrameFlow: competitor channels snapshot (yt-dlp, public data)
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=cloudebot
+WorkingDirectory=/opt/frameflow/stats
+ExecStart=/opt/frameflow/stats/.venv/bin/python /opt/frameflow/stats/competitors.py
+TimeoutStartSec=20min
+Nice=10
