@@ -242,12 +242,19 @@ export default function Stories({
       const saved = dirty ? await save() : story;
       if (!saved) return;
       const targets =
-        scope === 'all' ? saved.parts : [saved.parts[Math.min(partIndex, saved.parts.length - 1)]];
+        scope === 'all' || kind === 'pipeline'
+          ? saved.parts
+          : [saved.parts[Math.min(partIndex, saved.parts.length - 1)]];
       await api(`/stories/${saved.id}/tasks`, 'POST', {
         kind,
         parts: targets.map((p) => p.id),
         revision: saved.revision,
-        max_requests: kind === 'voice' ? targets.length : 0,
+        max_requests:
+          kind === 'voice'
+            ? targets.length
+            : kind === 'pipeline'
+              ? targets.filter((p) => !p.has_audio).length
+              : 0,
       });
       await load();
     });
@@ -1001,7 +1008,7 @@ export default function Stories({
                   disabled={locked || srtDirty || !part?.text.trim()}
                   onClick={() => start('voice')}
                 >
-                  Озвучить · до {scope === 'all' ? story.parts.length : 1} запр.
+                  Озвучить · {scope === 'all' ? story.parts.length : 1} запр.
                 </button>
                 <button
                   className="e-button primary"
@@ -1009,6 +1016,16 @@ export default function Stories({
                   onClick={() => start('render')}
                 >
                   <Play /> Собрать MP4
+                </button>
+                <button
+                  className="e-button"
+                  disabled={
+                    locked || srtDirty || story.parts.some((p) => !p.text.trim() && !p.has_audio)
+                  }
+                  title="Все части: озвучка того, что не озвучено → субтитры → MP4. Субтитры, совпавшие со сценарием, принимаются сами; иначе остановка для проверки"
+                  onClick={() => start('pipeline')}
+                >
+                  Всё сразу · {story.parts.filter((p) => !p.has_audio).length} запр.
                 </button>
               </div>
               <div className="story-status" role="status">

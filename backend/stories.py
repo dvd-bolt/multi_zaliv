@@ -10,6 +10,7 @@ import subprocess
 import time
 from contextlib import contextmanager
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Annotated, Literal
 
 import httpx
@@ -373,7 +374,7 @@ def save(key: str, request: Draft):
 
 
 class TaskRequest(BaseModel):
-    kind: Literal["voice", "captions", "render"]
+    kind: Literal["voice", "captions", "render", "pipeline"]
     parts: list[str] = Field(min_length=1, max_length=3)
     revision: int
     max_requests: int = Field(0, ge=0, le=3)
@@ -392,11 +393,20 @@ def enqueue(key: str, request: TaskRequest):
         calls = 0
         for key_part in request.parts:
             p = parts[key_part]
+            has_audio = bool(p.get("audio_path")) and Path(p["audio_path"]).is_file()
+            if request.kind == "pipeline":
+                # One button: voice what has no audio, captions, render. Captions are accepted automatically
+                # only when they match the script word for word; otherwise the part stops for a review.
+                if not has_audio:
+                    if not p["text"].strip():
+                        raise ValueError("Добавьте текст каждой выбранной части")
+                    calls += not story_tts.cache_file(p["text"], story.document["profile"]).exists()
+                continue
             if request.kind == "voice":
                 if not p["text"].strip():
                     raise ValueError("Добавьте текст каждой выбранной части")
                 calls += not story_tts.cache_file(p["text"], story.document["profile"]).exists()
-            elif not p.get("audio_path") or not Path(p["audio_path"]).is_file():
+            elif not has_audio:
                 raise ValueError("Сначала добавьте или создайте озвучку выбранных частей")
             if request.kind == "render" and story.document["subtitles"] and not p.get("captions_reviewed"):
                 raise ValueError("Проверьте и подтвердите субтитры либо выключите их для этого экспорта")
@@ -583,6 +593,64 @@ def recover():
             detail="Нужен повтор пользователя", updated=now()))
 
 
+def voice_step(part, document):
+    audio = story_tts.generate(part["text"], document["profile"])
+    part.update(audio_path=str(audio), duration=audio_info(audio)["duration"],
+                audio_key=story_tts.cache_key(part["text"], document["profile"]), audio_origin="tts")
+    for field in ("audio_id", "start", "end", "cues", "output_path", "asset_id", "captions_reviewed"):
+        part.pop(field, None)
+
+
+def same_words(a, b):
+    def norm(value):
+        return re.sub(r"[^\w]+", " ", value.casefold().replace("ё", "е")).split()
+    return norm(a) == norm(b)
+
+
+def captions_step(story, part, part_id, cancelled, auto=False):
+    folder = directory() / story.id
+    folder.mkdir(exist_ok=True)
+    audio = folder / (part_id + "-clip.wav")
+    command([binary("ffmpeg"), "-v", "error", "-y", "-ss", str(part.get("start", 0)),
+             "-i", part["audio_path"], "-t", str(part["duration"]), "-ac", "1", "-ar", "16000", str(audio)])
+    try:
+        part["cues"] = story_captions.transcribe(audio, lambda _: None, cancelled, part["text"])
+    finally:
+        audio.unlink(missing_ok=True)
+    part["captions_reviewed"] = False
+    part.pop("output_path", None)
+    part.pop("asset_id", None)
+    if auto:
+        if not same_words(" ".join(c["text"] for c in part["cues"]), part["text"]):
+            raise ValueError("Субтитры разошлись со сценарием — проверьте их во вкладке «Субтитры» и соберите MP4")
+        part["captions_reviewed"] = True
+
+
+def render_step(story, document, part, part_id, task_id, cancelled):
+    with writing() as db:
+        current = required(db, Story, story.id)
+        bg_path, choice = choose_background(db, current, part)
+        part["background"] = choice
+        # Persist the random choice before the expensive operation for reproducibility.
+        current.document = copy.deepcopy(document)
+    folder = directory() / story.id
+    folder.mkdir(exist_ok=True)
+    path = folder / (part_id + "-" + task_id + ".mp4")
+    part["background_path"] = bg_path
+    try:
+        render_part(SimpleNamespace(document=document), part, path, choice, cancelled)
+        info = inspect(path, "video", uid())
+        if abs(info["duration"] - part["duration"]) > .3 or info["width"] != document["width"]:
+            raise ValueError("Готовая часть не прошла проверку длительности/размера")
+    except Exception:
+        path.unlink(missing_ok=True)
+        raise
+    finally:
+        part.pop("background_path", None)
+    part["output_path"] = str(path)
+    part.pop("asset_id", None)
+
+
 def process_one():
     with writing() as db:
         task = db.scalar(select(StoryTask).where(StoryTask.status == "queued").order_by(StoryTask.created))
@@ -610,48 +678,32 @@ def process_one():
                 number = next(i for i, p in enumerate(document["parts"], 1) if p["id"] == part["id"])
                 task.detail = f"{kind}: часть {number} из {len(document['parts'])}"
                 task.progress, task.updated = index / len(targets) * 100, now()
-            if kind == "voice":
-                audio = story_tts.generate(part["text"], document["profile"])
-                part.update(audio_path=str(audio), duration=audio_info(audio)["duration"],
-                            audio_key=story_tts.cache_key(part["text"], document["profile"]), audio_origin="tts")
-                for field in ("audio_id", "start", "end", "cues", "output_path", "asset_id", "captions_reviewed"):
-                    part.pop(field, None)
-            elif kind == "captions":
-                folder = directory() / story.id
-                folder.mkdir(exist_ok=True)
-                audio = folder / (part_id + "-clip.wav")
-                command([binary("ffmpeg"), "-v", "error", "-y", "-ss", str(part.get("start", 0)),
-                         "-i", part["audio_path"], "-t", str(part["duration"]), "-ac", "1", "-ar", "16000", str(audio)])
-                try:
-                    part["cues"] = story_captions.transcribe(audio, lambda _: None, cancelled, part["text"])
-                finally:
-                    audio.unlink(missing_ok=True)
-                part["captions_reviewed"] = False
-                part.pop("output_path", None)
-                part.pop("asset_id", None)
-            else:
+            steps = [kind]
+            if kind == "pipeline":
+                steps = []
+                if not part.get("audio_path") or not Path(part["audio_path"]).is_file():
+                    steps.append("voice")
+                if document["subtitles"]:
+                    steps.append("captions")
+                steps.append("render")
+            for step in steps:
+                if kind == "pipeline":
+                    with writing() as db:
+                        task = required(db, StoryTask, task_id)
+                        names = {"voice": "озвучка", "captions": "субтитры", "render": "сборка MP4"}
+                        task.detail = f"{names[step]}: часть {number} из {len(document['parts'])}"
+                        task.updated = now()
+                    if cancelled():
+                        raise InterruptedError("Обработка отменена")
+                if step == "voice":
+                    voice_step(part, document)
+                elif step == "captions":
+                    captions_step(story, part, part_id, cancelled, auto=kind == "pipeline")
+                else:
+                    render_step(story, document, part, part_id, task_id, cancelled)
                 with writing() as db:
                     current = required(db, Story, story.id)
-                    bg_path, choice = choose_background(db, current, part)
-                    part["background"] = choice
-                    # Persist the random choice before the expensive operation for reproducibility.
-                    current.document = copy.deepcopy(document)
-                folder = directory() / story.id
-                folder.mkdir(exist_ok=True)
-                path = folder / (part_id + "-" + task_id + ".mp4")
-                part["background_path"] = bg_path
-                try:
-                    render_part(story, part, path, choice, cancelled)
-                    info = inspect(path, "video", uid())
-                    if abs(info["duration"] - part["duration"]) > .3 or info["width"] != document["width"]:
-                        raise ValueError("Готовая часть не прошла проверку длительности/размера")
-                except Exception:
-                    path.unlink(missing_ok=True)
-                    raise
-                finally:
-                    part.pop("background_path", None)
-                part["output_path"] = str(path)
-                part.pop("asset_id", None)
+                    current.document, current.updated = copy.deepcopy(document), now()
             # A completed response is retained even if cancellation arrived during TTS.
             with writing() as db:
                 current = required(db, Story, story.id)

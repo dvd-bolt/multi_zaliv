@@ -327,3 +327,51 @@ def test_voice_probe_spends_at_most_one_request_and_reuses_cache(draft, monkeypa
     audio = client.get('/api/stories/voice/probe/' + made['key'])
     assert audio.status_code == 200 and audio.content.startswith(b'RIFF')
     assert client.get('/api/stories/voice/probe/../../x').status_code == 404
+
+
+@pytest.mark.parametrize("matching", [True, False])
+def test_one_button_pipeline_voices_captions_and_renders(draft, monkeypatch, tmp_path, matching):
+    client, s = draft
+    bg = tmp_path / 'bg.mp4'
+    command([binary('ffmpeg'), '-v', 'error', '-y', '-f', 'lavfi', '-i',
+             'testsrc2=size=90x160:rate=10:duration=6', '-c:v', 'libx264', str(bg)])
+    with bg.open('rb') as f:
+        assert client.post('/api/stories/files?kind=background&category=cars',
+                           files={'file': ('bg.mp4', f, 'video/mp4')}).status_code == 200
+    requests = []
+
+    def fake_generate(text, profile):
+        requests.append(text)
+        path = story_tts.cache_file(text, profile)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(wav_bytes(2))
+        return path
+
+    def fake_transcribe(path, progress, cancelled, reference=''):
+        text = reference if matching else 'совсем другое'
+        return [{'start': 0, 'end': 1.8, 'text': text}]
+
+    monkeypatch.setattr(story_tts, 'generate', fake_generate)
+    monkeypatch.setattr(story_captions, 'transcribe', fake_transcribe)
+    for i, p in enumerate(s['parts']):
+        p['text'] = f'Часть номер {i + 1}. Я открыл дверь {matching}.'
+    s['hook'] = 'Дверь'
+    s = client.put('/api/stories/' + s['id'], json=s).json()
+    body = {'kind': 'pipeline', 'parts': [p['id'] for p in s['parts']], 'revision': s['revision']}
+    refused = client.post(f"/api/stories/{s['id']}/tasks", json=body)
+    assert refused.status_code >= 400 and 'разрешено: 0' in refused.text  # TTS spending must be allowed
+    task = client.post(f"/api/stories/{s['id']}/tasks", json={**body, 'max_requests': 2}).json()
+    assert task['new_requests'] == 2
+    assert stories.process_one()
+    with Session() as db:
+        result = db.get(StoryTask, task['id'])
+        document = db.get(Story, s['id']).document
+    assert len(requests) == (2 if matching else 1)  # a failed part stops the chain before the next request
+    if matching:
+        assert result.status == 'succeeded', result.error
+        for p in document['parts']:
+            assert p['captions_reviewed'] and Path(p['output_path']).is_file()
+            assert probe(Path(p['output_path']))['width'] == 1080
+    else:
+        assert result.status == 'failed' and 'разошлись со сценарием' in result.error
+        assert document['parts'][0].get('audio_path') and not document['parts'][0].get('output_path')
