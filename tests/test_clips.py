@@ -33,7 +33,12 @@ def source(tmp_path, monkeypatch):
         state = client.post("/api/clips/upload", files={"file": ("Подкаст.mp4", f, "video/mp4")}).json()
     yield client, state
     import shutil
-    shutil.rmtree(clips.root() / state["id"], ignore_errors=True)
+    folder = str(clips.root() / state["id"])
+    with Session.begin() as db:  # new sources inherit settings of the last one: leave no assets behind
+        for asset in db.query(Asset).all():
+            if asset.path.startswith(folder):
+                db.delete(asset)
+    shutil.rmtree(folder, ignore_errors=True)
 
 
 def test_upload_analyse_without_gemini_render_and_send_to_editor(source, monkeypatch):
