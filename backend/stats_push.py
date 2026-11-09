@@ -112,6 +112,20 @@ def build(db):
     for state, count in db.execute(select(Job.status, func.count()).group_by(Job.status)):
         if state in snapshot["queue"]:
             snapshot["queue"][state] = count
+    # Content calendar on the server: what is still waiting for publication (time, channel, title only).
+    snapshot["upcoming"] = [
+        {"time": job.scheduled, "status": job.status, "platform": account.platform, "account": account.name,
+         "title": str(notify.describe(db, job)["title"] or "")[:120]}
+        for job, account in db.execute(
+            select(Job, Account)
+            .join(Variant, Job.variant_id == Variant.id)
+            .join(Account, Variant.account_id == Account.id)
+            .where(Job.status.in_(("queued", "rendering", "ready", "scheduled", "waiting_auth", "uploading")),
+                   Job.scheduled.is_not(None))
+            .order_by(Job.scheduled)
+            .limit(100)
+        )
+    ]
     payout_rows = {row["asset_id"]: row for row in payouts.overview(db)}
     for job, variant, account, asset in db.execute(
         select(Job, Variant, Account, Asset)

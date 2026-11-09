@@ -358,3 +358,16 @@ def test_manual_refresh_and_csv_push_after_commit(database, monkeypatch):
     assert client.patch("/api/stats-push", json={"enabled": False}).status_code == 200
     with database() as db:
         assert not stats_push.status(db)["enabled"]
+
+
+def test_upcoming_lists_waiting_jobs_without_private_fields(database):
+    with database.begin() as db:
+        job = db.get(Job, "job")
+        job.status, job.scheduled = "scheduled", "2026-11-10T15:00:00+00:00"
+    with database() as db:
+        snapshot = stats_push.build(db)
+    assert snapshot["upcoming"] == [
+        {"time": "2026-11-10T15:00:00+00:00", "status": "scheduled", "platform": "youtube", "account": "Канал",
+         "title": "Название"}
+    ]
+    assert "PRIVATE" not in json.dumps(snapshot["upcoming"], ensure_ascii=False)
