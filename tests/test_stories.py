@@ -242,3 +242,43 @@ def test_gemini_script_draft_follows_the_scenario_contract(draft, monkeypatch):
     assert 'записка перед свадьбой' in calls[0]
     answer['parts'] = answer['parts'][:1] + ['коротко']
     assert client.post('/api/stories/script/draft', json={'theme': 'тема', 'parts': 2}).status_code >= 400
+
+
+def test_background_by_link_downloads_into_library(draft, monkeypatch, tmp_path):
+    import sys
+    import time as _time
+    import types
+
+    from backend import story_backgrounds
+    client, _ = draft
+    sample = tmp_path / 'sample.mp4'
+    command([binary('ffmpeg'), '-v', 'error', '-y', '-f', 'lavfi', '-i',
+             'testsrc2=size=90x160:rate=10:duration=3', '-c:v', 'libx264', str(sample)])
+
+    class FakeYDL:
+        def __init__(self, options):
+            self.options = options
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def extract_info(self, url, download):
+            target = self.options['outtmpl'].replace('%(ext)s', 'mp4')
+            Path(target).write_bytes(sample.read_bytes())
+            return {'title': 'Паркур', 'duration': 3}
+
+    monkeypatch.setitem(sys.modules, 'yt_dlp', types.SimpleNamespace(YoutubeDL=FakeYDL))
+    assert client.post('/api/stories/files/link', json={'url': 'ftp://x', 'category': 'cars'}).status_code >= 400
+    task = client.post('/api/stories/files/link', json={'url': 'https://youtu.be/abc', 'category': 'balls'}).json()
+    for _ in range(100):
+        state = next(t for t in story_backgrounds.listing() if t['id'] == task['id'])
+        if state['status'] != 'running':
+            break
+        _time.sleep(.05)
+    assert state['status'] == 'done', state
+    files = client.get('/api/stories').json()['files']
+    added = next(f for f in files if f['id'] == state['file_id'])
+    assert added['kind'] == 'background' and added['category'] == 'balls' and added['name'] == 'Паркур.mp4'

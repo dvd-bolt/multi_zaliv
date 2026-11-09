@@ -56,6 +56,14 @@ type Catalog = {
   tasks: Task[];
   models: string[];
   voices: string[];
+  downloads?: {
+    id: string;
+    status: string;
+    progress: number;
+    error: string;
+    name?: string;
+    url: string;
+  }[];
 };
 const categories = [
   ['balls', 'Шарики'],
@@ -114,7 +122,8 @@ export default function Stories({
     [importOpen, setImportOpen] = useState(false),
     [theme, setTheme] = useState(''),
     [themeParts, setThemeParts] = useState(3),
-    [draftHook, setDraftHook] = useState('');
+    [draftHook, setDraftHook] = useState(''),
+    [link, setLink] = useState('');
   const [scope, setScope] = useState('part'),
     [category, setCategory] = useState('cars'),
     [filePage, setFilePage] = useState(0),
@@ -648,6 +657,44 @@ export default function Stories({
                         />
                       </label>
                     </div>
+                    <div className="e-row story-link-row">
+                      <input
+                        className="e-field"
+                        aria-label="Ссылка на видео для фона"
+                        placeholder="Ссылка YouTube на фон (паркур, мыло…)"
+                        value={link}
+                        onChange={(e) => setLink(e.target.value)}
+                      />
+                      <button
+                        className="e-button"
+                        disabled={busy || !/^https?:\/\//.test(link.trim())}
+                        onClick={() =>
+                          void run(async () => {
+                            await api('/stories/files/link', 'POST', {
+                              url: link.trim(),
+                              category,
+                            });
+                            setLink('');
+                            await load();
+                            setNotice('Скачиваю фон — он появится в списке этой категории.');
+                          })
+                        }
+                      >
+                        Скачать
+                      </button>
+                    </div>
+                    {catalog?.downloads?.[0] && (
+                      <small
+                        className="e-muted story-download"
+                        title={catalog.downloads[0].error || catalog.downloads[0].url}
+                      >
+                        {catalog.downloads[0].status === 'running'
+                          ? `Скачивание: ${catalog.downloads[0].progress}%`
+                          : catalog.downloads[0].status === 'done'
+                            ? `Скачано: ${catalog.downloads[0].name ?? ''}`
+                            : `Не удалось скачать — проверьте ссылку (подробности при наведении)`}
+                      </small>
+                    )}
                     <div className="story-backgrounds">
                       {(
                         catalog?.files.filter(
@@ -700,8 +747,7 @@ export default function Stories({
                       </button>
                     </div>
                     <p className="e-muted">
-                      Фон случайный, выбранный фрагмент сохраняется. Звук фона выключен. Если фонов
-                      нет — добавьте свои файлы.
+                      Фрагмент фона случайный и сохраняется, звук фона выключен.
                     </p>
                   </>
                 )}

@@ -17,7 +17,7 @@ from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, Field
 from sqlalchemy import select, text, update
 
-from . import story_captions, story_script, story_tts
+from . import story_backgrounds, story_captions, story_script, story_tts
 from .config import DATA, binary
 from .db import Asset, Session, Setting, Story, StoryFile, StoryTask, now, uid
 from .media import NO_WINDOW, command, inspect
@@ -157,6 +157,7 @@ def listing():
                 "files": [file_data(f) for f in db.scalars(select(StoryFile).order_by(StoryFile.created.desc())).all()],
                 "tasks": [task_data(t) for t in db.scalars(select(StoryTask).order_by(StoryTask.created.desc()).limit(50)).all()],
                 "models": story_tts.MODELS, "voices": story_tts.VOICES,
+                "downloads": story_backgrounds.listing(),
                 "default_profile": story_tts.DEFAULT_PROFILE}
 
 
@@ -237,6 +238,27 @@ def upload(file: Annotated[UploadFile, File()], kind: Literal["background", "aud
         raise
     finally:
         file.file.close()
+
+
+class LinkInput(BaseModel):
+    url: str = Field(min_length=8, max_length=500)
+    category: Literal["balls", "carpets", "cars"] = "cars"
+
+
+@router.post("/files/link")
+def upload_link(request: LinkInput):
+    """Background video by link: downloaded in a thread, then added to the library like an upload."""
+    def register(path, name, digest):
+        key = path.name.split("-link")[0]
+        media = inspect(path, "video", key)
+        with writing() as db:
+            row = StoryFile(id=key, kind="background", category=request.category, name=name, path=str(path),
+                            sha256=digest, media=media)
+            db.add(row)
+            db.flush()
+            return file_data(row)
+
+    return story_backgrounds.start(request.url, request.category, directory() / "inputs", register)
 
 
 @router.get("/files/{key}")

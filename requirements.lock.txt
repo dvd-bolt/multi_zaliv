@@ -74,3 +74,4 @@ pyyaml==6.0.3
 numpy==2.5.4
 flatbuffers==25.12.19
 hf-xet==1.8.0
+yt-dlp==2026.10.26

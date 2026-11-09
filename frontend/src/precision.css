@@ -750,6 +750,18 @@
 #sf-editors .story-form-grid .story-wide {
   grid-column: 1 / -1;
 }
+#sf-editors .story-link-row input {
+  flex: 1;
+  min-width: 0;
+}
+#sf-editors .story-download {
+  display: block;
+  flex: none;
+  line-height: 1.4;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 .story-import-dialog .story-theme-row {
   display: flex;
   gap: 8px;
