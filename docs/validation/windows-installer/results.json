@@ -1,0 +1,51 @@
+{
+  "installer": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\releases\\FrameFlow-Setup-0.2.0-x64.exe",
+  "install": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\build\\installer-smoke-20261108-015505\\Установка FrameFlow",
+  "data": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\build\\installer-smoke-20261108-015505\\profile\\FrameFlow\\data",
+  "checks": [
+    "Per-user install, path contains spaces and Cyrillic, no shortcuts",
+    "Relocated Python/native libraries/model with global Python and Node absent from PATH",
+    "Bundled Playwright Node driver opened an isolated Chrome context",
+    "Native FrameFlow.exe launcher handles the installed Unicode path",
+    "Installed API/worker rendered MP4, kept running after window close, no upload authorized",
+    "Upgrade retained SQLite, account, job, settings and user file",
+    "Uninstall removed program and preserved data outside the installation"
+  ],
+  "probe": {
+    "packaged": true,
+    "root": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\build\\installer-smoke-20261108-015505\\Установка FrameFlow",
+    "data": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\build\\installer-smoke-20261108-015505\\profile\\FrameFlow\\data",
+    "python": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\build\\installer-smoke-20261108-015505\\Установка FrameFlow\\runtime\\python.exe",
+    "ffmpeg": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\build\\installer-smoke-20261108-015505\\Установка FrameFlow\\resources\\tools\\ffmpeg.exe",
+    "schema": 11,
+    "python_prefix": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\build\\installer-smoke-20261108-015505\\Установка FrameFlow\\runtime",
+    "sys_path": [
+      "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\build\\installer-smoke-20261108-015505\\Установка FrameFlow",
+      "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\build\\installer-smoke-20261108-015505\\Установка FrameFlow\\runtime",
+      "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\build\\installer-smoke-20261108-015505\\Установка FrameFlow\\runtime\\DLLs",
+      "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\build\\installer-smoke-20261108-015505\\Установка FrameFlow\\runtime\\Lib",
+      "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\build\\installer-smoke-20261108-015505\\Установка FrameFlow\\runtime\\Lib\\site-packages",
+      "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\build\\installer-smoke-20261108-015505\\Установка FrameFlow",
+      "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\"
+    ],
+    "isolated": 1,
+    "numpy": "2.5.4",
+    "ctranslate2": "4.8.5",
+    "onnxruntime": "1.31.1",
+    "local_model": true
+  },
+  "native": {
+    "checks": [
+      "Installed Python/pythonnet rendered real WebView2",
+      "Installed UI: Истории",
+      "Installed UI: Статистика",
+      "Installed UI: Каналы",
+      "Installed UI: Настройки",
+      "Installed UI: Очередь",
+      "Installed UI: Монтаж"
+    ],
+    "errors": []
+  },
+  "ok": true,
+  "test_install_left": false
+}

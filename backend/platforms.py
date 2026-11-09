@@ -466,13 +466,15 @@ def dispatch_one(db):
         return
 
 
-def refresh_metrics(db):
+def refresh_metrics(db, account_ids=None):
     result = {"updated": 0, "unavailable": 0}
     from .youtube_library import sync
 
     for account in db.scalars(
         select(Account).where(Account.platform == "youtube", Account.connected.is_(True))
     ).all():
+        if account_ids is not None and account.id not in account_ids:
+            continue
         try:
             result["updated"] += sync(db, account)
         except Exception:
@@ -490,19 +492,23 @@ def refresh_metrics(db):
     with db.no_autoflush:
         for job in db.scalars(select(Job).where(Job.external_id.is_not(None))).all():
             account = db.get(Account, db.get(Variant, job.variant_id).account_id)
-            if account.platform == "youtube":
+            if account.platform == "youtube" or (account_ids is not None and account.id not in account_ids):
                 continue
             try:
                 token = vault.get(account.id + "_metrics")
                 if not token:
-                    from .tiktok_public import metrics
+                    from .tiktok_public import fetch_item, item_metrics
 
-                    values = metrics(account.external_id, job.external_id)
+                    item = fetch_item(account.external_id, job.external_id)
+                    if not item:
+                        raise ValueError("Публичная статистика TikTok недоступна")
+                    values = item_metrics(item)
+                    publication_time = item.get("createTime")
                     source = "TikTok public page"
                 else:
                     response = httpx.post(
                         "https://open.tiktokapis.com/v2/video/query/",
-                        params={"fields": "id,view_count,like_count,comment_count,share_count"},
+                        params={"fields": "id,create_time,view_count,like_count,comment_count,share_count"},
                         headers={"Authorization": "Bearer " + token["access_token"]},
                         json={"filters": {"video_ids": [job.external_id]}},
                         timeout=20,
@@ -521,7 +527,20 @@ def refresh_metrics(db):
                         )
                     }
                     source = "TikTok Display API"
-                db.add(Metric(job_id=job.id, values=values, source=source))
+                    publication_time = videos[0].get("create_time")
+                captured = now()
+                db.add(Metric(job_id=job.id, values=values, source=source, captured=captured))
+                from .analytics import record
+
+                confirmed = None
+                if (type(publication_time) is int or
+                        isinstance(publication_time, str) and publication_time.isdigit()):
+                    try:
+                        confirmed = datetime.fromtimestamp(int(publication_time), UTC).isoformat()
+                    except (ValueError, OverflowError, OSError):
+                        pass
+                record(db, account.id, job.external_id, confirmed, source + " create_time",
+                       [{"captured": captured, "values": values, "source": source}])
                 result["updated"] += 1
             except Exception:
                 result["unavailable"] += 1

@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="Три новых интерактивных прототипа монтажной FrameFlow: Studio, Precision и Focus."
+    />
+    <title>FrameFlow — три новых направления</title>
+    <link rel="icon" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="prototype.css" />
+    <style>
+      body {
+        background: #131517;
+        color: #f0f1f2;
+      }
+      .gallery {
+        max-width: 1500px;
+        padding: 42px 40px 26px;
+        margin: auto;
+      }
+      .gallery-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 30px;
+        margin-block-end: 40px;
+      }
+      .gallery-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+      }
+      .gallery-brand svg {
+        width: 29px;
+        height: 29px;
+        color: #f7ab77;
+      }
+      .gallery-date {
+        color: #b1b5bb;
+        font-size: 11px;
+      }
+      .gallery h1 {
+        font-size: 36px;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -0.035em;
+        max-width: 650px;
+      }
+      .intro {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 30px;
+        margin-block-end: 34px;
+      }
+      .intro p {
+        max-width: 440px;
+        color: #b1b5bb;
+        font-size: 12px;
+        line-height: 1.8;
+      }
+      .concepts {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+      }
+      .concept {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        --own: #f7ab77;
+      }
+      .concept.precision {
+        --own: #e7e7e7;
+      }
+      .concept.focus {
+        --own: #bad7ac;
+      }
+      .concept-preview {
+        display: block;
+        border-radius: 10px;
+        background: #1e2226;
+        border: 1px solid #3a4047;
+        overflow: hidden;
+        aspect-ratio: 1.6;
+        transition: transform 180ms cubic-bezier(0.23, 1, 0.32, 1);
+      }
+      .concept-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: 50% 0;
+        display: block;
+      }
+      .concept-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-block: 21px 10px;
+      }
+      .concept h2 {
+        font-size: 24px;
+        color: var(--own);
+        font-weight: 600;
+      }
+      .concept-subtitle {
+        font-size: 10px;
+        color: #c0c4ca;
+        padding: 4px 8px;
+        border: 1px solid #3a4047;
+        border-radius: 5px;
+      }
+      .concept p {
+        font-size: 12px;
+        color: #b1b5bb;
+        line-height: 1.8;
+        max-width: 360px;
+        min-height: 65px;
+      }
+      .concept ul {
+        list-style: none;
+        padding: 17px 0;
+        margin: 0;
+        display: grid;
+        gap: 11px;
+        border-block: 1px solid #343a40;
+        font-size: 11px;
+        color: #d0d3d8;
+      }
+      .concept li {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .concept li:before {
+        content: '';
+        width: 4px;
+        height: 4px;
+        background: var(--own);
+        border-radius: 50%;
+      }
+      .concept-open {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+        font-weight: 700;
+        background: var(--own);
+        color: #172026;
+        border-radius: 7px;
+        margin-block-start: 19px;
+        padding: 12px 14px;
+        min-height: 44px;
+      }
+      .concept-open svg {
+        width: 17px;
+        height: 17px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.5;
+      }
+      .gallery-footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        color: #b1b5bb;
+        font-size: 10px;
+        margin-block-start: 32px;
+        line-height: 1.8;
+      }
+      .gallery-footer p {
+        max-width: 700px;
+      }
+      .gallery-footer span {
+        white-space: nowrap;
+      }
+      @media (hover: hover) and (pointer: fine) {
+        .concept-preview:hover {
+          transform: translateY(-2px);
+        }
+        .concept-open:hover {
+          filter: brightness(1.08);
+        }
+      }
+      @media (max-width: 1100px) {
+        .gallery {
+          padding: 30px 24px;
+        }
+        .gallery h1 {
+          font-size: 30px;
+        }
+        .concepts {
+          gap: 15px;
+        }
+        .intro {
+          align-items: flex-start;
+          flex-direction: column;
+          gap: 15px;
+        }
+        .intro p {
+          max-width: 650px;
+        }
+        .concept p {
+          min-height: 86px;
+        }
+        .concept-subtitle {
+          display: none;
+        }
+        .gallery-header {
+          margin-block-end: 30px;
+        }
+      }
+      @media (max-width: 720px) {
+        .gallery {
+          padding: 24px 18px;
+        }
+        .concepts {
+          grid-template-columns: 1fr;
+          gap: 38px;
+        }
+        .concept-preview {
+          aspect-ratio: 1.6;
+        }
+        .concept p {
+          min-height: 0;
+          max-width: 100%;
+          margin-block-end: 16px;
+        }
+        .concept-title {
+          margin-block-start: 16px;
+        }
+        .concept-subtitle {
+          display: block;
+        }
+        .gallery-header {
+          gap: 10px;
+        }
+        .gallery-date {
+          font-size: 9px;
+        }
+        .gallery h1 {
+          font-size: 29px;
+        }
+        .gallery-footer {
+          flex-direction: column;
+          gap: 10px;
+        }
+        .intro p {
+          font-size: 12px;
+        }
+        .concept-open {
+          margin-block-start: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="gallery">
+      <header class="gallery-header">
+        <div class="gallery-brand">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            aria-hidden="true"
+          >
+            <path d="M4 8V4h4m8 0h4v4M4 16v4h4m8 0h4v-4M8 8h8v8H8z" /></svg
+          >FrameFlow
+        </div>
+        <span class="gallery-date">Дизайн-исследование / 6 ноября 2026</span>
+      </header>
+      <div class="intro">
+        <h1>Три взгляда на вашу<br />новую монтажную.</h1>
+        <p>
+          Тот же рабочий процесс. Три разных характера.<br />Откройте каждый вариант: выберите
+          исходник, настройте баннер и пройдите запуск демопакета.
+        </p>
+      </div>
+      <div class="concepts">
+        <article class="concept studio">
+          <a class="concept-preview" href="studio.html" aria-label="Открыть прототип Studio"
+            ><img
+              src="shots/studio-1440.png"
+              alt="Studio: тёплая графитовая монтажная с карточками исходников и оранжевыми акцентами"
+          /></a>
+          <div class="concept-title">
+            <h2>Studio</h2>
+            <span class="concept-subtitle">Творческая студия</span>
+          </div>
+          <p>
+            Тёплый графит, крупные кадры исходников и отдельные рабочие поверхности. Видео остаётся
+            в центре внимания.
+          </p>
+          <ul>
+            <li>Визуальная библиотека материалов</li>
+            <li>Знакомая структура монтажной</li>
+            <li>Тёплый акцент на главном действии</li>
+          </ul>
+          <a class="concept-open" href="studio.html"
+            >Открыть Studio<svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14m-6-6 6 6-6 6" /></svg
+          ></a>
+        </article>
+        <article class="concept precision">
+          <a class="concept-preview" href="precision.html" aria-label="Открыть прототип Precision"
+            ><img
+              src="shots/precision-1440.png"
+              alt="Precision Mono: чёрно-белый редактор с графитовыми панелями и светлыми акцентами"
+          /></a>
+          <div class="concept-title">
+            <h2>Precision</h2>
+            <span class="concept-subtitle">Выбран · чёрно-белый</span>
+          </div>
+          <p>
+            Нейтральный графит, светлые акценты и чёткая сетка. Выбранное направление с более
+            читаемыми подписями и спокойными элементами управления.
+          </p>
+          <ul>
+            <li>Непрерывная поверхность редактора</li>
+            <li>Компактный список исходников</li>
+            <li>Более заметная временная шкала</li>
+          </ul>
+          <a class="concept-open" href="precision.html"
+            >Открыть Precision<svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14m-6-6 6 6-6 6" /></svg
+          ></a>
+        </article>
+        <article class="concept focus">
+          <a class="concept-preview" href="focus.html" aria-label="Открыть прототип Focus"
+            ><img
+              src="shots/focus-1440.png"
+              alt="Focus: спокойная зелёная монтажная с подписанной навигацией и мягкими поверхностями"
+          /></a>
+          <div class="concept-title">
+            <h2>Focus</h2>
+            <span class="concept-subtitle">Спокойный поток</span>
+          </div>
+          <p>
+            Глубокие зелёные поверхности, мягкие формы и подписанная навигация. Меньше разделителей,
+            спокойнее работа.
+          </p>
+          <ul>
+            <li>Навигация с названиями разделов</li>
+            <li>Просмотр отдельно от настроек</li>
+            <li>Единый блок каналов и запуска</li>
+          </ul>
+          <a class="concept-open" href="focus.html"
+            >Открыть Focus<svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14m-6-6 6 6-6 6" /></svg
+          ></a>
+        </article>
+      </div>
+      <footer class="gallery-footer">
+        <p>
+          Интерактивные прототипы с демонстрационными каналами и показателями. Настройки работают
+          локально; реальные публикации не выполняются. Действующий дизайн FrameFlow остаётся
+          отдельной версией.
+        </p>
+        <span>Исходники → баннер → варианты → выпуск</span>
+      </footer>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "product_name": "FrameFlow",
+  "api_pid": 5380,
+  "worker": true,
+  "native_window": true,
+  "frontend_build": "b5edd269420045f8",
+  "queue_unchanged": true,
+  "jobs": {
+    "cancelled": 4,
+    "published": 28,
+    "waiting_auth": 1
+  },
+  "stored_assets": 24,
+  "visible_assets": 23
+}

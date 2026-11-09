@@ -6,6 +6,7 @@ import '@fontsource/manrope/700.css';
 import '@fontsource/manrope/800.css';
 import '@fontsource/ibm-plex-mono/400.css';
 import './style.css';
+import './precision.css';
 import App from './App';
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

@@ -1,0 +1,10 @@
+{
+  "backup": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\data\\backups\\before-precision-mono-20261106-220543.sqlite3",
+  "jobs": {
+    "cancelled": 4,
+    "published": 28,
+    "waiting_auth": 1
+  },
+  "assets": 24,
+  "build": "b5edd269420045f8"
+}

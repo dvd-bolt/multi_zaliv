@@ -1,0 +1,32 @@
+{
+  "checked_at": "07.11.2026, 01:57 МСК",
+  "text_probe": {
+    "probe": "small_text",
+    "http_status": 200,
+    "seconds": 6.31,
+    "has_candidates": true
+  },
+  "video_probe": {
+    "state": "ready",
+    "seconds": 39.18,
+    "model": "gemini-3.1-flash-lite",
+    "cached": true
+  },
+  "tests": {
+    "pytest_gemini": 29,
+    "ui_fake_requests": 3,
+    "build": true,
+    "ruff": true
+  },
+  "after_launch": {
+    "api_pid": 15588,
+    "worker": true,
+    "cached_get": "ready",
+    "cached_post": "ready",
+    "jobs": {
+      "published": 29,
+      "cancelled": 4,
+      "waiting_auth": 1
+    }
+  }
+}

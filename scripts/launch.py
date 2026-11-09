@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from backend.config import DATA, PORT, binary  # noqa: E402
+from backend.config import DATA, PORT, binary, python_binary  # noqa: E402
 
 
 def ensure_services():
@@ -19,7 +19,7 @@ def ensure_services():
         raise RuntimeError("Сначала выполните scripts/setup.ps1")
     log_dir = DATA / "logs"
     flags = subprocess.CREATE_NO_WINDOW
-    python = str(ROOT / ".venv" / "Scripts" / "python.exe")
+    python = str(python_binary())
     base = f"http://127.0.0.1:{PORT}"
     try:
         with urllib.request.urlopen(base + "/api/state", timeout=2) as response:
@@ -29,6 +29,7 @@ def ensure_services():
             subprocess.Popen(
                 [
                     python,
+                    "-B",
                     "-m",
                     "uvicorn",
                     "backend.app:app",
@@ -65,7 +66,7 @@ def ensure_services():
     # safely rejects an extra launch when another worker is actually still running.
     with (log_dir / "worker.log").open("ab") as output:
         subprocess.Popen(
-            [python, "-m", "backend.worker"], cwd=ROOT, stdout=output, stderr=output, creationflags=flags
+            [python, "-B", "-m", "backend.worker"], cwd=ROOT, stdout=output, stderr=output, creationflags=flags
         )
     return base
 

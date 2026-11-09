@@ -18,13 +18,14 @@ export function useGemini(
   buba: boolean,
   fixedTags: string[],
   apply: (value: { title: string; caption: string }) => void,
+  automaticTags: string[] = [],
 ) {
   const [status, setStatus] = useState('');
   const [running, setRunning] = useState(false);
   const [failed, setFailed] = useState(false);
   const [proposal, setProposal] = useState<Proposal | null>(null);
-  const latest = useRef({ assetId, caption, title, buba, fixedTags, apply });
-  latest.current = { assetId, caption, title, buba, fixedTags, apply };
+  const latest = useRef({ assetId, caption, title, buba, fixedTags, apply, automaticTags });
+  latest.current = { assetId, caption, title, buba, fixedTags, apply, automaticTags };
   const sequence = useRef(0);
 
   function applyProposal(p: Proposal) {
@@ -47,7 +48,8 @@ export function useGemini(
     setProposal(null);
     try {
       let task = await api<Task>(`/assets/${initial.assetId}/ai-caption`, 'POST', { force });
-      for (let i = 0; task.state === 'running' && i < 180; i++) {
+      // Allow source preparation and the bounded four-model fallback to finish.
+      for (let i = 0; task.state === 'running' && i < 360; i++) {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         if (generation !== sequence.current) return;
         task = await api<Task>(`/assets/${initial.assetId}/ai-caption`);
@@ -90,7 +92,7 @@ export function useGemini(
             !current.title.trim() &&
             !current.caption
               .replace(/#[\p{L}\p{N}_]+/gu, (tag) =>
-                [...current.fixedTags, '#бубавпн'].some(
+                [...current.fixedTags, ...current.automaticTags, '#бубавпн'].some(
                   (fixed) => fixed.toLowerCase() === tag.toLowerCase(),
                 )
                   ? ''

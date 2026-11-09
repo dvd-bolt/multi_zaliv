@@ -70,6 +70,7 @@ def setup(tmp_path, monkeypatch):
             "paused": True,
             "buba_required": False,
             "interval": 0,
+            "tiktok_copyright": "warn",
         }
     writes = []
 
@@ -254,8 +255,9 @@ def test_verified_tiktok_autopublishes_without_validation_button(setup, monkeypa
         account = db.get(Account, body["account_ids"][0])
         account.platform, account.method, account.external_id = "tiktok", "browser_verified", "synthetic.test"
 
-    def upload(token, output, config, expected, *, before_post):
+    def upload(token, output, config, expected, *, before_post, sound=None, copyright="off"):
         assert expected == "synthetic.test" and Path(output).is_file()
+        assert sound is None and copyright == "warn"
         before_post()
         sent.append(True)
         return tiktok_upload.UploadResult(
@@ -368,8 +370,9 @@ def test_full_three_by_six_batch_renders_and_dispatches_once(setup, tmp_path, mo
             sent["youtube"].append(kwargs["body"])
             return Result({"id": f"BULKx{len(sent['youtube']):06d}"})
 
-    def upload(token, output, config, expected, *, before_post):
+    def upload(token, output, config, expected, *, before_post, sound=None, copyright="off"):
         assert expected.startswith("qa.bulk.") and Path(output).is_file()
+        assert sound is None and copyright == "warn"
         before_post()
         sent["tiktok"].append(config)
         vid = str(7701010935195962000 + len(sent["tiktok"]))

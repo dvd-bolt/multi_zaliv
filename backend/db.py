@@ -103,6 +103,55 @@ class Setting(Base):
     value: Mapped[dict] = mapped_column(JSON)
 
 
+class PublicationStats(Base):
+    """Derived public counters; milestones survive pruning a channel's recent history."""
+
+    __tablename__ = "publication_stats"
+    account_id: Mapped[str] = mapped_column(String, primary_key=True)
+    external_id: Mapped[str] = mapped_column(String, primary_key=True)
+    published_at: Mapped[str | None] = mapped_column(String, nullable=True)
+    publication_source: Mapped[str | None] = mapped_column(String, nullable=True)
+    milestones: Mapped[dict] = mapped_column(JSON, default=dict)
+    latest: Mapped[dict] = mapped_column(JSON, default=dict)
+
+
+class Story(Base):
+    __tablename__ = "stories"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=uid)
+    title: Mapped[str] = mapped_column(String)
+    revision: Mapped[int] = mapped_column(Integer, default=1)
+    document: Mapped[dict] = mapped_column(JSON, default=dict)
+    created: Mapped[str] = mapped_column(String, default=now)
+    updated: Mapped[str] = mapped_column(String, default=now)
+
+
+class StoryFile(Base):
+    __tablename__ = "story_files"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=uid)
+    kind: Mapped[str] = mapped_column(String)
+    name: Mapped[str] = mapped_column(String)
+    category: Mapped[str] = mapped_column(String, default="")
+    path: Mapped[str] = mapped_column(String)
+    sha256: Mapped[str] = mapped_column(String)
+    media: Mapped[dict] = mapped_column(JSON)
+    created: Mapped[str] = mapped_column(String, default=now)
+
+
+class StoryTask(Base):
+    __tablename__ = "story_tasks"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=uid)
+    story_id: Mapped[str] = mapped_column(ForeignKey("stories.id"))
+    revision: Mapped[int] = mapped_column(Integer)
+    kind: Mapped[str] = mapped_column(String)
+    parts: Mapped[list] = mapped_column(JSON)
+    status: Mapped[str] = mapped_column(String, default="queued")
+    progress: Mapped[float] = mapped_column(Float, default=0)
+    detail: Mapped[str] = mapped_column(String, default="В очереди")
+    error: Mapped[str | None] = mapped_column(String, nullable=True)
+    created: Mapped[str] = mapped_column(String, default=now)
+    updated: Mapped[str] = mapped_column(String, default=now)
+
+
 class BubaSubmission(Base):
     __tablename__ = "buba_submissions"
     job_id: Mapped[str] = mapped_column(ForeignKey("jobs.id"), primary_key=True)
@@ -214,6 +263,13 @@ def migrate():
             if "extras" not in columns:
                 conn.execute(text("ALTER TABLE jobs ADD COLUMN extras JSON NOT NULL DEFAULT '{}'"))
             conn.execute(text("INSERT INTO schema_migrations VALUES (9)"))
+        if version < 10:
+            PublicationStats.__table__.create(conn, checkfirst=True)
+            conn.execute(text("INSERT INTO schema_migrations VALUES (10)"))
+        if version < 11:
+            for table in (Story.__table__, StoryFile.__table__, StoryTask.__table__):
+                table.create(conn, checkfirst=True)
+            conn.execute(text("INSERT INTO schema_migrations VALUES (11)"))
     with Session.begin() as db:
         if not db.get(Setting, "application"):
             db.add(Setting(key="application", value=DEFAULTS.copy()))

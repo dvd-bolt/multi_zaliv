@@ -27,4 +27,7 @@ cookies*.txt
 storage_state*.json
 *.log
 *.tsbuildinfo
+build/
+dist/
+releases/
 

@@ -1,0 +1,481 @@
+{
+  "isolatedData": "C:\\Users\\dvd\\AppData\\Local\\Temp\\frameflow-story-ui-lOY6yV",
+  "realTtsRequestsInUi": 0,
+  "checks": [
+    "Averages use controlled observations and show n",
+    "Platforms remain separate",
+    "Actual local speech recognition, observed timing, editable SRT and review gate",
+    "Two actual speech parts rendered by the durable story worker",
+    "Transfer to existing editor creates an asset and no publication",
+    "Script import separates metadata and persists two parts"
+  ],
+  "layouts": [
+    {
+      "width": 1024,
+      "height": 600,
+      "tab": "Сценарий",
+      "w": 1024,
+      "h": 600,
+      "panel": {
+        "x": 234,
+        "y": 237.765625,
+        "width": 562,
+        "height": 248.234375,
+        "top": 237.765625,
+        "right": 796,
+        "bottom": 486,
+        "left": 234
+      },
+      "actions": {
+        "x": 234,
+        "y": 493,
+        "width": 562,
+        "height": 41,
+        "top": 493,
+        "right": 796,
+        "bottom": 534,
+        "left": 234
+      },
+      "children": [
+        {
+          "tag": "DIV",
+          "bottom": 267.765625
+        },
+        {
+          "tag": "TEXTAREA",
+          "bottom": 463.609375
+        },
+        {
+          "tag": "DIV",
+          "bottom": 486
+        }
+      ]
+    },
+    {
+      "width": 1024,
+      "height": 600,
+      "tab": "Голос",
+      "w": 1024,
+      "h": 600,
+      "panel": {
+        "x": 234,
+        "y": 237.765625,
+        "width": 562,
+        "height": 248.234375,
+        "top": 237.765625,
+        "right": 796,
+        "bottom": 486,
+        "left": 234
+      },
+      "actions": {
+        "x": 234,
+        "y": 493,
+        "width": 562,
+        "height": 41,
+        "top": 493,
+        "right": 796,
+        "bottom": 534,
+        "left": 234
+      },
+      "children": [
+        {
+          "tag": "DIV",
+          "bottom": 263.765625
+        },
+        {
+          "tag": "DIV",
+          "bottom": 323.5625
+        },
+        {
+          "tag": "LABEL",
+          "bottom": 400.359375
+        },
+        {
+          "tag": "DIV",
+          "bottom": 437.359375
+        },
+        {
+          "tag": "P",
+          "bottom": 475.140625
+        }
+      ]
+    },
+    {
+      "width": 1024,
+      "height": 600,
+      "tab": "Фон",
+      "w": 1024,
+      "h": 600,
+      "panel": {
+        "x": 234,
+        "y": 237.765625,
+        "width": 562,
+        "height": 248.234375,
+        "top": 237.765625,
+        "right": 796,
+        "bottom": 486,
+        "left": 234
+      },
+      "actions": {
+        "x": 234,
+        "y": 493,
+        "width": 562,
+        "height": 41,
+        "top": 493,
+        "right": 796,
+        "bottom": 534,
+        "left": 234
+      },
+      "children": [
+        {
+          "tag": "DIV",
+          "bottom": 278.5625
+        },
+        {
+          "tag": "LABEL",
+          "bottom": 326.359375
+        },
+        {
+          "tag": "DIV",
+          "bottom": 364.359375
+        },
+        {
+          "tag": "DIV",
+          "bottom": 401.15625
+        },
+        {
+          "tag": "DIV",
+          "bottom": 438.15625
+        },
+        {
+          "tag": "P",
+          "bottom": 475.9375
+        }
+      ]
+    },
+    {
+      "width": 1024,
+      "height": 600,
+      "tab": "Субтитры",
+      "w": 1024,
+      "h": 600,
+      "panel": {
+        "x": 234,
+        "y": 237.765625,
+        "width": 562,
+        "height": 248.234375,
+        "top": 237.765625,
+        "right": 796,
+        "bottom": 486,
+        "left": 234
+      },
+      "actions": {
+        "x": 234,
+        "y": 493,
+        "width": 562,
+        "height": 41,
+        "top": 493,
+        "right": 796,
+        "bottom": 534,
+        "left": 234
+      },
+      "children": [
+        {
+          "tag": "DIV",
+          "bottom": 267.765625
+        },
+        {
+          "tag": "TEXTAREA",
+          "bottom": 400.421875
+        },
+        {
+          "tag": "DIV",
+          "bottom": 448.21875
+        },
+        {
+          "tag": "P",
+          "bottom": 486
+        }
+      ]
+    },
+    {
+      "width": 1024,
+      "height": 600,
+      "tab": "Выпуск",
+      "w": 1024,
+      "h": 600,
+      "panel": {
+        "x": 234,
+        "y": 237.765625,
+        "width": 562,
+        "height": 248.234375,
+        "top": 237.765625,
+        "right": 796,
+        "bottom": 486,
+        "left": 234
+      },
+      "actions": {
+        "x": 234,
+        "y": 493,
+        "width": 562,
+        "height": 41,
+        "top": 493,
+        "right": 796,
+        "bottom": 534,
+        "left": 234
+      },
+      "children": [
+        {
+          "tag": "DIV",
+          "bottom": 290.5625
+        },
+        {
+          "tag": "P",
+          "bottom": 314.359375
+        },
+        {
+          "tag": "P",
+          "bottom": 352.140625
+        },
+        {
+          "tag": "DIV",
+          "bottom": 389.140625
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "tab": "Сценарий",
+      "w": 1440,
+      "h": 900,
+      "panel": {
+        "x": 252,
+        "y": 248.765625,
+        "width": 928,
+        "height": 531.234375,
+        "top": 248.765625,
+        "right": 1180,
+        "bottom": 780,
+        "left": 252
+      },
+      "actions": {
+        "x": 252,
+        "y": 790,
+        "width": 928,
+        "height": 41,
+        "top": 790,
+        "right": 1180,
+        "bottom": 831,
+        "left": 252
+      },
+      "children": [
+        {
+          "tag": "DIV",
+          "bottom": 278.765625
+        },
+        {
+          "tag": "TEXTAREA",
+          "bottom": 753.203125
+        },
+        {
+          "tag": "DIV",
+          "bottom": 780
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "tab": "Голос",
+      "w": 1440,
+      "h": 900,
+      "panel": {
+        "x": 252,
+        "y": 248.765625,
+        "width": 928,
+        "height": 531.234375,
+        "top": 248.765625,
+        "right": 1180,
+        "bottom": 780,
+        "left": 252
+      },
+      "actions": {
+        "x": 252,
+        "y": 790,
+        "width": 928,
+        "height": 41,
+        "top": 790,
+        "right": 1180,
+        "bottom": 831,
+        "left": 252
+      },
+      "children": [
+        {
+          "tag": "DIV",
+          "bottom": 274.765625
+        },
+        {
+          "tag": "DIV",
+          "bottom": 337.5625
+        },
+        {
+          "tag": "LABEL",
+          "bottom": 433.75
+        },
+        {
+          "tag": "DIV",
+          "bottom": 473.75
+        },
+        {
+          "tag": "P",
+          "bottom": 517.34375
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "tab": "Фон",
+      "w": 1440,
+      "h": 900,
+      "panel": {
+        "x": 252,
+        "y": 248.765625,
+        "width": 928,
+        "height": 531.234375,
+        "top": 248.765625,
+        "right": 1180,
+        "bottom": 780,
+        "left": 252
+      },
+      "actions": {
+        "x": 252,
+        "y": 790,
+        "width": 928,
+        "height": 41,
+        "top": 790,
+        "right": 1180,
+        "bottom": 831,
+        "left": 252
+      },
+      "children": [
+        {
+          "tag": "DIV",
+          "bottom": 289.5625
+        },
+        {
+          "tag": "LABEL",
+          "bottom": 340.359375
+        },
+        {
+          "tag": "DIV",
+          "bottom": 381.359375
+        },
+        {
+          "tag": "DIV",
+          "bottom": 421.15625
+        },
+        {
+          "tag": "DIV",
+          "bottom": 461.15625
+        },
+        {
+          "tag": "P",
+          "bottom": 487.953125
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "tab": "Субтитры",
+      "w": 1440,
+      "h": 900,
+      "panel": {
+        "x": 252,
+        "y": 248.765625,
+        "width": 928,
+        "height": 531.234375,
+        "top": 248.765625,
+        "right": 1180,
+        "bottom": 780,
+        "left": 252
+      },
+      "actions": {
+        "x": 252,
+        "y": 790,
+        "width": 928,
+        "height": 41,
+        "top": 790,
+        "right": 1180,
+        "bottom": 831,
+        "left": 252
+      },
+      "children": [
+        {
+          "tag": "DIV",
+          "bottom": 278.765625
+        },
+        {
+          "tag": "TEXTAREA",
+          "bottom": 702.40625
+        },
+        {
+          "tag": "DIV",
+          "bottom": 753.203125
+        },
+        {
+          "tag": "P",
+          "bottom": 780
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "tab": "Выпуск",
+      "w": 1440,
+      "h": 900,
+      "panel": {
+        "x": 252,
+        "y": 248.765625,
+        "width": 928,
+        "height": 531.234375,
+        "top": 248.765625,
+        "right": 1180,
+        "bottom": 780,
+        "left": 252
+      },
+      "actions": {
+        "x": 252,
+        "y": 790,
+        "width": 928,
+        "height": 41,
+        "top": 790,
+        "right": 1180,
+        "bottom": 831,
+        "left": 252
+      },
+      "children": [
+        {
+          "tag": "DIV",
+          "bottom": 301.5625
+        },
+        {
+          "tag": "P",
+          "bottom": 328.359375
+        },
+        {
+          "tag": "P",
+          "bottom": 355.15625
+        },
+        {
+          "tag": "DIV",
+          "bottom": 395.15625
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

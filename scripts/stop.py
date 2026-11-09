@@ -41,7 +41,9 @@ def main():
             "if ($p) { @{command=$p.CommandLine; created=$p.CreationDate.ToUniversalTime().ToString('o')} | ConvertTo-Json -Compress }"
         )
         result = subprocess.run(
-            ["powershell", "-NoProfile", "-Command", script],
+            [str(Path(os.environ.get("WINDIR", "C:/Windows")) /
+                 "System32/WindowsPowerShell/v1.0/powershell.exe"), "-NoProfile", "-Command",
+             "[Console]::OutputEncoding=[Text.UTF8Encoding]::new($false);" + script],
             capture_output=True,
             check=False,
             creationflags=subprocess.CREATE_NO_WINDOW,

@@ -8,8 +8,8 @@
     },
     {
       "name": "banner",
-      "top": 108.609375,
-      "bottom": 491.375,
+      "top": 91.8125,
+      "bottom": 508.171875,
       "scroll": false
     },
     {
@@ -20,14 +20,14 @@
     },
     {
       "name": "checks-ready",
-      "top": 58.515625,
-      "bottom": 541.484375,
+      "top": 48.125,
+      "bottom": 551.875,
       "scroll": false
     },
     {
       "name": "job-rules",
-      "top": 136.5,
-      "bottom": 463.484375,
+      "top": 131.109375,
+      "bottom": 468.875,
       "scroll": false
     },
     {
@@ -50,7 +50,7 @@
     }
   ],
   "geometry": {
-    "area": 25.99744496855346,
+    "area": 27.996191756272403,
     "centerX": 0.5,
     "centerY": 0.5
   },

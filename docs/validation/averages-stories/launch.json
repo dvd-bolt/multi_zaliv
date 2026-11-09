@@ -1,0 +1,27 @@
+{
+  "backup": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\data\\backups\\before-extensions-launch-20261107-231716.sqlite3",
+  "quick_check": "ok",
+  "jobs_before": {
+    "cancelled": 4,
+    "published": 30,
+    "waiting_auth": 1
+  },
+  "assets_before": 25,
+  "accounts_before": 4,
+  "pid": 20628,
+  "worker": true,
+  "schema": 11,
+  "quick_check_after": "ok",
+  "jobs_after": {
+    "cancelled": 4,
+    "published": 30,
+    "waiting_auth": 1
+  },
+  "assets_after": 25,
+  "accounts_after": 4,
+  "real_stories": 0,
+  "youtube_count": 23,
+  "hour_n": 9,
+  "day_n": 13,
+  "build": "5665070353e9b52f"
+}

@@ -16,6 +16,7 @@ import {
   Users,
   ChartNoAxesCombined,
   Settings2,
+  Image as ImageIcon,
   Plus,
   Play,
   Pause,
@@ -27,6 +28,7 @@ import {
   Save,
   Download,
   Trash2,
+  BookOpen,
 } from 'lucide-react';
 import {
   adStart,
@@ -41,6 +43,7 @@ import {
   type State,
 } from './api';
 import Stats from './Stats';
+import Stories from './Stories';
 import ChannelVideos from './ChannelVideos';
 import { GeminiSettings, useGemini } from './Gemini';
 
@@ -166,8 +169,13 @@ function Modal({
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const element = ref.current!;
+    const trigger = document.activeElement;
     element.showModal();
-    return () => element.close();
+    return () => {
+      element.close();
+      if (trigger instanceof HTMLElement && trigger.isConnected)
+        trigger.focus({ preventScroll: true });
+    };
   }, []);
   return (
     <dialog
@@ -268,6 +276,8 @@ function History({ rows }: { rows: Metric[] }) {
 }
 
 export default function App() {
+  const inspectorId = useId();
+  const [storyDirty, setStoryDirty] = useState(false);
   const [data, setData] = useState<State | null>(null),
     [view, setView] = useState('editor'),
     [message, setMessage] = useState(''),
@@ -413,13 +423,13 @@ export default function App() {
         });
   }, [view]);
   useEffect(() => {
-    if (!dirty) return;
+    if (!dirty && !storyDirty) return;
     const warn = (e: BeforeUnloadEvent) => {
       e.preventDefault();
     };
     window.addEventListener('beforeunload', warn);
     return () => window.removeEventListener('beforeunload', warn);
-  }, [dirty]);
+  }, [dirty, storyDirty]);
   useEffect(() => {
     const sync = () => {
       const host = window as Window & {
@@ -427,12 +437,12 @@ export default function App() {
           api?: { set_dirty?: (value: boolean) => Promise<unknown> };
         };
       };
-      void host.pywebview?.api?.set_dirty?.(dirty)?.catch(() => {});
+      void host.pywebview?.api?.set_dirty?.(dirty || storyDirty)?.catch(() => {});
     };
     sync();
     window.addEventListener('pywebviewready', sync);
     return () => window.removeEventListener('pywebviewready', sync);
-  }, [dirty]);
+  }, [dirty, storyDirty]);
   const videos = data?.assets.filter((a) => a.kind === 'video') ?? [];
   const asset = videos.find((a) => a.id === selected);
   useEffect(() => {
@@ -500,6 +510,11 @@ export default function App() {
     !!draft?.buba_mode,
     [], // genre tags are added on save (backend, up to 5 in total)
     patch,
+    draft?.auto_hashtags
+      ? (data?.genres?.[draft.genre === 'auto' ? 'story' : (draft.genre ?? 'story')]?.tags ??
+          data?.default_hashtags ??
+          [])
+      : [],
   );
   const save = async () => {
     if (!asset || !draft) return;
@@ -760,7 +775,7 @@ export default function App() {
   };
   return (
     <div id="sf-editors">
-      <div className="ed classic" aria-busy={busy}>
+      <div className="ed precision" aria-busy={busy}>
         <input
           hidden
           ref={metricFile}
@@ -827,15 +842,17 @@ export default function App() {
         <header className="e-head">
           <div className="e-row">
             <span className="e-logo">
-              frame<b>flow</b>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                <path d="M4 8V4h4m8 0h4v4M4 16v4h4m8 0h4v-4M8 8h8v8H8z" />
+              </svg>
+              FrameFlow
             </span>
-            <span className="e-badge">LOCAL · 0.1</span>
             <span className="e-project" title={data.settings.project_name}>
               {data.settings.project_name}
             </span>
           </div>
           <div className="e-row">
-            <span className={'e-badge ' + (data.worker ? 'good' : 'bad')}>
+            <span className={'e-badge e-head-state ' + (data.worker ? 'good' : 'bad')}>
               {data.worker ? 'Процесс работает' : 'Процесс не запущен'}
             </span>
             <Button
@@ -859,6 +876,7 @@ export default function App() {
           <nav className="e-nav" aria-label="Разделы">
             {[
               [Clapperboard, 'editor', 'Монтаж'],
+              [BookOpen, 'stories', 'Истории'],
               [ListVideo, 'queue', 'Очередь'],
               [Users, 'channels', 'Каналы'],
               [ChartNoAxesCombined, 'stats', 'Статистика'],
@@ -869,6 +887,7 @@ export default function App() {
                 <button
                   key={String(key)}
                   aria-pressed={view === key}
+                  disabled={storyDirty && key !== 'stories'}
                   onClick={() => setView(String(key))}
                 >
                   <Glyph />
@@ -890,6 +909,7 @@ export default function App() {
                       <button
                         className="e-source-select"
                         disabled={busy}
+                        aria-pressed={a.id === selected}
                         onClick={() => selectAsset(a)}
                       >
                         <div
@@ -899,17 +919,17 @@ export default function App() {
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
                           }}
-                        >
-                          <span>{clock(a.media.duration)}</span>
-                        </div>
-                        <span className="e-source-title" title={a.name}>
-                          {a.name}
+                        />
+                        <span className="e-source-info">
+                          <span className="e-source-title" title={a.name}>
+                            {a.name}
+                          </span>
+                          <span className="e-source-meta">
+                            {clock(a.media.duration)} · {a.media.width}×{a.media.height}
+                          </span>
                         </span>
                       </button>
                       <div className="e-source-tools">
-                        <span>
-                          {a.media.width}×{a.media.height}
-                        </span>
                         <button
                           aria-label={`Убрать ${a.name} из списка`}
                           title="Убрать из монтажной"
@@ -943,7 +963,10 @@ export default function App() {
                 </aside>
                 <section className="e-viewer">
                   <div className="e-viewer-heading">
-                    <span>ПРЕДПРОСМОТР · 9:16</span>
+                    <span className="e-viewer-filename" title={asset?.name}>
+                      <Play size={12} />
+                      <span className="truncate">{asset?.name ?? 'Предпросмотр · 9:16'}</span>
+                    </span>
                     <span>{draft?.format ?? '1080'}p</span>
                   </div>
                   <div className="e-preview" ref={preview}>
@@ -1160,7 +1183,16 @@ export default function App() {
                     <span>{clock(previewLength / 2)}</span>
                     <span>{clock(previewLength)}</span>
                   </div>
-                  <div className="e-track">{asset?.name ?? 'Видеодорожка'}</div>
+                  <div
+                    className={'e-track' + (asset ? ' has-source' : '')}
+                    style={
+                      asset
+                        ? { backgroundImage: `url(/api/assets/${asset.id}/thumbnail)` }
+                        : undefined
+                    }
+                  >
+                    <span className="e-track-label">{asset?.name ?? 'Видеодорожка'}</span>
+                  </div>
                   <div className="e-track banner">
                     {asset && draft && (
                       <span
@@ -1191,21 +1223,49 @@ export default function App() {
                 <aside className="e-inspector">
                   <div className="e-tabs" role="tablist" aria-label="Настройки ролика">
                     {[
-                      ['banner', 'Баннер'],
-                      ['filters', 'Варианты'],
-                      ['publish', 'Публикация'],
-                    ].map(([key, name]) => (
-                      <button
-                        role="tab"
-                        aria-selected={tab === key}
-                        key={key}
-                        onClick={() => setTab(key)}
-                      >
-                        {name}
-                      </button>
-                    ))}
+                      ['banner', 'Баннер', ImageIcon],
+                      ['filters', 'Варианты', Settings2],
+                      ['publish', 'Публикация', Upload],
+                    ].map(([key, name, Glyph]) => {
+                      const id = String(key);
+                      const TabIcon = Glyph as typeof ImageIcon;
+                      return (
+                        <button
+                          role="tab"
+                          id={`${inspectorId}-${id}`}
+                          aria-controls={`${inspectorId}-panel`}
+                          aria-selected={tab === id}
+                          tabIndex={tab === id ? 0 : -1}
+                          key={id}
+                          onClick={() => setTab(id)}
+                          onKeyDown={(event) => {
+                            if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key))
+                              return;
+                            event.preventDefault();
+                            const keys = ['banner', 'filters', 'publish'];
+                            const next =
+                              event.key === 'Home'
+                                ? 0
+                                : event.key === 'End'
+                                  ? 2
+                                  : (keys.indexOf(id) + (event.key === 'ArrowRight' ? 1 : -1) + 3) %
+                                    3;
+                            setTab(keys[next]);
+                            document.getElementById(`${inspectorId}-${keys[next]}`)?.focus();
+                          }}
+                        >
+                          <TabIcon size={13} />
+                          <span>{String(name)}</span>
+                        </button>
+                      );
+                    })}
                   </div>
-                  <div data-inspector role="tabpanel">
+                  <div
+                    data-inspector
+                    role="tabpanel"
+                    id={`${inspectorId}-panel`}
+                    aria-labelledby={`${inspectorId}-${tab}`}
+                  >
                     {!draft ? (
                       <p className="e-muted">Загрузите видео, чтобы открыть настройки.</p>
                     ) : tab === 'banner' ? (
@@ -1887,6 +1947,31 @@ export default function App() {
                     setPayouts(await api('/payouts'));
                   }, 'Статус заявки обновлён')
                 }
+              />
+            )}
+            {view === 'stories' && (
+              <Stories
+                onDirtyChange={setStoryDirty}
+                paused={data.settings.paused}
+                onReady={(next) => {
+                  void run(async () => {
+                    if (dirty) await save();
+                    setData((current) =>
+                      current
+                        ? {
+                            ...current,
+                            assets: [...current.assets.filter((a) => a.id !== next.id), next],
+                          }
+                        : current,
+                    );
+                    setSelected(next.id);
+                    setDraft(next.edit);
+                    setDirty(false);
+                    setTime(0);
+                    setPlaying(false);
+                    setView('editor');
+                  });
+                }}
               />
             )}
             {view === 'settings' && (

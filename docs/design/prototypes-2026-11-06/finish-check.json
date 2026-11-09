@@ -1,0 +1,57 @@
+{
+  "checks": [
+    {
+      "name": "gallery-1440",
+      "ok": true
+    },
+    {
+      "name": "gallery-1024",
+      "ok": true
+    },
+    {
+      "name": "gallery-390",
+      "ok": true
+    },
+    {
+      "name": "gallery-320",
+      "ok": true
+    },
+    {
+      "name": "studio: reduced motion",
+      "ok": true
+    },
+    {
+      "name": "studio: zero channels blocked",
+      "ok": true
+    },
+    {
+      "name": "studio: settings survive reload",
+      "ok": true
+    },
+    {
+      "name": "precision: reduced motion",
+      "ok": true
+    },
+    {
+      "name": "precision: zero channels blocked",
+      "ok": true
+    },
+    {
+      "name": "precision: settings survive reload",
+      "ok": true
+    },
+    {
+      "name": "focus: reduced motion",
+      "ok": true
+    },
+    {
+      "name": "focus: zero channels blocked",
+      "ok": true
+    },
+    {
+      "name": "focus: settings survive reload",
+      "ok": true
+    }
+  ],
+  "errors": []
+}

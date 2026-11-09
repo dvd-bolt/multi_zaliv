@@ -1,0 +1,17 @@
+{
+  "backup_source": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\data\\backups\\before-averages-stories-20261107-221002\\survivalflow.sqlite3",
+  "isolated_copy": "C:\\Users\\dvd\\AppData\\Local\\Temp\\frameflow-migration-4ueuggrc",
+  "schema": 11,
+  "quick_check": "ok",
+  "counts": {
+    "jobs": 35,
+    "assets": 26,
+    "accounts": 4,
+    "metrics": 3250,
+    "channel_videos": 24
+  },
+  "profile_count": 31,
+  "youtube_count": 23,
+  "hour_n": 9,
+  "day_n": 12
+}

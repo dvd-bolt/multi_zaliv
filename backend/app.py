@@ -65,6 +65,7 @@ from .schemas import (
     SettingsUpdate,
     TikTokConfirmation,
 )
+from .stories import router as stories_router
 from .tiktok_login import begin_tiktok, confirm_login, return_to_tiktok
 
 app = FastAPI(title="FrameFlow", docs_url="/api/docs", redoc_url=None)
@@ -137,6 +138,8 @@ def asset_data(asset):
 
 
 def job_data(db, job):
+    from .analytics import publication_info
+
     variant = db.get(Variant, job.variant_id)
     account = db.get(Account, variant.account_id)
     asset = db.get(Asset, variant.asset_id)
@@ -167,6 +170,7 @@ def job_data(db, job):
         "asset_id": asset.id,
         "config": variant.config,
         "has_output": bool(variant.output and Path(variant.output).exists()),
+        **publication_info(db, account.id, job.external_id),
     }
 
 
@@ -873,6 +877,19 @@ def metrics():
         ] + external_statistics(db)["metrics"]
 
 
+@app.get("/api/analytics/averages")
+def averages(platform: str = "youtube", account_id: str | None = None, days: int = 30,
+             content_format: str = "all"):
+    from .analytics import report
+
+    if platform not in ("youtube", "tiktok") or days not in (0, 7, 14, 30, 90):
+        raise ValueError("Выберите платформу и период")
+    if content_format not in ("all", "unknown", "story", "animation"):
+        raise ValueError("Неизвестный формат")
+    with Session.begin() as db:
+        return report(db, platform, account_id, days, content_format)
+
+
 @app.get("/api/accounts/{key}/videos")
 def channel_videos(key: str):
     from .youtube_library import library
@@ -1046,6 +1063,8 @@ def cleanup():
         days = settings(db)["retention_days"]
     return cleanup_exports(days)
 
+
+app.include_router(stories_router)
 
 dist = ROOT / "frontend" / "dist"
 if dist.exists():

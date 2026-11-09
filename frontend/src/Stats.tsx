@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { Job, Metric, Payout, State } from './api';
 import { channelSummaries, latestMetrics } from './statistics';
+import Averages from './Averages';
 
 // Statistics dashboard. Counters are cumulative snapshots: growth is computed between snapshots,
 // platforms are never summed into one number, missing data is shown as «—», not zero.
@@ -17,7 +18,7 @@ const PHASE: Record<Payout['phase'], [string, string]> = {
   expired: ['Срок прошёл', 'bad'],
 };
 
-type Tab = 'overview' | 'videos' | 'channels' | 'payouts';
+type Tab = 'overview' | 'videos' | 'averages' | 'channels' | 'payouts';
 type Props = {
   data: State;
   metrics: Metric[];
@@ -42,8 +43,9 @@ const short = (v: number | null | undefined) => {
 };
 const views = (m?: Metric) =>
   typeof m?.values.views === 'number' ? (m.values.views as number) : null;
-const published = (j: Job) => Date.parse(j.upload_started_at || j.updated);
+const published = (j: Job) => Date.parse(j.published_at || '');
 const age = (ms: number) => {
+  if (!Number.isFinite(ms)) return '—';
   const h = Math.max(0, Math.floor(ms / 3_600_000));
   return h < 48 ? `${h} ч` : `${Math.floor(h / 24)} д`;
 };
@@ -156,7 +158,12 @@ type SortKey = 'views' | 'speed' | 'growth' | 'day1' | 'likes' | 'comments' | 'e
 const sortValue = (
   r: Record<Exclude<SortKey, 'age'>, number | null> & { job: Job },
   key: SortKey,
-) => (key === 'age' ? Date.now() - published(r.job) : r[key]);
+) =>
+  key === 'age'
+    ? Number.isFinite(published(r.job))
+      ? Date.now() - published(r.job)
+      : null
+    : r[key];
 
 export default function Stats(p: Props) {
   const [tab, setTab] = useState<Tab>('overview');
@@ -190,7 +197,6 @@ export default function Stats(p: Props) {
       const before = [...list].reverse().find((m) => Date.parse(m.captured) <= lastAt - DAY);
       const hours = (from: Metric, to: Metric) =>
         Math.max(1, (Date.parse(to.captured) - Date.parse(from.captured)) / 3_600_000);
-      const at24 = list.filter((m) => Date.parse(m.captured) <= published(job) + DAY).pop();
       const v = views(last),
         likes = last?.values.likes ?? null,
         comments = last?.values.comments ?? null;
@@ -203,17 +209,18 @@ export default function Stats(p: Props) {
         // Views per hour inside the growth window: snapshots are not always exactly 24 h apart.
         rate: v !== null && before && last ? (v - views(before)!) / hours(before, last) : null,
         speed:
-          v !== null && last
+          v !== null && last && Number.isFinite(published(job))
             ? v / Math.max(1, (Date.parse(last.captured) - published(job)) / 3_600_000)
             : null,
         newComments:
           typeof comments === 'number' && typeof before?.values.comments === 'number'
             ? comments - before.values.comments
             : null,
-        day1: Date.now() - published(job) >= DAY && at24 ? views(at24) : null,
+        day1:
+          Date.now() - published(job) >= DAY ? (job.milestones?.day?.values.views ?? null) : null,
         er:
-          v && typeof likes === 'number'
-            ? ((likes + (typeof comments === 'number' ? comments : 0)) / v) * 100
+          v && typeof likes === 'number' && typeof comments === 'number'
+            ? ((likes + comments) / v) * 100
             : null,
         spark: list.map((m) => views(m)!),
         captured: last?.captured ?? null,
@@ -316,6 +323,7 @@ export default function Stats(p: Props) {
             [
               ['overview', 'Обзор'],
               ['videos', 'Ролики'],
+              ['averages', 'Средние'],
               ['channels', 'Каналы'],
               ['payouts', 'Выплаты БУБА' + (ready ? ` · ${ready}` : '')],
             ] as [Tab, string][]
@@ -334,7 +342,7 @@ export default function Stats(p: Props) {
             </button>
           ))}
         </div>
-        {tab !== 'payouts' && (
+        {tab !== 'payouts' && tab !== 'averages' && (
           <div className="st-tabs small" aria-label="Платформа">
             {(['all', 'tiktok', 'youtube'] as const).map((key) => (
               <button
@@ -348,6 +356,14 @@ export default function Stats(p: Props) {
           </div>
         )}
       </div>
+
+      {tab === 'averages' && (
+        <Averages
+          accounts={p.data.accounts}
+          revision={`${p.metrics.length}:${updated}`}
+          timezone={p.timezone}
+        />
+      )}
 
       {tab === 'overview' && (
         <>
@@ -499,7 +515,12 @@ export default function Stats(p: Props) {
                     <td className={r.growth ? 'st-up' : ''}>
                       {r.growth === null ? '—' : '+' + fmt(r.growth)}
                     </td>
-                    <td>{fmt(r.day1)}</td>
+                    <td>
+                      {r.day1 !== null && r.job.milestones?.day?.quality === 'approximate'
+                        ? '≈ '
+                        : ''}
+                      {fmt(r.day1)}
+                    </td>
                     <td>{fmt(r.likes)}</td>
                     <td>
                       {fmt(r.comments)}

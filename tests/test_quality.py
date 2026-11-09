@@ -287,7 +287,7 @@ def test_migration_preserves_a_version_one_database(tmp_path):
     assert result.returncode == 0, result.stderr.decode(errors="replace")
     with sqlite3.connect(path) as db:
         assert db.execute("SELECT name,archived FROM assets WHERE id='kept'").fetchone() == ("Keep me", 0)
-        assert db.execute("SELECT MAX(version) FROM schema_migrations").fetchone()[0] == 9
+        assert db.execute("SELECT MAX(version) FROM schema_migrations").fetchone()[0] == 11
         assert "upload_started_at" in [row[1] for row in db.execute("PRAGMA table_info(jobs)")]
         assert "validation_upload" in [row[1] for row in db.execute("PRAGMA table_info(jobs)")]
         assert "auto_publish" in [row[1] for row in db.execute("PRAGMA table_info(jobs)")]

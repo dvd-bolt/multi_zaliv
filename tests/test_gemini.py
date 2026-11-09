@@ -104,6 +104,44 @@ def test_all_timeouts_have_bounded_safe_diagnostics(monkeypatch):
     assert "synthetic-secret" not in str(error.value)
 
 
+def test_video_response_after_old_35_second_limit_is_accepted(monkeypatch):
+    calls = []
+
+    def post(url, **kwargs):
+        calls.append(url)
+        timeout = kwargs["timeout"]
+        # Reproduce a response arriving after the old timeout without a paid API call.
+        if timeout.read < 39.18:
+            raise httpx.ReadTimeout("synthetic-secret")
+        assert timeout.connect == 10 and timeout.write == 35
+        return answer()
+
+    monkeypatch.setattr(gemini.httpx, "post", post)
+    result = gemini.generate([{"inlineData": {"mimeType": "video/mp4", "data": "AA=="}}])
+    assert result["model"] == gemini.MODELS[0] and len(calls) == 1
+    assert result["failures"] == []
+
+
+@pytest.mark.parametrize(
+    ("error_type", "reason"),
+    [
+        (httpx.ReadTimeout, "ожидания ответа (90 с)"),
+        (httpx.WriteTimeout, "передачи видео (35 с)"),
+        (httpx.ConnectTimeout, "подключения (10 с)"),
+    ],
+)
+def test_timeout_diagnostics_identify_the_failed_stage(monkeypatch, error_type, reason):
+    def post(*args, **kwargs):
+        raise error_type("synthetic-secret")
+
+    monkeypatch.setattr(gemini.httpx, "post", post)
+    with pytest.raises(gemini.ModelsUnavailable) as error:
+        gemini.generate([])
+    assert len(error.value.attempts) == 4
+    assert all(reason in attempt["reason"] for attempt in error.value.attempts)
+    assert "synthetic-secret" not in str(error.value)
+
+
 @pytest.mark.parametrize(
     "response",
     [

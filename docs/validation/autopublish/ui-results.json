@@ -8,23 +8,23 @@
   "duplicateRemoteWrites": 0,
   "doubleClickSingleJob": true,
   "scheduleBounds": {
-    "top": 133.125,
-    "bottom": 466.875,
+    "top": 119.125,
+    "bottom": 480.875,
     "scroll": false
   },
   "bubaBounds": {
-    "top": 88.640625,
-    "bottom": 511.34375,
+    "top": 82.34375,
+    "bottom": 517.65625,
     "scroll": false
   },
   "bulkBounds": {
-    "top": 49.859375,
-    "bottom": 550.125,
+    "top": 43.5625,
+    "bottom": 556.4375,
     "scroll": false
   },
   "pagedBounds": {
-    "top": 29.859375,
-    "bottom": 570.125,
+    "top": 23.5625,
+    "bottom": 576.4375,
     "scroll": false
   },
   "errorBounds": {

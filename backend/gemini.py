@@ -36,6 +36,8 @@ LOCK = threading.Lock()
 TASKS = {}
 COOLDOWNS = {}
 TRANSIENT = {408, 500, 502, 503, 504}
+# Video processing can legitimately take longer than a small text request.
+GENERATE_TIMEOUT = httpx.Timeout(connect=10, read=90, write=35, pool=10)
 
 
 class ModelsUnavailable(ValueError):
@@ -117,10 +119,19 @@ def generate(parts, progress=None):
                 BASE + f"/models/{model}:generateContent",
                 headers=headers,
                 json=payload,
-                timeout=httpx.Timeout(35, connect=10),
+                timeout=GENERATE_TIMEOUT,
             )
         except httpx.HTTPError as error:
-            reason = "тайм-аут" if isinstance(error, httpx.TimeoutException) else "ошибка соединения"
+            if isinstance(error, httpx.ReadTimeout):
+                reason = "тайм-аут ожидания ответа (90 с)"
+            elif isinstance(error, httpx.WriteTimeout):
+                reason = "тайм-аут передачи видео (35 с)"
+            elif isinstance(error, httpx.ConnectTimeout):
+                reason = "тайм-аут подключения (10 с)"
+            else:
+                reason = (
+                    "тайм-аут" if isinstance(error, httpx.TimeoutException) else "ошибка соединения"
+                )
             failures.append({"model": model, "reason": reason})
             COOLDOWNS[model] = time.monotonic() + 60
             continue

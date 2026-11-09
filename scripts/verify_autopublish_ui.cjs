@@ -10,7 +10,10 @@ from backend.app import app
 from backend.db import Session,Account,Setting,Asset,Job,settings,uid
 from backend.schemas import Edit
 from backend.config import DATA
-from backend import platforms,worker
+from backend import platforms,worker,preflight
+with Session.begin() as fixture_db:
+ fixture_db.get(Setting,'application').value={**settings(fixture_db),'one_per_platform':False}
+preflight.CHECKS.update(youtube=lambda account: ('ok', 'Synthetic offline check'), tiktok=lambda account: ('ok', 'Synthetic offline check'))
 module=importlib.import_module('backend.app')
 module.ensure_queue_worker=lambda:None
 writes=[]
@@ -76,7 +79,7 @@ browser=await chromium.launch({channel:'chrome',headless:true});const p=await br
 await p.getByRole('button',{name:'В очередь · 1 вариантов',exact:true}).click();
 assert(await p.getByRole('checkbox',{name:'Автозалив после рендера',exact:true}).isChecked());await p.getByRole('list',{name:'Выбранные каналы'}).getByText('TEST ONLY channel',{exact:true}).waitFor();await p.getByRole('list',{name:'Выбранные исходники'}).getByText('Открытый доступ',{exact:true}).waitFor();
 await p.locator('input[type=datetime-local]').fill(new Date(Date.now()+3*3600*1000+120000).toISOString().slice(0,16));
-async function shot(name){const bounds=await p.getByRole('dialog').evaluate(e=>({top:e.getBoundingClientRect().top,bottom:e.getBoundingClientRect().bottom,scroll:e.scrollHeight>e.clientHeight}));await p.screenshot({path:path.join(out,name+'.png')});assert(bounds.top>=0&&bounds.bottom<=600&&!bounds.scroll,JSON.stringify(bounds));return bounds}
+async function shot(name){await p.evaluate(()=>document.fonts.ready);await p.screenshot({path:path.join(out,name+'.png')});const bounds=await p.getByRole('dialog').evaluate(e=>({top:e.getBoundingClientRect().top,bottom:e.getBoundingClientRect().bottom,scroll:e.scrollHeight>e.clientHeight}));await p.screenshot({path:path.join(out,name+'.png')});assert(bounds.top>=0&&bounds.bottom<=600&&!bounds.scroll,JSON.stringify(bounds));return bounds}
 const scheduleBounds=await shot('schedule');await p.getByRole('button',{name:'Запустить автозалив',exact:true}).evaluate(button=>{button.click();button.click()});
 const afterDoubleClick=await wait(s=>s.jobs.some(j=>j.status==='scheduled'&&j.approved&&j.auto_publish&&j.has_output));assert.equal(afterDoubleClick.jobs.length,1);assert.equal((await api('/test/deliveries')).count,0);
 await p.getByRole('table').getByText('Запланирован',{exact:true}).waitFor();await p.getByRole('button',{name:'Подробнее',exact:true}).first().click();assert.equal(await p.getByRole('button',{name:'Подтвердить отправку',exact:true}).count(),0);await shot('ready-for-autopublish');await p.getByRole('button',{name:'Закрыть диалог',exact:true}).click();

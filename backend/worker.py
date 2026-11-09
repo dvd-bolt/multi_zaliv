@@ -50,6 +50,27 @@ def heartbeat():
             pass
 
 
+def milestone_metrics():
+    from .analytics import due_accounts
+    from .platforms import refresh_metrics
+
+    with Session.begin() as db:
+        due = due_accounts(db)
+        # Newly uploaded jobs need a first platform timestamp before their first hour.
+        for job, variant in db.execute(select(Job, Variant).join(Variant)).all():
+            if job.external_id and job.status in ("published", "platform_processing"):
+                from datetime import UTC, datetime
+
+                from .analytics import publication_info, timestamp
+
+                uploaded = timestamp(job.upload_started_at)
+                if uploaded and 0 <= (datetime.now(UTC) - uploaded).total_seconds() <= 4200:
+                    if not publication_info(db, variant.account_id, job.external_id)["published_at"]:
+                        due.add(variant.account_id)
+        if due:
+            refresh_metrics(db, account_ids=due)
+
+
 def tick():
     heartbeat()
     with Session() as db:
@@ -71,6 +92,10 @@ def tick():
             flush(db)
         except Exception:
             db.rollback()  # A notification problem must never stop publishing.
+        from .stories import process_one
+
+        if process_one():
+            return
         job = db.scalar(select(Job).where(Job.status == "queued").order_by(Job.created))
         if not job:
             return
@@ -163,6 +188,9 @@ def main():
     (DATA / "worker.pid.json").write_text(json.dumps({"pid": os.getpid(), "recorded": now()}))
     with Session.begin() as db:
         recover(db)
+    from .stories import recover as recover_stories
+
+    recover_stories()
 
     def pulse():
         while True:
@@ -193,6 +221,7 @@ def main():
     )
     scheduler.add_job(tick, "interval", seconds=2, max_instances=1, coalesce=True)
     scheduler.add_job(metrics, "interval", hours=1, max_instances=1, coalesce=True)
+    scheduler.add_job(milestone_metrics, "interval", minutes=5, max_instances=1, coalesce=True)
     scheduler.add_job(backup_database, "interval", hours=24, max_instances=1, coalesce=True)
     scheduler.start()
 

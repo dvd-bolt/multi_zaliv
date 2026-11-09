@@ -74,7 +74,7 @@ def open_window(base):
         width=1280,
         height=800,
         min_size=(1040, 680),
-        background_color="#14171b",
+        background_color="#101010",
         text_select=True,
         js_api=state,
     )

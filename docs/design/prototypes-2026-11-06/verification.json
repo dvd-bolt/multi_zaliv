@@ -1,0 +1,1588 @@
+{
+  "checks": [
+    {
+      "name": "studio-1440: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "studio-1440: no vertical overflow",
+      "ok": true
+    },
+    {
+      "name": "studio-1440: regions in viewport",
+      "ok": true
+    },
+    {
+      "name": "studio-1440: inspector does not overlap",
+      "ok": true,
+      "details": {
+        "panel": 620.671875,
+        "footer": 620.671875
+      }
+    },
+    {
+      "name": "studio-1024-banner: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "studio-1024-banner: no vertical overflow",
+      "ok": true
+    },
+    {
+      "name": "studio-1024-banner: regions in viewport",
+      "ok": true
+    },
+    {
+      "name": "studio-1024-banner: inspector does not overlap",
+      "ok": true,
+      "details": {
+        "panel": 417.4375,
+        "footer": 423.5
+      }
+    },
+    {
+      "name": "studio-1024-filters: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "studio-1024-filters: no vertical overflow",
+      "ok": true
+    },
+    {
+      "name": "studio-1024-filters: regions in viewport",
+      "ok": true
+    },
+    {
+      "name": "studio-1024-filters: inspector does not overlap",
+      "ok": true,
+      "details": {
+        "panel": 432.484375,
+        "footer": 432.484375
+      }
+    },
+    {
+      "name": "studio-1024-publish: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "studio-1024-publish: no vertical overflow",
+      "ok": true
+    },
+    {
+      "name": "studio-1024-publish: regions in viewport",
+      "ok": true
+    },
+    {
+      "name": "studio-1024-publish: inspector does not overlap",
+      "ok": true,
+      "details": {
+        "panel": 409.9375,
+        "footer": 423.5
+      }
+    },
+    {
+      "name": "studio: source switch",
+      "ok": true
+    },
+    {
+      "name": "studio: banner width",
+      "ok": true
+    },
+    {
+      "name": "studio: banner copy",
+      "ok": true
+    },
+    {
+      "name": "studio: dialog closes and restores focus",
+      "ok": true
+    },
+    {
+      "name": "studio: preset applies",
+      "ok": true
+    },
+    {
+      "name": "studio: keyboard tabs",
+      "ok": true
+    },
+    {
+      "name": "studio: actual video plays",
+      "ok": true
+    },
+    {
+      "name": "studio: invalid visibility explains recovery",
+      "ok": true
+    },
+    {
+      "name": "studio: demo queue",
+      "ok": true
+    },
+    {
+      "name": "studio-768: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "studio-390: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "studio-320: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "precision-1440: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "precision-1440: no vertical overflow",
+      "ok": true
+    },
+    {
+      "name": "precision-1440: regions in viewport",
+      "ok": true
+    },
+    {
+      "name": "precision-1440: inspector does not overlap",
+      "ok": true,
+      "details": {
+        "panel": 528.921875,
+        "footer": 661.453125
+      }
+    },
+    {
+      "name": "precision-1024-banner: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "precision-1024-banner: no vertical overflow",
+      "ok": true
+    },
+    {
+      "name": "precision-1024-banner: regions in viewport",
+      "ok": true
+    },
+    {
+      "name": "precision-1024-banner: inspector does not overlap",
+      "ok": true,
+      "details": {
+        "panel": 422.4375,
+        "footer": 435.5
+      }
+    },
+    {
+      "name": "precision-1024-filters: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "precision-1024-filters: no vertical overflow",
+      "ok": true
+    },
+    {
+      "name": "precision-1024-filters: regions in viewport",
+      "ok": true
+    },
+    {
+      "name": "precision-1024-filters: inspector does not overlap",
+      "ok": true,
+      "details": {
+        "panel": 436.484375,
+        "footer": 436.484375
+      }
+    },
+    {
+      "name": "precision-1024-publish: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "precision-1024-publish: no vertical overflow",
+      "ok": true
+    },
+    {
+      "name": "precision-1024-publish: regions in viewport",
+      "ok": true
+    },
+    {
+      "name": "precision-1024-publish: inspector does not overlap",
+      "ok": true,
+      "details": {
+        "panel": 412.9375,
+        "footer": 435.5
+      }
+    },
+    {
+      "name": "precision: source switch",
+      "ok": true
+    },
+    {
+      "name": "precision: banner width",
+      "ok": true
+    },
+    {
+      "name": "precision: banner copy",
+      "ok": true
+    },
+    {
+      "name": "precision: dialog closes and restores focus",
+      "ok": true
+    },
+    {
+      "name": "precision: preset applies",
+      "ok": true
+    },
+    {
+      "name": "precision: keyboard tabs",
+      "ok": true
+    },
+    {
+      "name": "precision: actual video plays",
+      "ok": true
+    },
+    {
+      "name": "precision: invalid visibility explains recovery",
+      "ok": true
+    },
+    {
+      "name": "precision: demo queue",
+      "ok": true
+    },
+    {
+      "name": "precision-768: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "precision-390: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "precision-320: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "focus-1440: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "focus-1440: no vertical overflow",
+      "ok": true
+    },
+    {
+      "name": "focus-1440: regions in viewport",
+      "ok": true
+    },
+    {
+      "name": "focus-1440: inspector does not overlap",
+      "ok": true,
+      "details": {
+        "panel": 610.234375,
+        "footer": 620.90625
+      }
+    },
+    {
+      "name": "focus-1024-banner: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "focus-1024-banner: no vertical overflow",
+      "ok": true
+    },
+    {
+      "name": "focus-1024-banner: regions in viewport",
+      "ok": true
+    },
+    {
+      "name": "focus-1024-banner: inspector does not overlap",
+      "ok": true,
+      "details": {
+        "panel": 423,
+        "footer": 423
+      }
+    },
+    {
+      "name": "focus-1024-filters: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "focus-1024-filters: no vertical overflow",
+      "ok": true
+    },
+    {
+      "name": "focus-1024-filters: regions in viewport",
+      "ok": true
+    },
+    {
+      "name": "focus-1024-filters: inspector does not overlap",
+      "ok": true,
+      "details": {
+        "panel": 438.046875,
+        "footer": 438.046875
+      }
+    },
+    {
+      "name": "focus-1024-publish: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "focus-1024-publish: no vertical overflow",
+      "ok": true
+    },
+    {
+      "name": "focus-1024-publish: regions in viewport",
+      "ok": true
+    },
+    {
+      "name": "focus-1024-publish: inspector does not overlap",
+      "ok": true,
+      "details": {
+        "panel": 415.5,
+        "footer": 417.5
+      }
+    },
+    {
+      "name": "focus: source switch",
+      "ok": true
+    },
+    {
+      "name": "focus: banner width",
+      "ok": true
+    },
+    {
+      "name": "focus: banner copy",
+      "ok": true
+    },
+    {
+      "name": "focus: dialog closes and restores focus",
+      "ok": true
+    },
+    {
+      "name": "focus: preset applies",
+      "ok": true
+    },
+    {
+      "name": "focus: keyboard tabs",
+      "ok": true
+    },
+    {
+      "name": "focus: actual video plays",
+      "ok": true
+    },
+    {
+      "name": "focus: invalid visibility explains recovery",
+      "ok": true
+    },
+    {
+      "name": "focus: demo queue",
+      "ok": true
+    },
+    {
+      "name": "focus-768: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "focus-390: no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "focus-320: no horizontal overflow",
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "layouts": [
+    {
+      "label": "studio-1440",
+      "width": 1440,
+      "height": 900,
+      "docWidth": 1440,
+      "docHeight": 900,
+      "regions": [
+        {
+          "class": "sources",
+          "top": 108,
+          "bottom": 864,
+          "left": 88,
+          "right": 278,
+          "height": 756
+        },
+        {
+          "class": "editor",
+          "top": 108,
+          "bottom": 864,
+          "left": 290,
+          "right": 1104,
+          "height": 756
+        },
+        {
+          "class": "inspector",
+          "top": 108,
+          "bottom": 864,
+          "left": 1116,
+          "right": 1428,
+          "height": 756
+        },
+        {
+          "class": "tab-panel",
+          "top": 203.6875,
+          "bottom": 620.671875,
+          "left": 1116,
+          "right": 1428,
+          "height": 416.984375
+        },
+        {
+          "class": "inspector-footer",
+          "top": 620.671875,
+          "bottom": 867.21875,
+          "left": 1116,
+          "right": 1428,
+          "height": 246.546875
+        },
+        {
+          "class": "statusbar",
+          "top": 876,
+          "bottom": 900,
+          "left": 0,
+          "right": 1440,
+          "height": 24
+        }
+      ]
+    },
+    {
+      "label": "studio-1024-banner",
+      "width": 1024,
+      "height": 600,
+      "docWidth": 1024,
+      "docHeight": 600,
+      "regions": [
+        {
+          "class": "sources",
+          "top": 104,
+          "bottom": 568,
+          "left": 72,
+          "right": 226,
+          "height": 464
+        },
+        {
+          "class": "editor",
+          "top": 104,
+          "bottom": 568,
+          "left": 234,
+          "right": 722,
+          "height": 464
+        },
+        {
+          "class": "inspector",
+          "top": 104,
+          "bottom": 568,
+          "left": 730,
+          "right": 1016,
+          "height": 464
+        },
+        {
+          "class": "tab-panel",
+          "top": 143.9375,
+          "bottom": 417.4375,
+          "left": 730,
+          "right": 1016,
+          "height": 273.5
+        },
+        {
+          "class": "inspector-footer",
+          "top": 423.5,
+          "bottom": 568,
+          "left": 730,
+          "right": 1016,
+          "height": 144.5
+        },
+        {
+          "class": "statusbar",
+          "top": 576,
+          "bottom": 600,
+          "left": 0,
+          "right": 1024,
+          "height": 24
+        }
+      ]
+    },
+    {
+      "label": "studio-1024-filters",
+      "width": 1024,
+      "height": 600,
+      "docWidth": 1024,
+      "docHeight": 600,
+      "regions": [
+        {
+          "class": "sources",
+          "top": 104,
+          "bottom": 568,
+          "left": 72,
+          "right": 226,
+          "height": 464
+        },
+        {
+          "class": "editor",
+          "top": 104,
+          "bottom": 568,
+          "left": 234,
+          "right": 722,
+          "height": 464
+        },
+        {
+          "class": "inspector",
+          "top": 104,
+          "bottom": 568,
+          "left": 730,
+          "right": 1016,
+          "height": 464
+        },
+        {
+          "class": "tab-panel",
+          "top": 143.9375,
+          "bottom": 432.484375,
+          "left": 730,
+          "right": 1016,
+          "height": 288.546875
+        },
+        {
+          "class": "inspector-footer",
+          "top": 432.484375,
+          "bottom": 576.984375,
+          "left": 730,
+          "right": 1016,
+          "height": 144.5
+        },
+        {
+          "class": "statusbar",
+          "top": 576,
+          "bottom": 600,
+          "left": 0,
+          "right": 1024,
+          "height": 24
+        }
+      ]
+    },
+    {
+      "label": "studio-1024-publish",
+      "width": 1024,
+      "height": 600,
+      "docWidth": 1024,
+      "docHeight": 600,
+      "regions": [
+        {
+          "class": "sources",
+          "top": 104,
+          "bottom": 568,
+          "left": 72,
+          "right": 226,
+          "height": 464
+        },
+        {
+          "class": "editor",
+          "top": 104,
+          "bottom": 568,
+          "left": 234,
+          "right": 722,
+          "height": 464
+        },
+        {
+          "class": "inspector",
+          "top": 104,
+          "bottom": 568,
+          "left": 730,
+          "right": 1016,
+          "height": 464
+        },
+        {
+          "class": "tab-panel",
+          "top": 143.9375,
+          "bottom": 409.9375,
+          "left": 730,
+          "right": 1016,
+          "height": 266
+        },
+        {
+          "class": "inspector-footer",
+          "top": 423.5,
+          "bottom": 568,
+          "left": 730,
+          "right": 1016,
+          "height": 144.5
+        },
+        {
+          "class": "statusbar",
+          "top": 576,
+          "bottom": 600,
+          "left": 0,
+          "right": 1024,
+          "height": 24
+        }
+      ]
+    },
+    {
+      "label": "studio-768",
+      "width": 768,
+      "height": 1024,
+      "docWidth": 768,
+      "docHeight": 1163,
+      "regions": [
+        {
+          "class": "sources",
+          "top": 104,
+          "bottom": 654,
+          "left": 68,
+          "right": 198,
+          "height": 550
+        },
+        {
+          "class": "editor",
+          "top": 104,
+          "bottom": 654,
+          "left": 206,
+          "right": 760,
+          "height": 550
+        },
+        {
+          "class": "inspector",
+          "top": 662,
+          "bottom": 1128.921875,
+          "left": 68,
+          "right": 760,
+          "height": 466.921875
+        },
+        {
+          "class": "tab-panel",
+          "top": 711.9375,
+          "bottom": 1128.921875,
+          "left": 68,
+          "right": 414,
+          "height": 416.984375
+        },
+        {
+          "class": "inspector-footer",
+          "top": 674,
+          "bottom": 1116.921875,
+          "left": 426,
+          "right": 748,
+          "height": 442.921875
+        },
+        {
+          "class": "statusbar",
+          "top": 1136.921875,
+          "bottom": 1162.921875,
+          "left": 0,
+          "right": 768,
+          "height": 26
+        }
+      ]
+    },
+    {
+      "label": "studio-390",
+      "width": 390,
+      "height": 844,
+      "docWidth": 390,
+      "docHeight": 1812,
+      "regions": [
+        {
+          "class": "sources",
+          "top": -466,
+          "bottom": -249.40625,
+          "left": 8,
+          "right": 382,
+          "height": 216.59375
+        },
+        {
+          "class": "editor",
+          "top": -239.40625,
+          "bottom": 380.59375,
+          "left": 8,
+          "right": 382,
+          "height": 620
+        },
+        {
+          "class": "inspector",
+          "top": 390.59375,
+          "bottom": 1154.59375,
+          "left": 8,
+          "right": 382,
+          "height": 764
+        },
+        {
+          "class": "tab-panel",
+          "top": 441.984375,
+          "bottom": 881.15625,
+          "left": 8,
+          "right": 382,
+          "height": 439.171875
+        },
+        {
+          "class": "inspector-footer",
+          "top": 881.15625,
+          "bottom": 1142.59375,
+          "left": 20,
+          "right": 370,
+          "height": 261.4375
+        },
+        {
+          "class": "statusbar",
+          "top": 1167.59375,
+          "bottom": 1188.59375,
+          "left": 0,
+          "right": 390,
+          "height": 21
+        }
+      ]
+    },
+    {
+      "label": "studio-320",
+      "width": 320,
+      "height": 740,
+      "docWidth": 320,
+      "docHeight": 1767,
+      "regions": [
+        {
+          "class": "sources",
+          "top": -466,
+          "bottom": -249.40625,
+          "left": 8,
+          "right": 312,
+          "height": 216.59375
+        },
+        {
+          "class": "editor",
+          "top": -239.40625,
+          "bottom": 380.59375,
+          "left": 8,
+          "right": 312,
+          "height": 620
+        },
+        {
+          "class": "inspector",
+          "top": 390.59375,
+          "bottom": 1109.59375,
+          "left": 8,
+          "right": 312,
+          "height": 719
+        },
+        {
+          "class": "tab-panel",
+          "top": 441.984375,
+          "bottom": 846.15625,
+          "left": 8,
+          "right": 312,
+          "height": 404.171875
+        },
+        {
+          "class": "inspector-footer",
+          "top": 846.15625,
+          "bottom": 1097.59375,
+          "left": 20,
+          "right": 300,
+          "height": 251.4375
+        },
+        {
+          "class": "statusbar",
+          "top": 1122.59375,
+          "bottom": 1143.59375,
+          "left": 0,
+          "right": 320,
+          "height": 21
+        }
+      ]
+    },
+    {
+      "label": "precision-1440",
+      "width": 1440,
+      "height": 900,
+      "docWidth": 1440,
+      "docHeight": 900,
+      "regions": [
+        {
+          "class": "sources",
+          "top": 96,
+          "bottom": 875,
+          "left": 60,
+          "right": 236,
+          "height": 779
+        },
+        {
+          "class": "editor",
+          "top": 96,
+          "bottom": 875,
+          "left": 236,
+          "right": 1138,
+          "height": 779
+        },
+        {
+          "class": "inspector",
+          "top": 96,
+          "bottom": 875,
+          "left": 1138,
+          "right": 1440,
+          "height": 779
+        },
+        {
+          "class": "tab-panel",
+          "top": 140.9375,
+          "bottom": 528.921875,
+          "left": 1139,
+          "right": 1440,
+          "height": 387.984375
+        },
+        {
+          "class": "inspector-footer",
+          "top": 661.453125,
+          "bottom": 875,
+          "left": 1139,
+          "right": 1440,
+          "height": 213.546875
+        },
+        {
+          "class": "statusbar",
+          "top": 876,
+          "bottom": 900,
+          "left": 0,
+          "right": 1440,
+          "height": 24
+        }
+      ]
+    },
+    {
+      "label": "precision-1024-banner",
+      "width": 1024,
+      "height": 600,
+      "docWidth": 1024,
+      "docHeight": 600,
+      "regions": [
+        {
+          "class": "sources",
+          "top": 96,
+          "bottom": 575,
+          "left": 60,
+          "right": 212,
+          "height": 479
+        },
+        {
+          "class": "editor",
+          "top": 96,
+          "bottom": 575,
+          "left": 212,
+          "right": 742,
+          "height": 479
+        },
+        {
+          "class": "inspector",
+          "top": 96,
+          "bottom": 575,
+          "left": 742,
+          "right": 1024,
+          "height": 479
+        },
+        {
+          "class": "tab-panel",
+          "top": 140.9375,
+          "bottom": 422.4375,
+          "left": 743,
+          "right": 1024,
+          "height": 281.5
+        },
+        {
+          "class": "inspector-footer",
+          "top": 435.5,
+          "bottom": 575,
+          "left": 743,
+          "right": 1024,
+          "height": 139.5
+        },
+        {
+          "class": "statusbar",
+          "top": 576,
+          "bottom": 600,
+          "left": 0,
+          "right": 1024,
+          "height": 24
+        }
+      ]
+    },
+    {
+      "label": "precision-1024-filters",
+      "width": 1024,
+      "height": 600,
+      "docWidth": 1024,
+      "docHeight": 600,
+      "regions": [
+        {
+          "class": "sources",
+          "top": 96,
+          "bottom": 575,
+          "left": 60,
+          "right": 212,
+          "height": 479
+        },
+        {
+          "class": "editor",
+          "top": 96,
+          "bottom": 575,
+          "left": 212,
+          "right": 742,
+          "height": 479
+        },
+        {
+          "class": "inspector",
+          "top": 96,
+          "bottom": 575,
+          "left": 742,
+          "right": 1024,
+          "height": 479
+        },
+        {
+          "class": "tab-panel",
+          "top": 140.9375,
+          "bottom": 436.484375,
+          "left": 743,
+          "right": 1024,
+          "height": 295.546875
+        },
+        {
+          "class": "inspector-footer",
+          "top": 436.484375,
+          "bottom": 575.984375,
+          "left": 743,
+          "right": 1024,
+          "height": 139.5
+        },
+        {
+          "class": "statusbar",
+          "top": 576,
+          "bottom": 600,
+          "left": 0,
+          "right": 1024,
+          "height": 24
+        }
+      ]
+    },
+    {
+      "label": "precision-1024-publish",
+      "width": 1024,
+      "height": 600,
+      "docWidth": 1024,
+      "docHeight": 600,
+      "regions": [
+        {
+          "class": "sources",
+          "top": 96,
+          "bottom": 575,
+          "left": 60,
+          "right": 212,
+          "height": 479
+        },
+        {
+          "class": "editor",
+          "top": 96,
+          "bottom": 575,
+          "left": 212,
+          "right": 742,
+          "height": 479
+        },
+        {
+          "class": "inspector",
+          "top": 96,
+          "bottom": 575,
+          "left": 742,
+          "right": 1024,
+          "height": 479
+        },
+        {
+          "class": "tab-panel",
+          "top": 140.9375,
+          "bottom": 412.9375,
+          "left": 743,
+          "right": 1024,
+          "height": 272
+        },
+        {
+          "class": "inspector-footer",
+          "top": 435.5,
+          "bottom": 575,
+          "left": 743,
+          "right": 1024,
+          "height": 139.5
+        },
+        {
+          "class": "statusbar",
+          "top": 576,
+          "bottom": 600,
+          "left": 0,
+          "right": 1024,
+          "height": 24
+        }
+      ]
+    },
+    {
+      "label": "precision-768",
+      "width": 768,
+      "height": 1024,
+      "docWidth": 768,
+      "docHeight": 1146,
+      "regions": [
+        {
+          "class": "sources",
+          "top": 104,
+          "bottom": 654,
+          "left": 68,
+          "right": 198,
+          "height": 550
+        },
+        {
+          "class": "editor",
+          "top": 104,
+          "bottom": 654,
+          "left": 206,
+          "right": 760,
+          "height": 550
+        },
+        {
+          "class": "inspector",
+          "top": 662,
+          "bottom": 1110.921875,
+          "left": 68,
+          "right": 760,
+          "height": 448.921875
+        },
+        {
+          "class": "tab-panel",
+          "top": 718.9375,
+          "bottom": 1110.921875,
+          "left": 69,
+          "right": 414.5,
+          "height": 391.984375
+        },
+        {
+          "class": "inspector-footer",
+          "top": 674,
+          "bottom": 1098.921875,
+          "left": 426.5,
+          "right": 748,
+          "height": 424.921875
+        },
+        {
+          "class": "statusbar",
+          "top": 1119.921875,
+          "bottom": 1145.921875,
+          "left": 0,
+          "right": 768,
+          "height": 26
+        }
+      ]
+    },
+    {
+      "label": "precision-390",
+      "width": 390,
+      "height": 844,
+      "docWidth": 390,
+      "docHeight": 1757,
+      "regions": [
+        {
+          "class": "sources",
+          "top": -473,
+          "bottom": -252.40625,
+          "left": 8,
+          "right": 382,
+          "height": 220.59375
+        },
+        {
+          "class": "editor",
+          "top": -242.40625,
+          "bottom": 377.59375,
+          "left": 8,
+          "right": 382,
+          "height": 620
+        },
+        {
+          "class": "inspector",
+          "top": 387.59375,
+          "bottom": 1091.59375,
+          "left": 8,
+          "right": 382,
+          "height": 704
+        },
+        {
+          "class": "tab-panel",
+          "top": 445.984375,
+          "bottom": 860.15625,
+          "left": 9,
+          "right": 382,
+          "height": 414.171875
+        },
+        {
+          "class": "inspector-footer",
+          "top": 860.15625,
+          "bottom": 1079.59375,
+          "left": 21,
+          "right": 370,
+          "height": 219.4375
+        },
+        {
+          "class": "statusbar",
+          "top": 1105.59375,
+          "bottom": 1126.59375,
+          "left": 0,
+          "right": 390,
+          "height": 21
+        }
+      ]
+    },
+    {
+      "label": "precision-320",
+      "width": 320,
+      "height": 740,
+      "docWidth": 320,
+      "docHeight": 1747,
+      "regions": [
+        {
+          "class": "sources",
+          "top": -473,
+          "bottom": -252.40625,
+          "left": 8,
+          "right": 312,
+          "height": 220.59375
+        },
+        {
+          "class": "editor",
+          "top": -242.40625,
+          "bottom": 377.59375,
+          "left": 8,
+          "right": 312,
+          "height": 620
+        },
+        {
+          "class": "inspector",
+          "top": 387.59375,
+          "bottom": 1081.59375,
+          "left": 8,
+          "right": 312,
+          "height": 694
+        },
+        {
+          "class": "tab-panel",
+          "top": 445.984375,
+          "bottom": 860.15625,
+          "left": 9,
+          "right": 312,
+          "height": 414.171875
+        },
+        {
+          "class": "inspector-footer",
+          "top": 860.15625,
+          "bottom": 1069.59375,
+          "left": 21,
+          "right": 300,
+          "height": 209.4375
+        },
+        {
+          "class": "statusbar",
+          "top": 1095.59375,
+          "bottom": 1116.59375,
+          "left": 0,
+          "right": 320,
+          "height": 21
+        }
+      ]
+    },
+    {
+      "label": "focus-1440",
+      "width": 1440,
+      "height": 900,
+      "docWidth": 1440,
+      "docHeight": 900,
+      "regions": [
+        {
+          "class": "sources",
+          "top": 110,
+          "bottom": 862,
+          "left": 174,
+          "right": 344,
+          "height": 752
+        },
+        {
+          "class": "editor",
+          "top": 110,
+          "bottom": 862,
+          "left": 358,
+          "right": 1108,
+          "height": 752
+        },
+        {
+          "class": "inspector",
+          "top": 110,
+          "bottom": 862,
+          "left": 1122,
+          "right": 1426,
+          "height": 752
+        },
+        {
+          "class": "tab-panel",
+          "top": 193.25,
+          "bottom": 610.234375,
+          "left": 1122,
+          "right": 1426,
+          "height": 416.984375
+        },
+        {
+          "class": "inspector-footer",
+          "top": 620.90625,
+          "bottom": 854,
+          "left": 1130,
+          "right": 1418,
+          "height": 233.09375
+        },
+        {
+          "class": "statusbar",
+          "top": 876,
+          "bottom": 900,
+          "left": 0,
+          "right": 1440,
+          "height": 24
+        }
+      ]
+    },
+    {
+      "label": "focus-1024-banner",
+      "width": 1024,
+      "height": 600,
+      "docWidth": 1024,
+      "docHeight": 600,
+      "regions": [
+        {
+          "class": "sources",
+          "top": 106,
+          "bottom": 566,
+          "left": 72,
+          "right": 220,
+          "height": 460
+        },
+        {
+          "class": "editor",
+          "top": 106,
+          "bottom": 566,
+          "left": 230,
+          "right": 722,
+          "height": 460
+        },
+        {
+          "class": "inspector",
+          "top": 106,
+          "bottom": 566,
+          "left": 732,
+          "right": 1014,
+          "height": 460
+        },
+        {
+          "class": "tab-panel",
+          "top": 149.5,
+          "bottom": 423,
+          "left": 732,
+          "right": 1014,
+          "height": 273.5
+        },
+        {
+          "class": "inspector-footer",
+          "top": 423,
+          "bottom": 563.5,
+          "left": 740,
+          "right": 1006,
+          "height": 140.5
+        },
+        {
+          "class": "statusbar",
+          "top": 576,
+          "bottom": 600,
+          "left": 0,
+          "right": 1024,
+          "height": 24
+        }
+      ]
+    },
+    {
+      "label": "focus-1024-filters",
+      "width": 1024,
+      "height": 600,
+      "docWidth": 1024,
+      "docHeight": 600,
+      "regions": [
+        {
+          "class": "sources",
+          "top": 106,
+          "bottom": 566,
+          "left": 72,
+          "right": 220,
+          "height": 460
+        },
+        {
+          "class": "editor",
+          "top": 106,
+          "bottom": 566,
+          "left": 230,
+          "right": 722,
+          "height": 460
+        },
+        {
+          "class": "inspector",
+          "top": 106,
+          "bottom": 566,
+          "left": 732,
+          "right": 1014,
+          "height": 460
+        },
+        {
+          "class": "tab-panel",
+          "top": 149.5,
+          "bottom": 438.046875,
+          "left": 732,
+          "right": 1014,
+          "height": 288.546875
+        },
+        {
+          "class": "inspector-footer",
+          "top": 438.046875,
+          "bottom": 578.546875,
+          "left": 740,
+          "right": 1006,
+          "height": 140.5
+        },
+        {
+          "class": "statusbar",
+          "top": 576,
+          "bottom": 600,
+          "left": 0,
+          "right": 1024,
+          "height": 24
+        }
+      ]
+    },
+    {
+      "label": "focus-1024-publish",
+      "width": 1024,
+      "height": 600,
+      "docWidth": 1024,
+      "docHeight": 600,
+      "regions": [
+        {
+          "class": "sources",
+          "top": 106,
+          "bottom": 566,
+          "left": 72,
+          "right": 220,
+          "height": 460
+        },
+        {
+          "class": "editor",
+          "top": 106,
+          "bottom": 566,
+          "left": 230,
+          "right": 722,
+          "height": 460
+        },
+        {
+          "class": "inspector",
+          "top": 106,
+          "bottom": 566,
+          "left": 732,
+          "right": 1014,
+          "height": 460
+        },
+        {
+          "class": "tab-panel",
+          "top": 149.5,
+          "bottom": 415.5,
+          "left": 732,
+          "right": 1014,
+          "height": 266
+        },
+        {
+          "class": "inspector-footer",
+          "top": 417.5,
+          "bottom": 558,
+          "left": 740,
+          "right": 1006,
+          "height": 140.5
+        },
+        {
+          "class": "statusbar",
+          "top": 576,
+          "bottom": 600,
+          "left": 0,
+          "right": 1024,
+          "height": 24
+        }
+      ]
+    },
+    {
+      "label": "focus-768",
+      "width": 768,
+      "height": 1024,
+      "docWidth": 768,
+      "docHeight": 1159,
+      "regions": [
+        {
+          "class": "sources",
+          "top": 104,
+          "bottom": 654,
+          "left": 68,
+          "right": 198,
+          "height": 550
+        },
+        {
+          "class": "editor",
+          "top": 104,
+          "bottom": 654,
+          "left": 206,
+          "right": 760,
+          "height": 550
+        },
+        {
+          "class": "inspector",
+          "top": 662,
+          "bottom": 1125.484375,
+          "left": 68,
+          "right": 760,
+          "height": 463.484375
+        },
+        {
+          "class": "tab-panel",
+          "top": 708.5,
+          "bottom": 1125.484375,
+          "left": 68,
+          "right": 414,
+          "height": 416.984375
+        },
+        {
+          "class": "inspector-footer",
+          "top": 674,
+          "bottom": 1113.484375,
+          "left": 426,
+          "right": 748,
+          "height": 439.484375
+        },
+        {
+          "class": "statusbar",
+          "top": 1133.484375,
+          "bottom": 1159.484375,
+          "left": 0,
+          "right": 768,
+          "height": 26
+        }
+      ]
+    },
+    {
+      "label": "focus-390",
+      "width": 390,
+      "height": 844,
+      "docWidth": 390,
+      "docHeight": 1800,
+      "regions": [
+        {
+          "class": "sources",
+          "top": -466,
+          "bottom": -251.40625,
+          "left": 8,
+          "right": 382,
+          "height": 214.59375
+        },
+        {
+          "class": "editor",
+          "top": -241.40625,
+          "bottom": 378.59375,
+          "left": 8,
+          "right": 382,
+          "height": 620
+        },
+        {
+          "class": "inspector",
+          "top": 388.59375,
+          "bottom": 1143.203125,
+          "left": 8,
+          "right": 382,
+          "height": 754.609375
+        },
+        {
+          "class": "tab-panel",
+          "top": 442.59375,
+          "bottom": 881.765625,
+          "left": 8,
+          "right": 382,
+          "height": 439.171875
+        },
+        {
+          "class": "inspector-footer",
+          "top": 881.765625,
+          "bottom": 1131.203125,
+          "left": 20,
+          "right": 370,
+          "height": 249.4375
+        },
+        {
+          "class": "statusbar",
+          "top": 1156.203125,
+          "bottom": 1177.203125,
+          "left": 0,
+          "right": 390,
+          "height": 21
+        }
+      ]
+    },
+    {
+      "label": "focus-320",
+      "width": 320,
+      "height": 740,
+      "docWidth": 320,
+      "docHeight": 1765,
+      "regions": [
+        {
+          "class": "sources",
+          "top": -466,
+          "bottom": -251.40625,
+          "left": 8,
+          "right": 312,
+          "height": 214.59375
+        },
+        {
+          "class": "editor",
+          "top": -241.40625,
+          "bottom": 378.59375,
+          "left": 8,
+          "right": 312,
+          "height": 620
+        },
+        {
+          "class": "inspector",
+          "top": 388.59375,
+          "bottom": 1108.203125,
+          "left": 8,
+          "right": 312,
+          "height": 719.609375
+        },
+        {
+          "class": "tab-panel",
+          "top": 442.59375,
+          "bottom": 846.765625,
+          "left": 8,
+          "right": 312,
+          "height": 404.171875
+        },
+        {
+          "class": "inspector-footer",
+          "top": 846.765625,
+          "bottom": 1096.203125,
+          "left": 20,
+          "right": 300,
+          "height": 249.4375
+        },
+        {
+          "class": "statusbar",
+          "top": 1121.203125,
+          "bottom": 1142.203125,
+          "left": 0,
+          "right": 320,
+          "height": 21
+        }
+      ]
+    }
+  ]
+}

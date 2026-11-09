@@ -125,7 +125,20 @@ def child():
 def parent():
     folder = Path(tempfile.mkdtemp(prefix="survivalflow-desktop-"))
     env = {**os.environ, "SURVIVALFLOW_DATA": str(folder), "SURVIVALFLOW_PORT": "8772"}
-    env["SURVIVALFLOW_TEST_FIXTURES"] = sys.argv[1]
+    if len(sys.argv) > 1:
+        fixtures = Path(sys.argv[1])
+    else:
+        from backend.config import binary
+
+        fixtures = folder / "fixtures"
+        fixtures.mkdir()
+        subprocess.run(
+            [binary("ffmpeg"), "-v", "error", "-y", "-f", "lavfi", "-i",
+             "testsrc2=size=90x160:rate=10:duration=5", "-f", "lavfi", "-i",
+             "sine=frequency=440:duration=5", "-c:v", "libx264", "-c:a", "aac",
+             str(fixtures / "sample-0.mp4")], check=True, creationflags=subprocess.CREATE_NO_WINDOW,
+        )
+    env["SURVIVALFLOW_TEST_FIXTURES"] = str(fixtures)
     process = None
     try:
         with (folder / "desktop.log").open("wb") as log:
@@ -176,4 +189,4 @@ def parent():
 
 
 if __name__ == "__main__":
-    child() if sys.argv[1] == "--child" else parent()
+    child() if len(sys.argv) > 1 and sys.argv[1] == "--child" else parent()

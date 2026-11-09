@@ -83,6 +83,12 @@ def sync(db, account):
         }
         row.present, row.updated = True, captured
         row.history = (row.history + [{"captured": captured, "values": row.details["values"]}])[-48:]
+        from .analytics import record
+
+        record(db, account.id, video_id,
+               snippet["publishedAt"] if status.get("privacyStatus") in ("public", "unlisted") else None,
+               "YouTube snippet.publishedAt",
+               [{"captured": captured, "values": row.details["values"], "source": "YouTube Data API"}])
         if video_id in linked:
             db.add(
                 Metric(
@@ -149,6 +155,7 @@ def library(db, account):
 
 def external_statistics(db):
     """Project library rows to statistics only; they never enter the publishing queue."""
+    from .analytics import publication_info
     from .db import public_account
 
     jobs, metrics, missing = [], [], []
@@ -184,6 +191,7 @@ def external_statistics(db):
                     "url": "https://www.youtube.com/watch?v=" + row.external_id,
                     "has_output": False,
                     "external_only": True,
+                    **publication_info(db, account.id, row.external_id),
                 }
             )
             metrics.extend(

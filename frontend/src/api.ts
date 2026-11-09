@@ -79,6 +79,9 @@ export type AuthorComment = {
   text_sent?: string;
 };
 export type Job = {
+  published_at?: string | null;
+  publication_source?: string | null;
+  milestones?: Record<string, { captured: string; source: string; quality: string; values: Record<string, number | null> }>;
   external_only?: boolean;
   thumbnail?: { status?: string; file?: string; model?: string; error?: string; updated?: string };
   id: string;

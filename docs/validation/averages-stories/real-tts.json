@@ -1,0 +1,35 @@
+{
+  "authorized_max_requests": 3,
+  "requests": [
+    {
+      "number": 1,
+      "model": "gemini-3.8-flash-tts",
+      "status": 200
+    },
+    {
+      "number": 2,
+      "model": "gemini-3.8-flash-tts",
+      "status": 200
+    }
+  ],
+  "parts": [
+    {
+      "number": 1,
+      "text": "За день до свадьбы я нашёл на столе записку. В ней было всего три слова: не верь фотографиям. Я собирался позвонить невесте, но заметил на обороте адрес. Там находилась мастерская моего брата. Я решил сначала узнать правду.",
+      "audio": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\data\\stories\\voice-cache\\eb0251b4046ad4bc8941a13ea3f1c55b4d016da90ccc200d5d0f8956d06f23e1.wav"
+    },
+    {
+      "number": 2,
+      "text": "Брат встретил меня с большой коробкой. Внутри лежал восстановленный семейный альбом — наш свадебный подарок. Записка оказалась частью сюрприза: старые фотографии специально перепутали. Мы вместе рассмеялись. Хорошо, что я сначала задал вопрос, а не сделал вывод.",
+      "audio": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\data\\stories\\voice-cache\\b5d670f341d5a12e5dd0ee771a94907ec6b625fb78bcfc903a9c9c949cc79d4a.wav"
+    }
+  ],
+  "profile": {
+    "model": "gemini-3.8-flash-tts",
+    "voice": "Orus",
+    "language": "ru",
+    "style": "Разговорный русский рассказ от первого лица, сдержанная эмоциональность, естественные паузы, чёткая дикция."
+  },
+  "source": "https://ai.google.dev/gemini-api/docs/speech-generation",
+  "user_listening_pending": true
+}

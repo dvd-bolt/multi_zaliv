@@ -27,6 +27,13 @@ class SnapshotTooLarge(ValueError):
 
 @lru_cache(maxsize=1)
 def build_version():
+    manifest = ROOT / "frameflow-build.json"
+    if manifest.is_file():
+        try:
+            release = json.loads(manifest.read_text(encoding="utf-8"))
+            return release["version"] + "+" + release["source_sha256"][:12]
+        except (OSError, ValueError, KeyError):
+            pass
     try:
         result = subprocess.run(
             ["git", "rev-parse", "HEAD"],

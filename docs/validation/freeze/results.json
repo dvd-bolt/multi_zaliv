@@ -1,7 +1,7 @@
 {
   "bounds": {
-    "top": 74.734375,
-    "bottom": 525.265625,
+    "top": 28.9375,
+    "bottom": 571.0625,
     "scroll": false
   },
   "first": {
@@ -13,13 +13,13 @@
     "paused": true
   },
   "advert": {
-    "time": 1.193131,
+    "time": 1.248952,
     "paused": false,
     "muted": false,
     "volume": 1
   },
   "resumed": {
-    "time": 3.388083,
+    "time": 3.4091,
     "paused": false
   },
   "errors": [],
