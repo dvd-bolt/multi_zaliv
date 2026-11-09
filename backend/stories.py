@@ -185,6 +185,30 @@ def parse(request: ScriptInput):
     return parse_script(request.text)
 
 
+PROBE_TEXT = "За день до свадьбы я нашёл на столе записку. В ней было всего три слова: не верь фотографиям."
+
+
+@router.post("/voice/probe")
+def voice_probe(request: Profile, generate: bool = False):
+    """A short sample of a voice profile. Without generate=true it only reports whether a sample is
+    cached; with it — at most one TTS request (an existing sample is reused for free)."""
+    profile = request.model_dump()
+    path = story_tts.cache_file(PROBE_TEXT, profile)
+    if generate and not path.exists():
+        path = story_tts.generate(PROBE_TEXT, profile)
+    return {"exists": path.exists(), "key": story_tts.cache_key(PROBE_TEXT, profile)}
+
+
+@router.get("/voice/probe/{key}")
+def voice_probe_audio(key: str):
+    if not re.fullmatch(r"[0-9a-f]{64}", key):
+        raise HTTPException(404)
+    path = DATA / "stories" / "voice-cache" / (key + ".wav")
+    if not path.is_file():
+        raise HTTPException(404)
+    return FileResponse(path, media_type="audio/wav")
+
+
 @router.get("/ideas")
 def ideas():
     """Trending competitor topics collected on the owner's server (through the Telegram bot connection)."""

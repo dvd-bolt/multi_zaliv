@@ -304,3 +304,26 @@ def test_trend_ideas_come_from_the_bot_server(draft, monkeypatch):
     r = client.get('/api/stories/ideas')
     assert r.status_code == 200 and r.json()['ideas'][0]['title'] == 'Не оборачивайся'
     assert seen == {'url': 'https://bot.example/api/ext/frameflow/ideas', 'auth': 'Bearer k'}
+
+
+def test_voice_probe_spends_at_most_one_request_and_reuses_cache(draft, monkeypatch):
+    client, s = draft
+    calls = []
+
+    def fake_generate(text, profile):
+        calls.append(text)
+        path = story_tts.cache_file(text, profile)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(wav_bytes(1))
+        return path
+
+    monkeypatch.setattr(story_tts, 'generate', fake_generate)
+    profile = {**s['profile'], 'voice': 'Kore'}
+    assert client.post('/api/stories/voice/probe', json=profile).json()['exists'] is False
+    assert calls == []  # only checking never spends a request
+    made = client.post('/api/stories/voice/probe?generate=true', json=profile).json()
+    again = client.post('/api/stories/voice/probe?generate=true', json=profile).json()
+    assert made['exists'] and again['key'] == made['key'] and len(calls) == 1
+    audio = client.get('/api/stories/voice/probe/' + made['key'])
+    assert audio.status_code == 200 and audio.content.startswith(b'RIFF')
+    assert client.get('/api/stories/voice/probe/../../x').status_code == 404

@@ -750,6 +750,10 @@
 #sf-editors .story-form-grid .story-wide {
   grid-column: 1 / -1;
 }
+#sf-editors .story-probe {
+  height: 30px;
+  max-width: 200px;
+}
 #sf-editors .story-link-row input {
   flex: 1;
   min-width: 0;

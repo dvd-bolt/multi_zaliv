@@ -124,6 +124,7 @@ export default function Stories({
     [themeParts, setThemeParts] = useState(3),
     [draftHook, setDraftHook] = useState(''),
     [link, setLink] = useState(''),
+    [probe, setProbe] = useState<{ exists: boolean; key: string } | null>(null),
     [ideas, setIdeas] = useState<
       { title: string; channel: string; ratio: number; views: number }[]
     >([]);
@@ -204,6 +205,17 @@ export default function Stories({
     if (importOpen) importDialog.current?.showModal();
     else importDialog.current?.close();
   }, [importOpen]);
+  const profileKey = story ? JSON.stringify(story.profile) : '';
+  useEffect(() => {
+    if (!profileKey) return;
+    let alive = true;
+    api<{ exists: boolean; key: string }>('/stories/voice/probe', 'POST', JSON.parse(profileKey))
+      .then((r) => alive && setProbe(r))
+      .catch(() => alive && setProbe(null));
+    return () => {
+      alive = false;
+    };
+  }, [profileKey]);
   const edit = (patch: Partial<Story>) => {
     if (!story) return;
     dirtyRef.current = true;
@@ -509,18 +521,44 @@ export default function Stories({
                           >
                             Проверить доступ
                           </button>
-                          <span className="e-muted">
-                            {checkedModels
-                              ? checkedModels.length
+                          <button
+                            className="e-button"
+                            disabled={locked || busy}
+                            title="Короткая фраза этим голосом и подачей: один запрос TTS, повтор — из кэша"
+                            onClick={() =>
+                              void run(async () => {
+                                setNotice('Озвучиваю пробную фразу…');
+                                setProbe(
+                                  await api<{ exists: boolean; key: string }>(
+                                    '/stories/voice/probe?generate=true',
+                                    'POST',
+                                    story.profile,
+                                  ),
+                                );
+                                setNotice('Проба готова — послушайте рядом.');
+                              })
+                            }
+                          >
+                            {probe?.exists ? 'Проба есть' : 'Проба · 1 запрос'}
+                          </button>
+                          {probe?.exists && (
+                            <audio
+                              className="story-probe"
+                              controls
+                              src={`/api/stories/voice/probe/${probe.key}`}
+                            />
+                          )}
+                          {checkedModels && (
+                            <span className="e-muted">
+                              {checkedModels.length
                                 ? 'Доступны: ' + checkedModels.join(', ')
-                                : 'Модели TTS недоступны'
-                              : 'Используется защищённый ключ Gemini'}
-                          </span>
+                                : 'Модели TTS недоступны'}
+                            </span>
+                          )}
                         </div>
                         <p className="e-muted">
-                          Настройки сохраняются для всех частей. Каждый запуск делает до одного
-                          нового запроса на часть; готовый кэш используется повторно. После
-                          тайм-аута автоматического повтора нет.
+                          Для всех частей. Не больше одного нового запроса на часть, кэш
+                          переиспользуется, автоповтора нет.
                         </p>
                       </>
                     ) : (
