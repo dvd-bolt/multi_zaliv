@@ -1,5 +1,6 @@
 import base64
 import io
+import json
 import wave
 from pathlib import Path
 
@@ -215,3 +216,29 @@ def test_story_2_settings_saved_and_old_documents_keep_classic_look(draft):
     from backend.stories import public
     old = type('S', (), {'id': 'x', 'title': 't', 'revision': 1, 'updated': '', 'document': {'parts': []}})()
     assert public(old)['caption_style'] == 'classic' and public(old)['next_hint'] is False
+
+
+def test_gemini_script_draft_follows_the_scenario_contract(draft, monkeypatch):
+    from backend import gemini
+    client, _ = draft
+    body = "Слово " * 150
+    answer = {"title": "Записка", "hook": "Не верь фотографиям", "description": "История о записке.",
+              "parts": ["[Часть 1] " + body + "Я открыл дверь.", body + "Конец."]}
+    calls = []
+
+    def fake(system, parts, progress=None, **kwargs):
+        calls.append(parts[0]["text"])
+        return json.dumps(answer, ensure_ascii=False), "gemini-test", ["gemini-test"], []
+
+    monkeypatch.setattr(gemini, "request_json", fake)
+    r = client.post('/api/stories/script/draft', json={'theme': 'записка перед свадьбой', 'parts': 2,
+                                                        'category': 'cars'})
+    assert r.status_code == 200, r.text
+    data = r.json()
+    assert data['hook'] == 'Не верь фотографиям' and data['model'] == 'gemini-test'
+    assert '[Часть 1]\nСлово' in data['script'] and 'Фон: Машины' in data['script']
+    parsed = client.post('/api/stories/parse', json={'text': data['script']}).json()
+    assert len(parsed['parts']) == 2 and parsed['categories'] == ['cars']
+    assert 'записка перед свадьбой' in calls[0]
+    answer['parts'] = answer['parts'][:1] + ['коротко']
+    assert client.post('/api/stories/script/draft', json={'theme': 'тема', 'parts': 2}).status_code >= 400

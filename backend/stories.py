@@ -17,7 +17,7 @@ from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, Field
 from sqlalchemy import select, text, update
 
-from . import story_captions, story_tts
+from . import story_captions, story_script, story_tts
 from .config import DATA, binary
 from .db import Asset, Session, Setting, Story, StoryFile, StoryTask, now, uid
 from .media import NO_WINDOW, command, inspect
@@ -181,6 +181,22 @@ class ScriptInput(BaseModel):
 @router.post("/parse")
 def parse(request: ScriptInput):
     return parse_script(request.text)
+
+
+class ThemeInput(BaseModel):
+    theme: str = Field(min_length=3, max_length=300)
+    parts: Literal[2, 3] = 3
+    notes: str = Field("", max_length=600)
+    category: Literal["balls", "carpets", "cars", ""] = ""
+
+
+@router.post("/script/draft")
+def script_draft(request: ThemeInput):
+    """A Gemini draft for the import dialog: shown to the user, never saved or voiced by itself."""
+    name = next((k for k, v in CATEGORY_NAMES.items() if v == request.category), "")
+    result = story_script.write(request.theme.strip(), request.parts, request.notes.strip(), name)
+    parse_script(result["script"])  # the draft must pass the same contract as a user scenario
+    return result
 
 
 @router.get("/models")

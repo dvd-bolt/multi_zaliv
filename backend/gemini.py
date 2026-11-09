@@ -47,6 +47,10 @@ class ModelsUnavailable(ValueError):
         super().__init__("Все модели Gemini сейчас недоступны. " + details)
 
 
+class IncompleteAnswer(ValueError):
+    pass
+
+
 class Proposal(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     title: str = Field(min_length=1, max_length=90)
@@ -93,16 +97,17 @@ def check_models():
         raise ValueError("Нет связи с Gemini") from None
 
 
-def generate(parts, progress=None):
-    """Bounded fallback on quotas/transient failures; auth and invalid input stop the chain."""
+def request_json(system, parts, progress=None, temperature=0.3, max_tokens=4096, label="анализ исходника"):
+    """JSON text from the first model that answers. Bounded fallback on quotas/transient failures;
+    auth and invalid input stop the chain. Returns (text, model, tried, failures)."""
     headers = {"x-goog-api-key": key()}
     payload = {
-        "systemInstruction": {"parts": [{"text": PROMPT}]},
+        "systemInstruction": {"parts": [{"text": system}]},
         "contents": [{"role": "user", "parts": parts}],
         "generationConfig": {
             "responseMimeType": "application/json",
-            "temperature": 0.3,
-            "maxOutputTokens": 4096,
+            "temperature": temperature,
+            "maxOutputTokens": max_tokens,
         },
     }
     tried = []
@@ -113,7 +118,7 @@ def generate(parts, progress=None):
             continue
         tried.append(model)
         if progress:
-            progress(f"Gemini {model.removeprefix('gemini-')} · анализ исходника…")
+            progress(f"Gemini {model.removeprefix('gemini-')} · {label}…")
         try:
             response = httpx.post(
                 BASE + f"/models/{model}:generateContent",
@@ -149,18 +154,29 @@ def generate(parts, progress=None):
         if not response.is_success:
             raise ValueError(f"Gemini временно недоступен (HTTP {response.status_code}). Повторите позже")
         try:
-            candidates = response.json().get("candidates", [])
-            candidate = candidates[0]
+            candidate = response.json().get("candidates", [])[0]
             if candidate.get("finishReason") != "STOP":
                 raise ValueError("Incomplete response")
             content = "".join(
                 p.get("text", "") for p in candidate["content"]["parts"] if not p.get("thought")
             )
-            proposal = Proposal.model_validate_json(content)
         except (ValueError, TypeError, IndexError, KeyError):
-            raise ValueError("Gemini не вернул корректное описание. Старый текст сохранён") from None
-        return {**proposal.model_dump(), "model": model, "tried": tried, "failures": failures}
+            raise IncompleteAnswer("Gemini не вернул полный ответ. Повторите позже") from None
+        return content, model, tried, failures
     raise ModelsUnavailable(failures)
+
+
+def generate(parts, progress=None):
+    bad = "Gemini не вернул корректное описание. Старый текст сохранён"
+    try:
+        content, model, tried, failures = request_json(PROMPT, parts, progress)
+    except IncompleteAnswer:
+        raise ValueError(bad) from None
+    try:
+        proposal = Proposal.model_validate_json(content)
+    except ValueError:
+        raise ValueError(bad) from None
+    return {**proposal.model_dump(), "model": model, "tried": tried, "failures": failures}
 
 
 def analyze(path, duration, progress=None):

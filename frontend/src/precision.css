@@ -750,6 +750,15 @@
 #sf-editors .story-form-grid .story-wide {
   grid-column: 1 / -1;
 }
+.story-import-dialog .story-theme-row {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0;
+}
+.story-import-dialog .story-theme-row input {
+  flex: 1;
+  min-width: 0;
+}
 #sf-editors .story-checks {
   display: flex;
   flex-wrap: wrap;

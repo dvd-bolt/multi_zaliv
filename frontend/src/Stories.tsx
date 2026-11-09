@@ -111,7 +111,10 @@ export default function Stories({
   const [error, setError] = useState(''),
     [notice, setNotice] = useState(''),
     [script, setScript] = useState(''),
-    [importOpen, setImportOpen] = useState(false);
+    [importOpen, setImportOpen] = useState(false),
+    [theme, setTheme] = useState(''),
+    [themeParts, setThemeParts] = useState(3),
+    [draftHook, setDraftHook] = useState('');
   const [scope, setScope] = useState('part'),
     [category, setCategory] = useState('cars'),
     [filePage, setFilePage] = useState(0),
@@ -862,8 +865,8 @@ export default function Stories({
                     </div>
                     <p className="e-muted">
                       Часть {partIndex + 1} из {story.parts.length}:{' '}
-                      {part.duration ? `${part.duration.toFixed(1)} с` : 'сначала добавьте озвучку'}.
-                      Соберите и просмотрите MP4; баннер, каналы и время — в монтажной.
+                      {part.duration ? `${part.duration.toFixed(1)} с` : 'сначала добавьте озвучку'}
+                      . Соберите и просмотрите MP4; баннер, каналы и время — в монтажной.
                     </p>
                     <div className="e-row">
                       <a
@@ -999,6 +1002,50 @@ export default function Stories({
               Закрыть
             </button>
           </div>
+          <div className="e-row story-theme-row">
+            <input
+              className="e-field"
+              aria-label="Тема для Gemini"
+              placeholder="Тема: например, «нашёл чужой телефон в такси»"
+              maxLength={300}
+              value={theme}
+              onChange={(e) => setTheme(e.target.value)}
+            />
+            <select
+              aria-label="Частей"
+              value={themeParts}
+              onChange={(e) => setThemeParts(Number(e.target.value))}
+            >
+              <option value={2}>2 части</option>
+              <option value={3}>3 части</option>
+            </select>
+            <button
+              className="e-button"
+              disabled={busy || theme.trim().length < 3}
+              onClick={() =>
+                void run(async () => {
+                  setNotice('Gemini пишет сценарий… обычно 10–40 секунд');
+                  const r = await api<{
+                    script: string;
+                    hook: string;
+                    model: string;
+                    words: number[];
+                  }>('/stories/script/draft', 'POST', {
+                    theme,
+                    parts: themeParts,
+                    category: story?.categories[0] ?? '',
+                  });
+                  setScript(r.script);
+                  setDraftHook(r.hook);
+                  setNotice(
+                    `Черновик от ${r.model.replace('gemini-', '')}: ${r.words.join(' / ')} слов. Прочитайте и поправьте, затем «Разобрать».`,
+                  );
+                })
+              }
+            >
+              Написать через Gemini
+            </button>
+          </div>
           <p>
             Название: … · Частей: 2 или 3 · Фон: Мойка машин
             <br />
@@ -1040,7 +1087,9 @@ export default function Stories({
                     parts: r.parts.map((p, i) => ({ id: story?.parts[i]?.id ?? '', text: p.text })),
                     categories: r.categories.length ? r.categories : story?.categories,
                     source_script: script,
+                    ...(draftHook ? { hook: draftHook } : {}),
                   });
+                  setDraftHook('');
                   setPartIndex(0);
                   setImportOpen(false);
                   setNotice('Сценарий разобран. Проверьте части и сохраните.');
@@ -1050,7 +1099,7 @@ export default function Stories({
               Разобрать по частям
             </button>
           </div>
-          {error && <p role="alert">{error}</p>}
+          {(error || notice) && <p role={error ? 'alert' : 'status'}>{error || notice}</p>}
         </form>
       </dialog>
     </section>
