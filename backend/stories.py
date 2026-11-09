@@ -12,6 +12,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Annotated, Literal
 
+import httpx
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, Field
@@ -182,6 +183,26 @@ class ScriptInput(BaseModel):
 @router.post("/parse")
 def parse(request: ScriptInput):
     return parse_script(request.text)
+
+
+@router.get("/ideas")
+def ideas():
+    """Trending competitor topics collected on the owner's server (through the Telegram bot connection)."""
+    from . import notify
+
+    conn = notify.connection()
+    if not conn:
+        raise ValueError("Подключите Telegram-бота (команда /frameflow, затем код в настройках FrameFlow)")
+    try:
+        response = httpx.get(conn["url"] + "/ideas", headers={"Authorization": "Bearer " + conn["secret"]},
+                             timeout=15)
+    except httpx.HTTPError:
+        raise ValueError("Сервер с идеями сейчас недоступен") from None
+    if response.status_code in (401, 403):
+        raise ValueError("Сервер не принял код бота. Получите новый командой /frameflow")
+    if not response.is_success:
+        raise ValueError(f"Сервер идей ответил HTTP {response.status_code}")
+    return {"ideas": response.json().get("ideas", [])[:20]}
 
 
 class ThemeInput(BaseModel):

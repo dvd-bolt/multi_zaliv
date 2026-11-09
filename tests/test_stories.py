@@ -282,3 +282,25 @@ def test_background_by_link_downloads_into_library(draft, monkeypatch, tmp_path)
     files = client.get('/api/stories').json()['files']
     added = next(f for f in files if f['id'] == state['file_id'])
     assert added['kind'] == 'background' and added['category'] == 'balls' and added['name'] == 'Паркур.mp4'
+
+
+def test_trend_ideas_come_from_the_bot_server(draft, monkeypatch):
+    import httpx
+
+    from backend import notify
+    client, _ = draft
+    monkeypatch.setattr(notify, 'connection', lambda: None)
+    assert '/frameflow' in client.get('/api/stories/ideas').json().get('detail', '') or \
+        client.get('/api/stories/ideas').status_code >= 400
+    seen = {}
+
+    def fake_get(url, headers, timeout):
+        seen.update(url=url, auth=headers['Authorization'])
+        return httpx.Response(200, json={'ideas': [{'title': 'Не оборачивайся', 'channel': 'ВЫЖИВИ',
+                                                    'ratio': 1.8, 'views': 50649}]})
+
+    monkeypatch.setattr(notify, 'connection', lambda: {'url': 'https://bot.example/api/ext/frameflow', 'secret': 'k'})
+    monkeypatch.setattr(stories.httpx, 'get', fake_get)
+    r = client.get('/api/stories/ideas')
+    assert r.status_code == 200 and r.json()['ideas'][0]['title'] == 'Не оборачивайся'
+    assert seen == {'url': 'https://bot.example/api/ext/frameflow/ideas', 'auth': 'Bearer k'}

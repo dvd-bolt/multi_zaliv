@@ -767,6 +767,10 @@
   gap: 8px;
   margin: 8px 0;
 }
+.story-import-dialog .story-theme-row .story-ideas {
+  min-width: 0;
+  flex: 1;
+}
 .story-import-dialog .story-theme-row input {
   flex: 1;
   min-width: 0;

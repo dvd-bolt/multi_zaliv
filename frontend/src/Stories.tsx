@@ -123,7 +123,10 @@ export default function Stories({
     [theme, setTheme] = useState(''),
     [themeParts, setThemeParts] = useState(3),
     [draftHook, setDraftHook] = useState(''),
-    [link, setLink] = useState('');
+    [link, setLink] = useState(''),
+    [ideas, setIdeas] = useState<
+      { title: string; channel: string; ratio: number; views: number }[]
+    >([]);
   const [scope, setScope] = useState('part'),
     [category, setCategory] = useState('cars'),
     [filePage, setFilePage] = useState(0),
@@ -1091,6 +1094,39 @@ export default function Stories({
             >
               Написать через Gemini
             </button>
+          </div>
+          <div className="e-row story-theme-row">
+            <button
+              className="e-button"
+              disabled={busy}
+              onClick={() =>
+                void run(async () => {
+                  const r = await api<{ ideas: typeof ideas }>('/stories/ideas');
+                  setIdeas(r.ideas);
+                  setNotice(r.ideas.length ? '' : 'Свежих трендов пока нет');
+                })
+              }
+            >
+              Идеи из трендов
+            </button>
+            {ideas.length > 0 && (
+              <select
+                className="story-ideas"
+                aria-label="Идея из трендов"
+                value=""
+                onChange={(e) => {
+                  const idea = ideas[Number(e.target.value)];
+                  if (idea) setTheme(`Своя история по мотивам темы: «${idea.title}»`);
+                }}
+              >
+                <option value="">Выберите тему ({ideas.length})…</option>
+                {ideas.map((idea, i) => (
+                  <option key={i} value={i}>
+                    {idea.ratio.toFixed(1)}× · {idea.channel}: {idea.title}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
           <p>
             Название: … · Частей: 2 или 3 · Фон: Мойка машин
