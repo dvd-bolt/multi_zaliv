@@ -171,7 +171,8 @@ def groups(cue, size=3):
     return [words[i:i + size] for i in range(0, len(words), size)]
 
 
-def ass(cues, part_number, total, width, height, style="classic", hook="", next_hint=False, duration=None):
+def ass(cues, part_number, total, width, height, style="classic", hook="", next_hint=False, duration=None,
+        part_label=True):
     # ASS control sequences are stripped from user text; no arbitrary override tags.
     big = int(width * .078)
     header = f"""[Script Info]
@@ -205,7 +206,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 events.append(f"Dialogue: 1,{stamp(begin, True)},{stamp(finish, True)},Words,,0,0,0,,{text}")
     end = duration or (cues[-1]["end"] if cues else 0)
     hook_end = min(2.8, end)
-    if cues:
+    if cues and part_label:
         start_part = hook_end if hook.strip() else 0
         events.append(f"Dialogue: 0,{stamp(start_part, True)},{stamp(cues[-1]['end'], True)},Part,,0,0,0,,"
                       f"Часть {part_number} из {total}")

@@ -75,7 +75,7 @@ def run(key, url, category, folder, register):
             return "Видео длиннее 3 часов — выберите короче"
         return None
 
-    options = {"format": FORMAT, "outtmpl": str(target) + ".%(ext)s", "noplaylist": True, "quiet": True,
+    options = {"format": FORMAT, "outtmpl": str(target) + ".%(ext)s", "noplaylist": True, "quiet": True, "noprogress": True,
                "no_warnings": True, "progress_hooks": [hook], "match_filter": short_enough,
                "ffmpeg_location": binary("ffmpeg"), "merge_output_format": "mp4", "retries": 3}
     try:

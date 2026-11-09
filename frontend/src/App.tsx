@@ -29,6 +29,7 @@ import {
   Download,
   Trash2,
   BookOpen,
+  Scissors,
 } from 'lucide-react';
 import {
   adStart,
@@ -44,6 +45,7 @@ import {
 } from './api';
 import Stats from './Stats';
 import Stories from './Stories';
+import Clips from './Clips';
 import ChannelVideos from './ChannelVideos';
 import { GeminiSettings, useGemini } from './Gemini';
 
@@ -877,6 +879,7 @@ export default function App() {
             {[
               [Clapperboard, 'editor', 'Монтаж'],
               [BookOpen, 'stories', 'Истории'],
+              [Scissors, 'clips', 'Нарезки'],
               [ListVideo, 'queue', 'Очередь'],
               [Users, 'channels', 'Каналы'],
               [ChartNoAxesCombined, 'stats', 'Статистика'],
@@ -1971,6 +1974,32 @@ export default function App() {
                     setPlaying(false);
                     setView('editor');
                   });
+                }}
+              />
+            )}
+            {view === 'clips' && (
+              <Clips
+                paused={data.settings.paused}
+                onReady={(assets) => {
+                  if (!assets.length) return;
+                  void run(async () => {
+                    if (dirty) await save();
+                    const ids = new Set(assets.map((a) => a.id));
+                    setData((current) =>
+                      current
+                        ? {
+                            ...current,
+                            assets: [...current.assets.filter((a) => !ids.has(a.id)), ...assets],
+                          }
+                        : current,
+                    );
+                    setSelected(assets[0].id);
+                    setDraft(assets[0].edit);
+                    setDirty(false);
+                    setTime(0);
+                    setPlaying(false);
+                    setView('editor');
+                  }, `В монтажной: ${assets.length} клип(ов). Выберите баннер, каналы и время.`);
                 }}
               />
             )}

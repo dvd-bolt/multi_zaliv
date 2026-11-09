@@ -962,3 +962,55 @@
 #sf-editors .story-status {
   line-height: 1.25;
 }
+
+#sf-editors .clip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+  overflow: hidden;
+}
+#sf-editors .clip-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 62px 62px 34px;
+  grid-template-rows: auto auto;
+  gap: 2px 6px;
+  align-items: center;
+  padding: 5px 6px;
+  border: 1px solid var(--e-line);
+  border-radius: 4px;
+}
+#sf-editors .clip-row.on {
+  border-color: var(--e-text);
+}
+#sf-editors .clip-row .clip-meta {
+  grid-column: 2 / -1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 11px;
+}
+#sf-editors .clip-row .clip-time {
+  padding-left: 6px;
+  padding-right: 6px;
+  text-align: center;
+}
+#sf-editors .clip-row .clip-play {
+  padding: 0;
+  justify-content: center;
+  min-width: 0;
+}
+#sf-editors .clips-view .story-partbar > span {
+  white-space: nowrap;
+}
+#sf-editors .clip-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+#sf-editors .clip-settings {
+  margin-top: auto;
+}
+#sf-editors .clips-view .stories-list > .e-row {
+  flex-wrap: wrap;
+}

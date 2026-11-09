@@ -96,6 +96,10 @@ def tick():
 
         if process_one():
             return
+        from .clips import process_one as process_clip
+
+        if process_clip():
+            return
         job = db.scalar(select(Job).where(Job.status == "queued").order_by(Job.created))
         if not job:
             return
@@ -191,6 +195,9 @@ def main():
     from .stories import recover as recover_stories
 
     recover_stories()
+    from .clips import recover as recover_clips
+
+    recover_clips()
 
     def pulse():
         while True:

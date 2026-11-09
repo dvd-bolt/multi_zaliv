@@ -28,6 +28,7 @@ from .browser_pairing import (
     pairing_details,
     submit_pairing,
 )
+from .clips import router as clips_router
 from .config import DATA, PORT, ROOT, binary
 from .db import (
     Account,
@@ -1065,6 +1066,7 @@ def cleanup():
 
 
 app.include_router(stories_router)
+app.include_router(clips_router)
 
 dist = ROOT / "frontend" / "dist"
 if dist.exists():
