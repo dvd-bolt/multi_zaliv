@@ -741,11 +741,19 @@
   gap: 5px;
   color: var(--e-muted);
 }
-#sf-editors .stories-view .story-check {
+#sf-editors .stories-view label.story-check {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 7px;
+}
+#sf-editors .story-form-grid .story-wide {
+  grid-column: 1 / -1;
+}
+#sf-editors .story-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
 }
 #sf-editors .stories-view input[type='checkbox'] {
   width: auto;

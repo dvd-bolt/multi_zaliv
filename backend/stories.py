@@ -68,6 +68,9 @@ def file_data(row):
 
 def public(story):
     doc = copy.deepcopy(story.document)
+    # Stories saved before 2.0 keep their look until the user changes the settings.
+    for key, value in (("caption_style", "classic"), ("hook", ""), ("next_hint", False)):
+        doc.setdefault(key, value)
     for part in doc["parts"]:
         for key in ("audio_path", "output_path"):
             path = part.pop(key, None)
@@ -108,7 +111,10 @@ class Draft(BaseModel):
     categories: list[Literal["balls", "carpets", "cars"]] = Field(default_factory=lambda: ["cars"])
     loop: bool = False
     subtitles: bool = True
-    width: Literal[720, 1080] = 720
+    width: Literal[720, 1080] = 1080
+    caption_style: Literal["words", "classic"] = "words"
+    hook: str = Field("", max_length=80)
+    next_hint: bool = True
     source_script: str = Field("", max_length=40000)
 
 
@@ -161,7 +167,8 @@ def create():
         s = Story(title="Новая история", document={"parts": [{"id": uid(), "text": ""} for _ in range(2)],
                   "profile": saved_profile.value if saved_profile else story_tts.DEFAULT_PROFILE,
                   "categories": ["cars"], "loop": False,
-                  "subtitles": True, "width": 720})
+                  "subtitles": True, "width": 1080, "caption_style": "words", "hook": "",
+                  "next_hint": True})
         db.add(s)
         db.flush()
         return public(s)
@@ -258,7 +265,8 @@ def save(key: str, request: Draft):
                 part.pop("cues", None)
                 part.pop("captions_reviewed", None)
             render_changed = changed_voice or changed_audio or story.title != request.title or any(
-                old.get(k) != getattr(request, k) for k in ("categories", "loop", "subtitles", "width"))
+                old.get(k) != getattr(request, k)
+                for k in ("categories", "loop", "subtitles", "width", "caption_style", "hook", "next_hint"))
             render_changed = render_changed or [p.get("id") for p in old["parts"]] != [p.id for p in request.parts]
             if render_changed:
                 for field in ("output_path", "asset_id"):
@@ -448,8 +456,12 @@ def render_part(story, part, path, background, cancelled):
     if story.document["subtitles"]:
         ass_file = folder / (part["id"] + ".ass")
         number = next(i for i, p in enumerate(story.document["parts"], 1) if p["id"] == part["id"])
-        ass_file.write_text(story_captions.ass(part["cues"], number,
-                                             len(story.document["parts"]), width, height), encoding="utf-8-sig")
+        document = story.document
+        ass_file.write_text(story_captions.ass(part["cues"], number, len(document["parts"]), width, height,
+                                               style=document.get("caption_style", "classic"),
+                                               hook=document.get("hook", ""),
+                                               next_hint=document.get("next_hint", False),
+                                               duration=part["duration"]), encoding="utf-8-sig")
         graph += f",ass=filename={ass_file.name}"
     args = [binary("ffmpeg"), "-v", "error", "-y"]
     if background["loop"]:

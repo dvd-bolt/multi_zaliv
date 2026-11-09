@@ -27,6 +27,9 @@ type Story = {
   loop: boolean;
   subtitles: boolean;
   width: number;
+  caption_style?: 'words' | 'classic';
+  hook?: string;
+  next_hint?: boolean;
   updated: string;
   source_script?: string;
 };
@@ -77,6 +80,9 @@ const inputPayload = (s: Story) => ({
   loop: s.loop,
   subtitles: s.subtitles,
   width: s.width,
+  caption_style: s.caption_style ?? 'classic',
+  hook: s.hook ?? '',
+  next_hint: s.next_hint ?? false,
   source_script: s.source_script ?? '',
   parts: s.parts.map((p) => ({
     id: p.id || null,
@@ -810,24 +816,54 @@ export default function Stories({
                           <option value={1080}>1080 × 1920</option>
                         </select>
                       </label>
-                      <label className="story-check">
-                        <input
-                          type="checkbox"
-                          checked={story.subtitles}
-                          disabled={locked}
-                          onChange={(e) => edit({ subtitles: e.target.checked })}
-                        />
-                        Субтитры в видео
+                      <label>
+                        Стиль субтитров
+                        <select
+                          value={story.caption_style ?? 'classic'}
+                          disabled={locked || !story.subtitles}
+                          onChange={(e) =>
+                            edit({ caption_style: e.target.value as Story['caption_style'] })
+                          }
+                        >
+                          <option value="words">Крупно, по словам с подсветкой</option>
+                          <option value="classic">Фразы внизу</option>
+                        </select>
                       </label>
+                      <label className="story-wide">
+                        Заголовок первых секунд
+                        <input
+                          value={story.hook ?? ''}
+                          maxLength={80}
+                          disabled={locked}
+                          placeholder="Например: Записка под дверью"
+                          onChange={(e) => edit({ hook: e.target.value })}
+                        />
+                      </label>
+                      <div className="story-wide story-checks">
+                        <label className="story-check">
+                          <input
+                            type="checkbox"
+                            checked={story.subtitles}
+                            disabled={locked}
+                            onChange={(e) => edit({ subtitles: e.target.checked })}
+                          />
+                          Субтитры в видео
+                        </label>
+                        <label className="story-check">
+                          <input
+                            type="checkbox"
+                            checked={story.next_hint ?? false}
+                            disabled={locked || story.parts.length < 2}
+                            onChange={(e) => edit({ next_hint: e.target.checked })}
+                          />
+                          В конце: «Часть N — уже в профиле»
+                        </label>
+                      </div>
                     </div>
-                    <p>
-                      Часть {partIndex + 1} из {story.parts.length}:{' '}
-                      {part.duration ? `${part.duration.toFixed(1)} с` : 'сначала добавьте озвучку'}
-                      .
-                    </p>
                     <p className="e-muted">
-                      Сначала соберите и просмотрите MP4. В монтажной можно добавить баннер, выбрать
-                      каналы, видимость и время. Старые задания не меняются.
+                      Часть {partIndex + 1} из {story.parts.length}:{' '}
+                      {part.duration ? `${part.duration.toFixed(1)} с` : 'сначала добавьте озвучку'}.
+                      Соберите и просмотрите MP4; баннер, каналы и время — в монтажной.
                     </p>
                     <div className="e-row">
                       <a

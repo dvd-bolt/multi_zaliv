@@ -133,7 +133,7 @@ def test_real_local_render_slices_reuse_and_editor_no_publication(draft, tmp_pat
         saved = db.get(Story, s['id'])
         for p in saved.document['parts']:
             info = probe(Path(p['output_path']))
-            assert info['width'] == 720 and abs(info['duration'] - 2) < .3 and info['has_audio']
+            assert info['width'] == 1080 and abs(info['duration'] - 2) < .3 and info['has_audio']
         first_bg = saved.document['parts'][0]['background']
         assert first_bg['sha256']
         before = len(db.scalars(select(Job)).all())
@@ -177,3 +177,41 @@ def test_worker_partial_tts_failure_preserves_other_part_and_recovery(draft, mon
         assert db.get(StoryTask, t['id']).status == 'failed'
         assert 'прервана' in db.get(StoryTask, t['id']).error
     assert count == 2  # No automatic paid retry.
+
+
+def test_word_captions_highlight_each_word_hook_and_next_part():
+    cue = {"start": 0.0, "end": 2.0, "text": "Я нашёл {ключ} в подвале",
+           "words": [{"start": 0.0, "end": .4, "text": "Я"}, {"start": .4, "end": .9, "text": "нашёл"},
+                     {"start": .9, "end": 1.3, "text": "{ключ}"}, {"start": 1.3, "end": 1.5, "text": "в"},
+                     {"start": 1.5, "end": 2.0, "text": "подвале"}]}
+    ass = story_captions.ass([cue], 1, 2, 1080, 1920, style="words", hook="Не открывай {дверь}",
+                             next_hint=True, duration=6.0)
+    words = [line for line in ass.splitlines() if ",Words," in line]
+    assert len(words) == 5  # one event per word, groups of three
+    assert "{\\c&H0000E5FF&\\fscx112\\fscy112}НАШЁЛ{\\r}" in words[1] and "ПОДВАЛЕ" not in words[1]
+    assert words[3].endswith("ПОДВАЛЕ") and "{\\c" in words[3]
+    assert "{ключ}" not in ass and "{дверь}" not in ass  # user braces never become override tags
+    assert ",Hook,,0,0,0,,Не открывай  дверь " in ass
+    assert "0:00:03.80,0:00:06.00,Next,,0,0,0,,Часть 2 — уже в профиле" in ass
+    last = story_captions.ass([cue], 2, 2, 1080, 1920, style="words", next_hint=True, duration=6.0)
+    assert ",Next," not in last.split("[Events]")[1]
+
+
+def test_reference_words_get_heard_times_or_letter_split():
+    heard = [type("W", (), {"start": s, "end": e, "word": w})() for s, e, w in
+             ((0, .5, " Привет"), (.5, 1.0, " мир"))]
+    cue = {"start": 0, "end": 1.0, "text": "Привет, мир!"}
+    assert story_captions.word_times(cue, heard)[1] == {"start": .5, "end": 1.0, "text": "мир!"}
+    split = story_captions.word_times({"start": 0, "end": 1.0, "text": "аа бббб"}, heard[:1])
+    assert split[0]["end"] == pytest.approx(1 / 3, abs=.01)
+
+
+def test_story_2_settings_saved_and_old_documents_keep_classic_look(draft):
+    client, s = draft
+    assert s['width'] == 1080 and s['caption_style'] == 'words' and s['next_hint'] is True
+    s.update(hook='Записка под дверью', caption_style='classic', next_hint=False)
+    saved = client.put('/api/stories/' + s['id'], json=s).json()
+    assert (saved['hook'], saved['caption_style'], saved['next_hint']) == ('Записка под дверью', 'classic', False)
+    from backend.stories import public
+    old = type('S', (), {'id': 'x', 'title': 't', 'revision': 1, 'updated': '', 'document': {'parts': []}})()
+    assert public(old)['caption_style'] == 'classic' and public(old)['next_hint'] is False
