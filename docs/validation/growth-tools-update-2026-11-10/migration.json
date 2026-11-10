@@ -1,0 +1,28 @@
+{
+  "quick_check": "ok",
+  "schema": 11,
+  "counts": {
+    "schema_migrations": 11,
+    "assets": 29,
+    "accounts": 4,
+    "settings": 6,
+    "variants": 38,
+    "jobs": 38,
+    "metrics": 4520,
+    "buba_submissions": 0,
+    "comment_scans": 33,
+    "comments": 0,
+    "channel_videos": 27,
+    "publication_stats": 34,
+    "stories": 0,
+    "story_files": 0,
+    "story_tasks": 0
+  },
+  "jobs": {
+    "cancelled": 4,
+    "published": 33,
+    "waiting_auth": 1
+  },
+  "isolatedData": "C:\\Users\\dvd\\AppData\\Local\\Temp\\frameflow-update-migration-4_ds7nzc",
+  "countsPreserved": true
+}

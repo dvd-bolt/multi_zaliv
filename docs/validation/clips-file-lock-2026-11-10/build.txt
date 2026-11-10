@@ -1,0 +1,63 @@
+
+> survivalflow-ui@0.2.0 build
+> tsc -b && vite build
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 1594 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                     0.48 kB │ gzip:   0.35 kB
+dist/assets/manrope-vietnamese-800-normal-ClPWri-A.woff2            4.16 kB
+dist/assets/manrope-vietnamese-400-normal-DHb3EETF.woff2            4.46 kB
+dist/assets/manrope-vietnamese-600-normal-C1J5PCl_.woff2            4.47 kB
+dist/assets/manrope-vietnamese-700-normal-CUqMx5-1.woff2            4.55 kB
+dist/assets/manrope-greek-800-normal-CDvU698_.woff2                 5.18 kB
+dist/assets/manrope-greek-600-normal-BoRV6lzK.woff2                 5.23 kB
+dist/assets/manrope-greek-700-normal-CHUG9PD8.woff2                 5.24 kB
+dist/assets/manrope-greek-400-normal-CM4qok81.woff2                 5.28 kB
+dist/assets/ibm-plex-mono-vietnamese-400-normal-DDuiU_S-.woff       5.62 kB
+dist/assets/ibm-plex-mono-cyrillic-ext-400-normal-DMdlQ8Kv.woff     5.82 kB
+dist/assets/ibm-plex-mono-vietnamese-400-normal-BulugwFq.woff2      5.87 kB
+dist/assets/manrope-vietnamese-400-normal-D7E_mLGF.woff             6.11 kB
+dist/assets/manrope-vietnamese-800-normal-bvg7iBCV.woff             6.13 kB
+dist/assets/manrope-vietnamese-600-normal-lA7a_7Ok.woff             6.14 kB
+dist/assets/manrope-vietnamese-700-normal-pt65Fn2Z.woff             6.36 kB
+dist/assets/manrope-greek-800-normal-Bw-67qu9.woff                  6.63 kB
+dist/assets/manrope-greek-600-normal-CF2i9ZRY.woff                  6.74 kB
+dist/assets/manrope-greek-700-normal-DyfsrCpP.woff                  6.74 kB
+dist/assets/manrope-greek-400-normal-DuX9RsAR.woff                  6.77 kB
+dist/assets/ibm-plex-mono-cyrillic-ext-400-normal-xuaO2J-f.woff2    6.91 kB
+dist/assets/ibm-plex-mono-cyrillic-400-normal-CEL4l2ZJ.woff         7.20 kB
+dist/assets/manrope-cyrillic-800-normal-AvdZ5mAV.woff2              7.59 kB
+dist/assets/manrope-cyrillic-400-normal-BMzJvInZ.woff2              7.84 kB
+dist/assets/manrope-cyrillic-700-normal-Dw_fZAg2.woff2              7.85 kB
+dist/assets/manrope-cyrillic-600-normal-DvRl3Mj-.woff2              7.87 kB
+dist/assets/manrope-latin-ext-800-normal-DdFx7KEb.woff2             8.03 kB
+dist/assets/manrope-latin-ext-700-normal-DYOwVNan.woff2             8.28 kB
+dist/assets/manrope-latin-ext-400-normal-CMDvPJRp.woff2             8.29 kB
+dist/assets/manrope-latin-ext-600-normal-_gBojHdJ.woff2             8.30 kB
+dist/assets/ibm-plex-mono-cyrillic-400-normal-BSMlKf0J.woff2        8.36 kB
+dist/assets/manrope-cyrillic-800-normal-BuEMjQU-.woff               9.78 kB
+dist/assets/manrope-cyrillic-700-normal-7JNVKxyl.woff              10.00 kB
+dist/assets/manrope-cyrillic-400-normal-Dvx59UGC.woff              10.03 kB
+dist/assets/manrope-cyrillic-600-normal-It4mZcQk.woff              10.06 kB
+dist/assets/manrope-latin-ext-800-normal-BQAQsuQc.woff             11.11 kB
+dist/assets/manrope-latin-ext-600-normal-u5Pl7hTU.woff             11.25 kB
+dist/assets/manrope-latin-ext-400-normal-C-X6QNXX.woff             11.32 kB
+dist/assets/manrope-latin-ext-700-normal-eVCcYqtJ.woff             11.35 kB
+dist/assets/ibm-plex-mono-latin-ext-400-normal-D3D2R8hC.woff       11.77 kB
+dist/assets/ibm-plex-mono-latin-400-normal-CvHOgSBP.woff           13.14 kB
+dist/assets/ibm-plex-mono-latin-ext-400-normal-BmRBH3aV.woff2      13.35 kB
+dist/assets/manrope-latin-800-normal-BfWYOv1c.woff2                13.65 kB
+dist/assets/manrope-latin-400-normal-PaqtzbVb.woff2                14.11 kB
+dist/assets/manrope-latin-600-normal-4f0koTD-.woff2                14.17 kB
+dist/assets/manrope-latin-700-normal-BZp_XxE4.woff2                14.21 kB
+dist/assets/ibm-plex-mono-latin-400-normal-DMJ8VG8y.woff2          14.71 kB
+dist/assets/manrope-latin-800-normal-uHUdIJgA.woff                 17.91 kB
+dist/assets/manrope-latin-400-normal-8tf8FM3T.woff                 18.29 kB
+dist/assets/manrope-latin-600-normal-BqgrALkZ.woff                 18.38 kB
+dist/assets/manrope-latin-700-normal-DGRFkw-m.woff                 18.41 kB
+dist/assets/index-TRwZGqyc.css                                     82.15 kB │ gzip:  24.62 kB
+dist/assets/index-D53kkMMk.js                                     389.92 kB │ gzip: 116.81 kB
+✓ built in 3.54s

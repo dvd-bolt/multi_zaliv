@@ -1,0 +1,14 @@
+{
+  "id": "47abdefa883d46c18163d49602d461df",
+  "downloadBefore": "failed",
+  "partialBytesBefore": 20451571,
+  "paidRequests": 0,
+  "publications": 0,
+  "downloadAfter": "queued_analyze",
+  "videoBytes": 71113303,
+  "status": "ready",
+  "duration": 437.74,
+  "method": "речь и громкость",
+  "candidates": 5,
+  "error": ""
+}

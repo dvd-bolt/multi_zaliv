@@ -60,7 +60,7 @@ try{
  const after=await(await page.request.get(base+'/api/state')).json();assert.equal(after.jobs.length,before);assert(after.assets.some(a=>a.edit.genre==='story'));checks.push('Transfer to existing editor creates an asset and no publication');
  await page.getByRole('button',{name:'Истории',exact:true}).click();await page.getByRole('tab',{name:'Сценарий',exact:true}).click();await page.getByRole('button',{name:'Импорт сценария',exact:true}).click();
  await page.getByLabel('Полный сценарий').fill('Название: Проверка\nЧастей: 2\nФон: Мойка машин\n[Часть 1]\nПервый текст.\n[Часть 2]\nВторой текст.');
- await page.getByRole('button',{name:'Разобрать по частям',exact:true}).click();assert.equal(await page.getByLabel('Текст части').inputValue(),'Первый текст.');await page.getByRole('button',{name:'Сохранить',exact:true}).click();checks.push('Script import separates metadata and persists two parts');
+ await page.getByRole('button',{name:'Разобрать по частям',exact:true}).click();await page.getByRole('dialog').waitFor({state:'hidden'});assert.equal(await page.getByLabel('Текст части').inputValue(),'Первый текст.');await page.getByRole('button',{name:'Сохранить',exact:true}).click();checks.push('Script import separates metadata and persists two parts');
  assert.deepEqual(errors,[]);
 }finally{fs.writeFileSync(path.join(out,'ui-results.json'),JSON.stringify({isolatedData:data,realTtsRequestsInUi:0,checks,layouts,errors},null,2));if(browser)await browser.close();server.kill();fs.closeSync(log);}
 console.log(JSON.stringify({checks,errors}));})().catch(e=>{console.error(e);process.exitCode=1});

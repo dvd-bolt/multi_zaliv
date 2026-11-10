@@ -1,0 +1,67 @@
+{
+  "backup": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\data\\backups\\before-clips-file-lock-20261110-144219",
+  "countsBefore": {
+    "schema_migrations": 11,
+    "assets": 29,
+    "accounts": 5,
+    "settings": 7,
+    "variants": 38,
+    "jobs": 38,
+    "metrics": 4520,
+    "buba_submissions": 0,
+    "comment_scans": 33,
+    "comments": 0,
+    "channel_videos": 27,
+    "publication_stats": 34,
+    "stories": 0,
+    "story_files": 0,
+    "story_tasks": 0
+  },
+  "countsAfter": {
+    "schema_migrations": 11,
+    "assets": 29,
+    "accounts": 5,
+    "settings": 7,
+    "variants": 38,
+    "jobs": 38,
+    "metrics": 4520,
+    "buba_submissions": 0,
+    "comment_scans": 33,
+    "comments": 0,
+    "channel_videos": 27,
+    "publication_stats": 34,
+    "stories": 0,
+    "story_files": 0,
+    "story_tasks": 0
+  },
+  "countsPreserved": true,
+  "jobsBefore": {
+    "cancelled": 4,
+    "published": 33,
+    "waiting_auth": 1
+  },
+  "jobsAfter": {
+    "cancelled": 4,
+    "published": 33,
+    "waiting_auth": 1
+  },
+  "jobStatusesPreserved": true,
+  "quick_check": "ok",
+  "health": {
+    "ok": true,
+    "tools": {
+      "ffmpeg": true,
+      "ffprobe": true
+    },
+    "free_gb": 162.1,
+    "application": "SurvivalFlow",
+    "product_name": "FrameFlow",
+    "data_directory": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\data",
+    "pid": 14880
+  },
+  "worker": true,
+  "build": "2c28a0ed4d2693da",
+  "desktopObserved": true,
+  "paidRequests": 0,
+  "publications": 0
+}

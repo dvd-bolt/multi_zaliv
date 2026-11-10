@@ -1,0 +1,30 @@
+{
+  "isolatedData": "C:\\Users\\dvd\\AppData\\Local\\Temp\\frameflow-clips-ui-Yq90sf",
+  "syntheticTranscript": true,
+  "externalRequests": [],
+  "checks": [
+    "Six moments paginate four at a time",
+    "Edited title and selection survive reload",
+    "Selected clip renders to real 1080x1920 MP4 and plays",
+    "Transfer creates an editor source without publication jobs"
+  ],
+  "layouts": [
+    {
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "actionBottom": 534,
+      "clipped": []
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "sw": 1440,
+      "sh": 900,
+      "actionBottom": 831,
+      "clipped": []
+    }
+  ],
+  "errors": []
+}

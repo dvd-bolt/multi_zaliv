@@ -1,0 +1,72 @@
+{
+  "commit": "0765637",
+  "build": "70ade5c103da6bf8",
+  "backup": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\data\\backups\\before-growth-update-20261110-142554\\survivalflow.sqlite3",
+  "quick_check": "ok",
+  "schema": 11,
+  "countsBefore": {
+    "schema_migrations": 11,
+    "assets": 29,
+    "accounts": 4,
+    "settings": 6,
+    "variants": 38,
+    "jobs": 38,
+    "metrics": 4520,
+    "buba_submissions": 0,
+    "comment_scans": 33,
+    "comments": 0,
+    "channel_videos": 27,
+    "publication_stats": 34,
+    "stories": 0,
+    "story_files": 0,
+    "story_tasks": 0
+  },
+  "countsAfter": {
+    "schema_migrations": 11,
+    "assets": 29,
+    "accounts": 4,
+    "settings": 6,
+    "variants": 38,
+    "jobs": 38,
+    "metrics": 4520,
+    "buba_submissions": 0,
+    "comment_scans": 33,
+    "comments": 0,
+    "channel_videos": 27,
+    "publication_stats": 34,
+    "stories": 0,
+    "story_files": 0,
+    "story_tasks": 0
+  },
+  "countsPreserved": true,
+  "jobsBefore": {
+    "cancelled": 4,
+    "published": 33,
+    "waiting_auth": 1
+  },
+  "jobsAfter": {
+    "cancelled": 4,
+    "published": 33,
+    "waiting_auth": 1
+  },
+  "jobStatusesPreserved": true,
+  "worker": true,
+  "health": {
+    "ok": true,
+    "tools": {
+      "ffmpeg": true,
+      "ffprobe": true
+    },
+    "free_gb": 162.2,
+    "application": "SurvivalFlow",
+    "product_name": "FrameFlow",
+    "data_directory": "C:\\Users\\dvd\\Desktop\\Projects\\multi_zaliv\\data",
+    "pid": 16796
+  },
+  "paidRequestsByAgent": 0,
+  "publicationsByAgent": 0,
+  "desktopObserved": true,
+  "desktopSectionObserved": "Clips",
+  "launchMethod": "Verified desktop shortcut target and arguments; launched equivalent hidden pythonw command",
+  "installerRebuilt": false
+}

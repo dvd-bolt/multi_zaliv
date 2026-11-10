@@ -352,15 +352,17 @@ export default function Clips({
                 </button>
                 <button
                   className="e-button"
-                  disabled={locked || dirty || !current.has_video}
-                  title="Расшифровать заново и найти моменты; ваши правки моментов заменятся"
+                  disabled={locked || dirty || (!current.has_video && !current.url)}
+                  title={current.has_video
+                    ? 'Расшифровать заново и найти моменты; ваши правки моментов заменятся'
+                    : 'Продолжить загрузку по исходной ссылке; скачанные части сохранятся'}
                   onClick={() =>
                     void run(async () => {
                       accept(await api<Source>(`/clips/${current.id}/analyze`, 'POST'));
                     })
                   }
                 >
-                  <RefreshCw /> Найти заново
+                  <RefreshCw /> {current.has_video ? 'Найти заново' : 'Повторить загрузку'}
                 </button>
                 <button
                   className="e-button primary"

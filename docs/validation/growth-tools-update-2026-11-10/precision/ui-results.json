@@ -1,0 +1,710 @@
+{
+  "isolatedData": "C:\\Users\\dvd\\AppData\\Local\\Temp\\frameflow-precision-ZHKhzw",
+  "noPlatformRequests": true,
+  "checks": [
+    {
+      "name": "API uses isolated data",
+      "ok": true
+    },
+    {
+      "name": "empty: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "empty: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "empty: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "empty: content above launch",
+      "ok": true,
+      "details": {
+        "width": 1024,
+        "height": 600,
+        "sw": 1024,
+        "sh": 600,
+        "overflow": [],
+        "contentBottom": 119.1875,
+        "saveTop": 454.609375
+      }
+    },
+    {
+      "name": "Precision is production theme",
+      "ok": true
+    },
+    {
+      "name": "neutral monochrome tokens",
+      "ok": true,
+      "details": [
+        "#101010",
+        "#191919",
+        "#f2f2f2",
+        "#e7e7e7"
+      ]
+    },
+    {
+      "name": "create test channel 1",
+      "ok": true
+    },
+    {
+      "name": "create test channel 2",
+      "ok": true
+    },
+    {
+      "name": "create test channel 3",
+      "ok": true
+    },
+    {
+      "name": "create test channel 4",
+      "ok": true
+    },
+    {
+      "name": "create test channel 5",
+      "ok": true
+    },
+    {
+      "name": "create test channel 6",
+      "ok": true
+    },
+    {
+      "name": "six channels persist",
+      "ok": true
+    },
+    {
+      "name": "banner timing persists",
+      "ok": true
+    },
+    {
+      "name": "1440-900-banner: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "1440-900-banner: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "1440-900-banner: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "1440-900-banner: content above launch",
+      "ok": true,
+      "details": {
+        "width": 1440,
+        "height": 900,
+        "sw": 1440,
+        "sh": 900,
+        "overflow": [],
+        "contentBottom": 399.78125,
+        "saveTop": 703
+      }
+    },
+    {
+      "name": "1440-900-filters: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "1440-900-filters: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "1440-900-filters: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "1440-900-filters: content above launch",
+      "ok": true,
+      "details": {
+        "width": 1440,
+        "height": 900,
+        "sw": 1440,
+        "sh": 900,
+        "overflow": [],
+        "contentBottom": 401.390625,
+        "saveTop": 703
+      }
+    },
+    {
+      "name": "1440-900-publish: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "1440-900-publish: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "1440-900-publish: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "1440-900-publish: content above launch",
+      "ok": true,
+      "details": {
+        "width": 1440,
+        "height": 900,
+        "sw": 1440,
+        "sh": 900,
+        "overflow": [],
+        "contentBottom": 443.953125,
+        "saveTop": 703
+      }
+    },
+    {
+      "name": "1280-800-banner: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "1280-800-banner: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "1280-800-banner: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "1280-800-banner: content above launch",
+      "ok": true,
+      "details": {
+        "width": 1280,
+        "height": 800,
+        "sw": 1280,
+        "sh": 800,
+        "overflow": [],
+        "contentBottom": 399.78125,
+        "saveTop": 603
+      }
+    },
+    {
+      "name": "1280-800-filters: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "1280-800-filters: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "1280-800-filters: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "1280-800-filters: content above launch",
+      "ok": true,
+      "details": {
+        "width": 1280,
+        "height": 800,
+        "sw": 1280,
+        "sh": 800,
+        "overflow": [],
+        "contentBottom": 401.390625,
+        "saveTop": 603
+      }
+    },
+    {
+      "name": "1280-800-publish: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "1280-800-publish: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "1280-800-publish: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "1280-800-publish: content above launch",
+      "ok": true,
+      "details": {
+        "width": 1280,
+        "height": 800,
+        "sw": 1280,
+        "sh": 800,
+        "overflow": [],
+        "contentBottom": 443.953125,
+        "saveTop": 603
+      }
+    },
+    {
+      "name": "1024-600-banner: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "1024-600-banner: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "1024-600-banner: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "1024-600-banner: content above launch",
+      "ok": true,
+      "details": {
+        "width": 1024,
+        "height": 600,
+        "sw": 1024,
+        "sh": 600,
+        "overflow": [],
+        "contentBottom": 387.171875,
+        "saveTop": 420
+      }
+    },
+    {
+      "name": "1024-600-filters: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "1024-600-filters: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "1024-600-filters: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "1024-600-filters: content above launch",
+      "ok": true,
+      "details": {
+        "width": 1024,
+        "height": 600,
+        "sw": 1024,
+        "sh": 600,
+        "overflow": [],
+        "contentBottom": 395.78125,
+        "saveTop": 420
+      }
+    },
+    {
+      "name": "1024-600-publish: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "1024-600-publish: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "1024-600-publish: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "1024-600-publish: content above launch",
+      "ok": true,
+      "details": {
+        "width": 1024,
+        "height": 600,
+        "sw": 1024,
+        "sh": 600,
+        "overflow": [],
+        "contentBottom": 412.34375,
+        "saveTop": 420
+      }
+    },
+    {
+      "name": "keyboard switches inspector tab",
+      "ok": true
+    },
+    {
+      "name": "filter preview responds",
+      "ok": true
+    },
+    {
+      "name": "banner-dialog: dialog fits",
+      "ok": true,
+      "details": {
+        "top": 28.9375,
+        "bottom": 571.0625,
+        "scroll": false
+      }
+    },
+    {
+      "name": "dialog restores focus",
+      "ok": true
+    },
+    {
+      "name": "real preview plays",
+      "ok": true
+    },
+    {
+      "name": "enqueue-dialog: dialog fits",
+      "ok": true,
+      "details": {
+        "top": 62.953125,
+        "bottom": 537.046875,
+        "scroll": false
+      }
+    },
+    {
+      "name": "channels: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "channels: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "channels: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "new-account-dialog: dialog fits",
+      "ok": true,
+      "details": {
+        "top": 159.8125,
+        "bottom": 440.1875,
+        "scroll": false
+      }
+    },
+    {
+      "name": "queue-empty: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "queue-empty: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "queue-empty: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "statistics-Обзор: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "statistics-Обзор: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "statistics-Обзор: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "statistics-Ролики: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "statistics-Ролики: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "statistics-Ролики: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "statistics-Каналы: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "statistics-Каналы: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "statistics-Каналы: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "statistics-Выплаты БУБА: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "statistics-Выплаты БУБА: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "statistics-Выплаты БУБА: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "settings-Программа: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "settings-Программа: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "settings-Программа: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "settings-Подключения: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "settings-Подключения: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "settings-Подключения: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "settings-Данные: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "settings-Данные: vertical bounds",
+      "ok": true
+    },
+    {
+      "name": "settings-Данные: no clipped panels",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "compact-768: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "compact-390: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "compact-320: horizontal bounds",
+      "ok": true
+    },
+    {
+      "name": "reduced motion",
+      "ok": true
+    },
+    {
+      "name": "no publications or queue writes",
+      "ok": true
+    }
+  ],
+  "layouts": [
+    {
+      "name": "empty",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "overflow": [],
+      "contentBottom": 119.1875,
+      "saveTop": 454.609375
+    },
+    {
+      "name": "1440-900-banner",
+      "width": 1440,
+      "height": 900,
+      "sw": 1440,
+      "sh": 900,
+      "overflow": [],
+      "contentBottom": 399.78125,
+      "saveTop": 703
+    },
+    {
+      "name": "1440-900-filters",
+      "width": 1440,
+      "height": 900,
+      "sw": 1440,
+      "sh": 900,
+      "overflow": [],
+      "contentBottom": 401.390625,
+      "saveTop": 703
+    },
+    {
+      "name": "1440-900-publish",
+      "width": 1440,
+      "height": 900,
+      "sw": 1440,
+      "sh": 900,
+      "overflow": [],
+      "contentBottom": 443.953125,
+      "saveTop": 703
+    },
+    {
+      "name": "1280-800-banner",
+      "width": 1280,
+      "height": 800,
+      "sw": 1280,
+      "sh": 800,
+      "overflow": [],
+      "contentBottom": 399.78125,
+      "saveTop": 603
+    },
+    {
+      "name": "1280-800-filters",
+      "width": 1280,
+      "height": 800,
+      "sw": 1280,
+      "sh": 800,
+      "overflow": [],
+      "contentBottom": 401.390625,
+      "saveTop": 603
+    },
+    {
+      "name": "1280-800-publish",
+      "width": 1280,
+      "height": 800,
+      "sw": 1280,
+      "sh": 800,
+      "overflow": [],
+      "contentBottom": 443.953125,
+      "saveTop": 603
+    },
+    {
+      "name": "1024-600-banner",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "overflow": [],
+      "contentBottom": 387.171875,
+      "saveTop": 420
+    },
+    {
+      "name": "1024-600-filters",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "overflow": [],
+      "contentBottom": 395.78125,
+      "saveTop": 420
+    },
+    {
+      "name": "1024-600-publish",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "overflow": [],
+      "contentBottom": 412.34375,
+      "saveTop": 420
+    },
+    {
+      "name": "channels",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "overflow": [],
+      "contentBottom": 0
+    },
+    {
+      "name": "queue-empty",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "overflow": [],
+      "contentBottom": 0
+    },
+    {
+      "name": "statistics-Обзор",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "overflow": [],
+      "contentBottom": 0
+    },
+    {
+      "name": "statistics-Ролики",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "overflow": [],
+      "contentBottom": 0
+    },
+    {
+      "name": "statistics-Каналы",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "overflow": [],
+      "contentBottom": 0
+    },
+    {
+      "name": "statistics-Выплаты БУБА",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "overflow": [],
+      "contentBottom": 0
+    },
+    {
+      "name": "settings-Программа",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "overflow": [],
+      "contentBottom": 0
+    },
+    {
+      "name": "settings-Подключения",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "overflow": [],
+      "contentBottom": 0
+    },
+    {
+      "name": "settings-Данные",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "overflow": [],
+      "contentBottom": 0
+    },
+    {
+      "name": "compact-768",
+      "width": 768,
+      "height": 800,
+      "sw": 768,
+      "sh": 800,
+      "overflow": [],
+      "contentBottom": 399.78125,
+      "saveTop": 603
+    },
+    {
+      "name": "compact-390",
+      "width": 390,
+      "height": 844,
+      "sw": 390,
+      "sh": 1430,
+      "overflow": [],
+      "contentBottom": 1183.5625,
+      "saveTop": 1197.5625
+    },
+    {
+      "name": "compact-320",
+      "width": 320,
+      "height": 740,
+      "sw": 320,
+      "sh": 1441,
+      "overflow": [],
+      "contentBottom": 1194.75,
+      "saveTop": 1208.75
+    }
+  ],
+  "errors": []
+}

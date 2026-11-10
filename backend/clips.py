@@ -13,6 +13,7 @@ import os
 import re
 import shutil
 import subprocess
+import tempfile
 import threading
 import time
 from pathlib import Path
@@ -57,9 +58,29 @@ def load(key):
 def save(state):
     state["updated"] = now()
     path = state_path(state["id"])
-    tmp = path.with_suffix(".tmp")
-    tmp.write_text(json.dumps(state, ensure_ascii=False, indent=1), encoding="utf-8")
-    os.replace(tmp, path)
+    # API readers live in another process. On Windows their short-lived open
+    # handles can deny replacement; keep the old JSON intact and retry the swap.
+    # Each writer owns its temporary file, including during retry/cleanup.
+    with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent,
+                                     prefix="state-", suffix=".tmp", delete=False) as file:
+        tmp = Path(file.name)
+        try:
+            json.dump(state, file, ensure_ascii=False, indent=1)
+        except BaseException:
+            file.close()
+            tmp.unlink(missing_ok=True)
+            raise
+    try:
+        for attempt in range(10):
+            try:
+                os.replace(tmp, path)
+                break
+            except PermissionError:
+                if attempt == 9:
+                    raise
+                time.sleep(min(.01 * 2**attempt, .16))
+    finally:
+        tmp.unlink(missing_ok=True)
 
 
 def public(state):
@@ -191,9 +212,13 @@ def analyze_again(key: str):
         state = load(key)
         if state["status"].startswith(("queued", "running")):
             raise ValueError("Уже в обработке")
-        if not state.get("path") or not Path(state["path"]).is_file():
-            raise ValueError("Видео источника не найдено")
-        state.update(status="queued_analyze", detail="В очереди", error="", progress=0)
+        has_video = bool(state.get("path")) and Path(state["path"]).is_file()
+        if not has_video:
+            if not state.get("url"):
+                raise ValueError("Видео источника не найдено")
+            story_backgrounds.check_url(state["url"])
+        state.update(status="queued_analyze" if has_video else "queued_download",
+                     detail="В очереди", error="", progress=0, cancel=False)
         save(state)
         return public(state)
 
@@ -333,14 +358,20 @@ def download(state):
 
     key = state["id"]
     folder = root() / key
+    last_report = 0.0
 
     def hook(d):
+        nonlocal last_report
         if d.get("status") == "downloading":
+            tick = time.monotonic()
+            if tick - last_report < .25:
+                return
             total = d.get("total_bytes") or d.get("total_bytes_estimate") or 0
             if cancelled(key):
                 raise InterruptedError("Отменено")
             set_state(key, progress=round(100 * (d.get("downloaded_bytes") or 0) / total) if total else 0,
                       detail="Скачивание")
+            last_report = tick
 
     options = {"format": "bv*[height<=1080][ext=mp4]+ba[ext=m4a]/bv*[height<=1080]+ba/b[height<=1080]/bv*+ba/b",
                "outtmpl": str(folder / "source.%(ext)s"), "noplaylist": True, "quiet": True, "noprogress": True,
