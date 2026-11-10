@@ -87,6 +87,12 @@ def tick():
         dispatch_one(db)
         db.commit()
         try:
+            from .releases import tick as releases_tick
+
+            releases_tick()  # Continue a batch once its first TikTok publication is confirmed.
+        except Exception:
+            logging.getLogger(__name__).exception("Не удалось продолжить выпуск")
+        try:
             from .notify import flush
 
             flush(db)

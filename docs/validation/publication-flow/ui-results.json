@@ -1,0 +1,404 @@
+{
+  "isolatedData": "/tmp/frameflow-release-ui-6HWMU6",
+  "externalRequests": [],
+  "checks": [
+    {
+      "name": "01-empty: fits 1024×600 without scroll",
+      "ok": true,
+      "details": {
+        "width": 1024,
+        "height": 600,
+        "sw": 1024,
+        "sh": 600,
+        "clipped": [],
+        "actions": 0
+      }
+    },
+    {
+      "name": "three materials in the draft",
+      "ok": true
+    },
+    {
+      "name": "batch banner applied to every material",
+      "ok": true
+    },
+    {
+      "name": "02-step-materials: fits 1024×600 without scroll",
+      "ok": true,
+      "details": {
+        "width": 1024,
+        "height": 600,
+        "sw": 1024,
+        "sh": 600,
+        "clipped": [],
+        "actions": 558
+      }
+    },
+    {
+      "name": "TikTok readiness explains the next step",
+      "ok": true
+    },
+    {
+      "name": "03-step-channels: fits 1024×600 without scroll",
+      "ok": true,
+      "details": {
+        "width": 1024,
+        "height": 600,
+        "sw": 1024,
+        "sh": 600,
+        "clipped": [],
+        "actions": 558
+      }
+    },
+    {
+      "name": "draft and step survive reload",
+      "ok": true,
+      "details": {
+        "id": "b8b508dd1bc34514af6cd359639af4bd",
+        "status": "draft",
+        "asset_ids": [
+          "79dd26390bc3445f8b96c622a92e65b2",
+          "cff1ba9d51134a0e84c81c8265915e71",
+          "6f75f844d8814440b1bdc9d192baf5e7"
+        ],
+        "account_ids": [
+          "28e31f2eee794fa9a8b85e9a2357bf39",
+          "e178e506332f4ab198abc391b4e5e769"
+        ],
+        "plan": {
+          "step": 2,
+          "publish": true,
+          "scheduled": null,
+          "schedules": {},
+          "comment": null,
+          "comment_pin": true,
+          "tiktok_sound": null,
+          "continue_after_first": false,
+          "buba_confirmed": false
+        },
+        "jobs": {},
+        "created": "2026-11-10T13:34:33.224766+00:00",
+        "updated": "2026-11-10T13:34:33.862908+00:00"
+      }
+    },
+    {
+      "name": "nothing queued before the final step",
+      "ok": true
+    },
+    {
+      "name": "final table shows every planned publication",
+      "ok": true
+    },
+    {
+      "name": "04-step-check: fits 1024×600 without scroll",
+      "ok": true,
+      "details": {
+        "width": 1024,
+        "height": 600,
+        "sw": 1024,
+        "sh": 600,
+        "clipped": [],
+        "actions": 558
+      }
+    },
+    {
+      "name": "start: YouTube batch authorized, TikTok gets one unauthorized first video",
+      "ok": true,
+      "details": [
+        [
+          "@tt_new",
+          "queued",
+          false
+        ],
+        [
+          "Канал YouTube",
+          "queued",
+          true
+        ],
+        [
+          "Канал YouTube",
+          "queued",
+          true
+        ],
+        [
+          "Канал YouTube",
+          "queued",
+          true
+        ]
+      ]
+    },
+    {
+      "name": "05-started-preparing: fits 1024×600 without scroll",
+      "ok": true,
+      "details": {
+        "width": 1024,
+        "height": 600,
+        "sw": 1024,
+        "sh": 600,
+        "clipped": [],
+        "actions": 558
+      }
+    },
+    {
+      "name": "final MP4 is shown before the first publication",
+      "ok": true
+    },
+    {
+      "name": "06-first-ready: fits 1024×600 without scroll",
+      "ok": true,
+      "details": {
+        "width": 1024,
+        "height": 600,
+        "sw": 1024,
+        "sh": 600,
+        "clipped": [],
+        "actions": 558
+      }
+    },
+    {
+      "name": "first publication authorizes exactly the shown video and resumes the queue",
+      "ok": true
+    },
+    {
+      "name": "lost answer offers a check and no plain retry",
+      "ok": true
+    },
+    {
+      "name": "07-first-unknown: fits 1024×600 without scroll",
+      "ok": true,
+      "details": {
+        "width": 1024,
+        "height": 600,
+        "sw": 1024,
+        "sh": 600,
+        "clipped": [],
+        "actions": 558
+      }
+    },
+    {
+      "name": "link from another account is refused",
+      "ok": true
+    },
+    {
+      "name": "after the confirmed first video the rest of the batch continues by the plan",
+      "ok": true
+    },
+    {
+      "name": "08-first-confirmed: fits 1024×600 without scroll",
+      "ok": true,
+      "details": {
+        "width": 1024,
+        "height": 600,
+        "sw": 1024,
+        "sh": 600,
+        "clipped": [],
+        "actions": 558
+      }
+    },
+    {
+      "name": "09-queue-actions: fits 1024×600 without scroll",
+      "ok": true,
+      "details": {
+        "width": 1024,
+        "height": 600,
+        "sw": 1024,
+        "sh": 600,
+        "clipped": [],
+        "actions": 0
+      }
+    },
+    {
+      "name": "queue rows offer the next action",
+      "ok": true
+    },
+    {
+      "name": "10-queue-all: fits 1024×600 without scroll",
+      "ok": true,
+      "details": {
+        "width": 1024,
+        "height": 600,
+        "sw": 1024,
+        "sh": 600,
+        "clipped": [],
+        "actions": 0
+      }
+    },
+    {
+      "name": "verified TikTok is ready for autopublish",
+      "ok": true
+    },
+    {
+      "name": "11-channels: fits 1024×600 without scroll",
+      "ok": true,
+      "details": {
+        "width": 1024,
+        "height": 600,
+        "sw": 1024,
+        "sh": 600,
+        "clipped": [],
+        "actions": 0
+      }
+    },
+    {
+      "name": "«Подготовить публикацию» opens a draft for this channel",
+      "ok": true,
+      "details": {
+        "id": "ba58ef9e5a9e4679be716fcc03ff12a3",
+        "status": "draft",
+        "asset_ids": [
+          "79dd26390bc3445f8b96c622a92e65b2"
+        ],
+        "account_ids": [
+          "9fdc924cba374e7bab5a85658b53bed5"
+        ],
+        "plan": {
+          "step": 2,
+          "publish": true,
+          "scheduled": null,
+          "schedules": {},
+          "comment": null,
+          "comment_pin": true,
+          "tiktok_sound": null,
+          "continue_after_first": false,
+          "buba_confirmed": false
+        },
+        "jobs": {},
+        "created": "2026-11-10T13:34:41.901912+00:00",
+        "updated": "2026-11-10T13:34:41.914766+00:00"
+      }
+    },
+    {
+      "name": "12-prepare-from-channel: fits 1024×600 without scroll",
+      "ok": true,
+      "details": {
+        "width": 1024,
+        "height": 600,
+        "sw": 1024,
+        "sh": 600,
+        "clipped": [],
+        "actions": 558
+      }
+    },
+    {
+      "name": "no page errors",
+      "ok": true,
+      "details": []
+    },
+    {
+      "name": "no external requests",
+      "ok": true,
+      "details": []
+    }
+  ],
+  "layouts": [
+    {
+      "name": "01-empty",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "clipped": [],
+      "actions": 0
+    },
+    {
+      "name": "02-step-materials",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "clipped": [],
+      "actions": 558
+    },
+    {
+      "name": "03-step-channels",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "clipped": [],
+      "actions": 558
+    },
+    {
+      "name": "04-step-check",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "clipped": [],
+      "actions": 558
+    },
+    {
+      "name": "05-started-preparing",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "clipped": [],
+      "actions": 558
+    },
+    {
+      "name": "06-first-ready",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "clipped": [],
+      "actions": 558
+    },
+    {
+      "name": "07-first-unknown",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "clipped": [],
+      "actions": 558
+    },
+    {
+      "name": "08-first-confirmed",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "clipped": [],
+      "actions": 558
+    },
+    {
+      "name": "09-queue-actions",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "clipped": [],
+      "actions": 0
+    },
+    {
+      "name": "10-queue-all",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "clipped": [],
+      "actions": 0
+    },
+    {
+      "name": "11-channels",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "clipped": [],
+      "actions": 0
+    },
+    {
+      "name": "12-prepare-from-channel",
+      "width": 1024,
+      "height": 600,
+      "sw": 1024,
+      "sh": 600,
+      "clipped": [],
+      "actions": 558
+    }
+  ],
+  "errors": []
+}

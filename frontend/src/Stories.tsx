@@ -104,10 +104,12 @@ const inputPayload = (s: Story) => ({
 export default function Stories({
   paused,
   onReady,
+  onPublish,
   onDirtyChange,
 }: {
   paused: boolean;
   onReady: (asset: Asset) => void;
+  onPublish: (asset: Asset) => void;
   onDirtyChange: (dirty: boolean) => void;
 }) {
   const [catalog, setCatalog] = useState<Catalog | null>(null),
@@ -960,7 +962,7 @@ export default function Stories({
                     <p className="e-muted">
                       Часть {partIndex + 1} из {story.parts.length}:{' '}
                       {part.duration ? `${part.duration.toFixed(1)} с` : 'сначала добавьте озвучку'}
-                      . Соберите и просмотрите MP4; баннер, каналы и время — в монтажной.
+                      . Соберите и просмотрите MP4; баннер, каналы и время — в выпуске.
                     </p>
                     <div className="e-row">
                       <a
@@ -974,7 +976,7 @@ export default function Stories({
                         <Download /> MP4
                       </a>
                       <button
-                        className="e-button primary"
+                        className="e-button"
                         disabled={locked || dirty || !part.has_output}
                         onClick={() =>
                           void run(async () => {
@@ -987,7 +989,23 @@ export default function Stories({
                           })
                         }
                       >
-                        Передать в монтажную
+                        В монтажную
+                      </button>
+                      <button
+                        className="e-button primary"
+                        disabled={locked || dirty || !part.has_output}
+                        onClick={() =>
+                          void run(async () => {
+                            onPublish(
+                              await api<Asset>(
+                                `/stories/${story.id}/parts/${part.id}/editor`,
+                                'POST',
+                              ),
+                            );
+                          })
+                        }
+                      >
+                        К публикации
                       </button>
                     </div>
                   </>

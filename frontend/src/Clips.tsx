@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Plus, Upload, Save, Play, RefreshCw, Trash2 } from 'lucide-react';
+import { Plus, Upload, Save, Play, RefreshCw, Trash2, Send } from 'lucide-react';
 import { api, type Asset } from './api';
 
 type Candidate = {
@@ -39,9 +39,11 @@ const seconds = (v: string) => {
 export default function Clips({
   paused,
   onReady,
+  onPublish,
 }: {
   paused: boolean;
   onReady: (assets: Asset[]) => void;
+  onPublish: (assets: Asset[]) => void;
 }) {
   const [sources, setSources] = useState<Source[] | null>(null),
     [current, setCurrent] = useState<Source | null>(null),
@@ -108,14 +110,34 @@ export default function Clips({
   };
   const locked = busyState(current ?? undefined) || busy;
   const chosen = current?.candidates.filter((c) => c.selected) ?? [];
+  const built = chosen.filter((c) => c.status === 'done');
+  const rendering = current?.status === 'queued_render' || current?.status === 'running_render';
+  // Selection → preparation → done: the user always sees what the program is doing now.
+  const stage = rendering ? 2 : chosen.length && built.length === chosen.length ? 3 : 1;
+  // Clips become ordinary sources once; repeated clicks reuse them (stable ids, no duplicates).
+  const handOver = async () => {
+    if (!current) return [];
+    const saved = dirty ? await save() : current;
+    if (!saved) return [];
+    return (await api<{ assets: Asset[] }>(`/clips/${saved.id}/editor`, 'POST')).assets;
+  };
   const pages = Math.max(1, Math.ceil((current?.candidates.length ?? 0) / PAGE));
   return (
     <section className="e-content stories-view clips-view">
       <div className="e-page-head">
         <div>
           <h1>Нарезки</h1>
-          <p>Длинное видео → лучшие моменты → вертикальные клипы с субтитрами → монтажная</p>
+          <p>Длинное видео → лучшие моменты → вертикальные клипы с субтитрами → выпуск</p>
         </div>
+        {current && current.candidates.length > 0 && (
+          <ol className="release-stages clip-stages" aria-label="Этапы">
+            {['Выбор моментов', 'Подготовка', 'Готово'].map((name, i) => (
+              <li key={name} className={i + 1 < stage ? 'done' : i + 1 === stage ? 'on' : ''}>
+                {name}
+              </li>
+            ))}
+          </ol>
+        )}
       </div>
       {(error || notice) && (
         <div className="story-message" role={error ? 'alert' : 'status'}>
@@ -358,35 +380,56 @@ export default function Clips({
                     : 'Продолжить загрузку по исходной ссылке; скачанные части сохранятся'}
                   onClick={() =>
                     void run(async () => {
+                      if (
+                        current.has_video &&
+                        current.candidates.length &&
+                        !window.confirm(
+                          'Найти моменты заново? Текущий список, отметки и правки заголовков заменятся.',
+                        )
+                      )
+                        return;
                       accept(await api<Source>(`/clips/${current.id}/analyze`, 'POST'));
                     })
                   }
                 >
-                  <RefreshCw /> {current.has_video ? 'Найти заново' : 'Повторить загрузку'}
+                  <RefreshCw /> {current.has_video ? 'Найти заново' : 'Продолжить загрузку'}
                 </button>
-                <button
-                  className="e-button primary"
-                  disabled={locked || !chosen.length}
-                  onClick={() =>
-                    void run(async () => {
-                      const saved = dirty ? await save() : current;
-                      if (!saved) return;
-                      accept(await api<Source>(`/clips/${saved.id}/render`, 'POST'));
-                    })
-                  }
-                >
-                  <Play /> Собрать {chosen.length}
-                </button>
+                {stage === 3 && !dirty ? (
+                  <button
+                    className="e-button primary"
+                    disabled={locked}
+                    onClick={() =>
+                      void run(async () => {
+                        const assets = await handOver();
+                        if (assets.length) onPublish(assets);
+                      })
+                    }
+                  >
+                    <Send /> К публикации · {built.length}
+                  </button>
+                ) : (
+                  <button
+                    className="e-button primary"
+                    disabled={locked || !chosen.length}
+                    onClick={() =>
+                      void run(async () => {
+                        const saved = dirty ? await save() : current;
+                        if (!saved) return;
+                        accept(await api<Source>(`/clips/${saved.id}/render`, 'POST'));
+                      })
+                    }
+                  >
+                    <Play /> Собрать {chosen.length - built.length || chosen.length}
+                  </button>
+                )}
                 <button
                   className="e-button"
-                  disabled={locked || dirty || !chosen.some((c) => c.status === 'done')}
+                  disabled={locked || !built.length}
+                  title="Подробная правка каждого клипа в монтажной"
                   onClick={() =>
                     void run(async () => {
-                      const r = await api<{ assets: Asset[] }>(
-                        `/clips/${current.id}/editor`,
-                        'POST',
-                      );
-                      onReady(r.assets);
+                      const assets = await handOver();
+                      if (assets.length) onReady(assets);
                     })
                   }
                 >
@@ -437,9 +480,8 @@ export default function Clips({
                 )}
               </div>
               <p className="e-muted">
-                Отмечено: {chosen.length} · собрано:{' '}
-                {chosen.filter((c) => c.status === 'done').length}. Баннер, каналы и время — в
-                монтажной.
+                Отмечено: {chosen.length} · собрано: {built.length}. Баннер, каналы и время — в
+                выпуске.
               </p>
             </aside>
           </>

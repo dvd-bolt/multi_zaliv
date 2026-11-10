@@ -233,7 +233,7 @@ def render_selected(key: str):
         for c in chosen:
             if c.get("status") != "done":
                 c["status"] = "queued"
-        state.update(status="queued_render", detail="Сборка в очереди", error="")
+        state.update(status="queued_render", detail="Сборка в очереди", error="", progress=0)
         save(state)
         return public(state)
 
@@ -580,10 +580,12 @@ def process_one():
         elif step == "analyze":
             analyse(state)
         else:
-            for clip in [c for c in state["candidates"] if c.get("status") == "queued"]:
+            queue = [c for c in state["candidates"] if c.get("status") == "queued"]
+            for number, clip in enumerate(queue, 1):
                 if cancelled(key):
                     raise InterruptedError("Отменено")
-                set_state(key, detail=f"Сборка: {clip['title'][:40]}")
+                set_state(key, detail=f"Собираем клип {number} из {len(queue)}: {clip['title'][:40]}",
+                          progress=round((number - 1) * 100 / len(queue)))
                 out = render_clip(load(key), clip)
                 with LOCK:
                     fresh = load(key)
@@ -591,7 +593,7 @@ def process_one():
                         if c["id"] == clip["id"]:
                             c.update(status="done", output_path=str(out))
                     save(fresh)
-            set_state(key, status="ready", detail="Клипы собраны")
+            set_state(key, status="ready", detail="Клипы собраны", progress=100)
     except Exception as error:
         with LOCK:
             fresh = load(key)

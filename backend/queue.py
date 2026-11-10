@@ -273,6 +273,50 @@ def action(db, job, request):
             and (not variant.output or not Path(variant.output).is_file())
         ):
             job.status = "queued"
+    elif request.action in ("tiktok_link", "tiktok_absent"):
+        # Manual answer after a lost TikTok response, when the read-only Studio check found nothing.
+        variant = db.get(Variant, job.variant_id)
+        account = db.get(Account, variant.account_id)
+        if account.platform != "tiktok" or job.status != "unknown" or job.external_id:
+            raise ValueError("Ручная отметка доступна только для TikTok с потерянным ответом")
+        if request.action == "tiktok_absent":
+            # The user looked at the profile and states the video is absent: a new upload needs a new click.
+            ready = bool(variant.output and Path(variant.output).is_file())
+            job.status = "ready" if ready else "failed"
+            job.approved, job.auto_publish, job.validation_upload, job.upload_started_at = (
+                False,
+                False,
+                False,
+                None,
+            )
+            job.error = (
+                "Вы подтвердили, что ролика нет в профиле TikTok. Повторная отправка — только по вашей кнопке."
+            )
+        else:
+            import re
+
+            match = re.fullmatch(
+                r"https?://(?:www\.)?tiktok\.com/@([A-Za-z0-9_.]+)/video/(\d{8,25})(?:[/?#].*)?",
+                (request.external_id or "").strip(),
+            )
+            if not match:
+                raise ValueError("Вставьте ссылку вида https://www.tiktok.com/@аккаунт/video/123…")
+            handle, external_id = match.groups()
+            if handle.lower() != (account.external_id or "").lstrip("@").lower():
+                raise ValueError(f"Ссылка ведёт в другой аккаунт, а не @{account.external_id}")
+            duplicate = db.scalar(
+                select(Job.id)
+                .join(Variant)
+                .where(Variant.account_id == account.id, Job.external_id == external_id, Job.id != job.id)
+            )
+            if duplicate:
+                raise ValueError("Этот ролик уже учтён в другом задании")
+            job.external_id = external_id
+            job.url = f"https://www.tiktok.com/@{handle}/video/{external_id}"
+            job.status = "platform_processing"
+            job.error = "Ссылку на ролик указали вы. Публичная доступность проверяется отдельно."
+            # The adapter reached publication and the user proved the video exists in this account.
+            account.method = "browser_verified"
     elif request.action == "reconcile":
         if job.status != "unknown" or not request.external_id:
             raise ValueError("Укажите ID ролика для задания с неизвестным результатом")

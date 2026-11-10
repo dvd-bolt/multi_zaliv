@@ -7,7 +7,9 @@ const fs = require('node:fs'),
 const assert = require('node:assert/strict');
 const root = path.resolve(__dirname, '..');
 const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'frameflow-precision-'));
-const out = path.join(root, 'docs/validation/precision-mono');
+const out = path.resolve(
+  process.env.FRAMEFLOW_VALIDATION_OUT || path.join(root, 'docs/validation/precision-mono'),
+);
 fs.mkdirSync(out, { recursive: true });
 const base = 'http://127.0.0.1:8793';
 const fixture = `
@@ -29,7 +31,7 @@ Image.new('RGBA',(200,60),(240,240,240,220)).save(DATA/'banner.png')
 uvicorn.run(module.app, host='127.0.0.1', port=8793, log_level='error')
 `;
 const log = fs.openSync(path.join(directory, 'server.log'), 'a');
-const server = spawn(path.join(root, '.venv/Scripts/python.exe'), ['-c', fixture], {
+const server = spawn(path.join(root, process.platform === 'win32' ? '.venv/Scripts/python.exe' : '.venv/bin/python'), ['-c', fixture], {
   cwd: root,
   windowsHide: true,
   stdio: ['ignore', log, log],
@@ -60,7 +62,7 @@ function check(name, condition, details) {
       'API uses isolated data',
       path.resolve(health.data_directory) === path.resolve(directory),
     );
-    browser = await chromium.launch({ channel: 'chrome', headless: true });
+    browser = await chromium.launch({ channel: process.platform === 'win32' ? 'chrome' : undefined, headless: true });
     const page = await browser.newPage({ viewport: { width: 1024, height: 600 } });
     page.on('pageerror', (e) => report.errors.push(e.message));
     page.on('response', (r) => {
@@ -77,7 +79,7 @@ function check(name, condition, details) {
         height: innerHeight,
         sw: document.documentElement.scrollWidth,
         sh: document.documentElement.scrollHeight,
-        overflow: [...document.querySelectorAll('.e-inspector,[data-inspector],.e-assets')]
+        overflow: [...document.querySelectorAll('.e-inspector,[data-inspector],.e-assets,.release-main,.release-side,.e-nav')]
           .filter((n) => n.scrollHeight > n.clientHeight + 2)
           .map((n) => n.className),
         contentBottom: Math.max(
@@ -226,9 +228,18 @@ function check(name, condition, details) {
     await page.waitForFunction(() => !document.querySelector('.e-video').paused);
     check('real preview plays', true);
     await page.getByRole('button', { name: 'Остановить воспроизведение', exact: true }).click();
-    await page.getByRole('button', { name: 'В очередь · 6 вариантов', exact: true }).click();
-    await dialogShot('enqueue-dialog');
-    await page.keyboard.press('Escape');
+    // «К публикации» opens the saved release screen (replaces the former autopublish dialog).
+    await page.getByRole('button', { name: /^К публикации/ }).click();
+    await page.locator('.release-view').waitFor();
+    await snapshot('release-step-1');
+    await page.getByRole('tab', { name: /Каналы и время/ }).click();
+    await snapshot('release-step-2');
+    await page.getByRole('tab', { name: /Перед отправкой/ }).click();
+    await snapshot('release-step-3');
+    check(
+      'release draft starts nothing',
+      (await (await fetch(base + '/api/state')).json()).jobs.length === 0,
+    );
     await page.getByRole('button', { name: 'Каналы', exact: true }).click();
     await snapshot('channels');
     await page.getByRole('button', { name: 'Добавить аккаунт', exact: true }).click();

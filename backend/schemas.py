@@ -131,8 +131,18 @@ class Preflight(BaseModel):
 
 
 class JobAction(BaseModel):
-    action: Literal["retry", "cancel", "approve", "resume", "reconcile", "test_upload", "reupload"]
-    external_id: str | None = Field(None, max_length=120)
+    action: Literal[
+        "retry",
+        "cancel",
+        "approve",
+        "resume",
+        "reconcile",
+        "test_upload",
+        "reupload",
+        "tiktok_link",
+        "tiktok_absent",
+    ]
+    external_id: str | None = Field(None, max_length=300)
 
 
 class BatchApproval(BaseModel):

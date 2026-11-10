@@ -50,6 +50,7 @@ from .maintenance import backup_database, cleanup_exports
 from .media import asset_pauses, asset_visible, builtin_banner, inspect
 from .platforms import AUTH, begin_youtube, cancelling_auth, import_tiktok, refresh_metrics
 from .queue import action, enqueue
+from .releases import router as releases_router
 from .schemas import (
     AccountCreate,
     BatchApproval,
@@ -1067,6 +1068,7 @@ def cleanup():
 
 app.include_router(stories_router)
 app.include_router(clips_router)
+app.include_router(releases_router)
 
 dist = ROOT / "frontend" / "dist"
 if dist.exists():

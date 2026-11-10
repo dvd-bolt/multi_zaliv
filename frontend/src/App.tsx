@@ -30,13 +30,13 @@ import {
   Trash2,
   BookOpen,
   Scissors,
+  Send,
 } from 'lucide-react';
 import {
   adStart,
   api,
   type Account,
   type Asset,
-  type BestTime,
   type Edit,
   type Job,
   type Metric,
@@ -47,6 +47,7 @@ import Stats from './Stats';
 import Stories from './Stories';
 import Clips from './Clips';
 import ChannelVideos from './ChannelVideos';
+import Release, { NextAction, jobGroup, readiness, stateText, type ReleaseData } from './Release';
 import { GeminiSettings, useGemini } from './Gemini';
 
 import { latestMetrics, channelSummaries, channelsReport } from './statistics';
@@ -295,8 +296,7 @@ export default function App() {
     [currentAccount, setCurrentAccount] = useState<Account | null>(null);
   const [accountName, setAccountName] = useState(''),
     [platform, setPlatform] = useState('youtube'),
-    [schedule, setSchedule] = useState(''),
-    [allSources, setAllSources] = useState(false);
+    [releaseId, setReleaseId] = useState('');
   const [metrics, setMetrics] = useState<Metric[]>([]),
     [jobPage, setJobPage] = useState(0),
     [channelPage, setChannelPage] = useState(0),
@@ -306,16 +306,6 @@ export default function App() {
   const [batchIds, setBatchIds] = useState<string[]>([]),
     [batchPage, setBatchPage] = useState(0);
   const [testConsent, setTestConsent] = useState(false);
-  const [autoPublish, setAutoPublish] = useState(true);
-  const [bubaConfirmed, setBubaConfirmed] = useState(false);
-  const [queueSelectionPage, setQueueSelectionPage] = useState(0);
-  const [queueError, setQueueError] = useState('');
-  // Best-time advice per channel and per-job options (author comment, TikTok sound).
-  const [schedules, setSchedules] = useState<Record<string, BestTime>>({});
-  const [authorComment, setAuthorComment] = useState(''),
-    [commentPin, setCommentPin] = useState(true),
-    [tiktokSound, setTiktokSound] = useState(''),
-    [checkingSignIn, setCheckingSignIn] = useState(false);
   const statsAccount = 'all',
     statsPlatform = 'all';
   const [browserPairing, setBrowserPairing] = useState<{
@@ -350,8 +340,6 @@ export default function App() {
     setMessage('');
     setError(false);
     setTestConsent(false);
-    setBubaConfirmed(false);
-    setQueueSelectionPage(0);
   }, [modal]);
   useEffect(() => {
     setCurrentJob((current) =>
@@ -471,6 +459,11 @@ export default function App() {
   }, [selected]);
   useEffect(() => {
     if (view !== 'editor') setPlaying(false);
+    // Banner/title/visibility may have changed on the release screen: reload the clean draft.
+    if (view === 'editor' && !dirty) {
+      const current = data?.assets.find((a) => a.id === selected);
+      if (current) setDraft(current.edit);
+    }
   }, [view]);
   const [telegramCode, setTelegramCode] = useState('');
   const [settingsTab, setSettingsTab] = useState('general');
@@ -491,10 +484,6 @@ export default function App() {
       const problem = e instanceof Error ? e.message : 'Не удалось выполнить действие';
       setMessage(problem);
       setError(true);
-      if (modal === 'enqueue') {
-        setQueueError(problem);
-        setModal('enqueue-error');
-      }
     } finally {
       mutationPending.current = false;
       setBusy(false);
@@ -734,8 +723,6 @@ export default function App() {
       ? { height: '100%', objectFit: 'fill' }
       : undefined;
   const targets = draft?.targets ?? [];
-  const queueSources = allSources ? videos : asset ? [asset] : [];
-  const queueAccounts = data.accounts.filter((a) => targets.includes(a.id));
   // One video → one TikTok + one YouTube: picking a second account of a platform replaces the first.
   const toggleTarget = (a: Account) =>
     targets.includes(a.id)
@@ -748,10 +735,43 @@ export default function App() {
           ),
           a.id,
         ];
-  const queueSourcePages = Math.max(1, Math.ceil(queueSources.length / 3));
-  const queueAccountPages = Math.max(1, Math.ceil(queueAccounts.length / 6));
-  const queuePages = Math.max(queueSourcePages, queueAccountPages);
-  const filteredJobs = data.jobs.filter((j) => filter === 'all' || j.status === filter);
+  const filteredJobs = data.jobs.filter((j) => filter === 'all' || jobGroup(j) === filter);
+  // «К публикации»: saves the editor and opens (or reuses) the saved release of these materials.
+  const openRelease = (assetIds: string[], accountIds: string[] = []) =>
+    void run(async () => {
+      if (dirty) await save();
+      const release = await api<ReleaseData>('/releases', 'POST', {
+        asset_ids: assetIds,
+        account_ids: accountIds,
+      });
+      setReleaseId(release.id);
+      setView('release');
+    });
+  // A channel without its first TikTok publication: continue the current draft or start from the editor.
+  const prepareFor = (account: Account) =>
+    void run(async () => {
+      if (dirty) await save();
+      const drafts = (await api<ReleaseData[]>('/releases')).filter((r) => r.status === 'draft');
+      const base = drafts[0]?.asset_ids ?? (asset ? [asset.id] : []);
+      if (!base.length) {
+        setView('editor');
+        throw new Error(
+          'Выберите ролик в монтажной, нарезках или историях и нажмите «К публикации».',
+        );
+      }
+      const release = await api<ReleaseData>('/releases', 'POST', { asset_ids: base });
+      const others = release.account_ids.filter(
+        (id) =>
+          data.settings.one_per_platform === false ||
+          data.accounts.find((x) => x.id === id)?.platform !== account.platform,
+      );
+      await api('/releases/' + release.id, 'PUT', {
+        account_ids: [...others, account.id],
+        plan: { ...release.plan, step: 2 },
+      });
+      setReleaseId(release.id);
+      setView('release');
+    });
   const visibleJobs = filteredJobs.slice(jobPage * 4, jobPage * 4 + 4);
   const statsAccounts = data.accounts.filter(
     (a) =>
@@ -880,6 +900,7 @@ export default function App() {
               [Clapperboard, 'editor', 'Монтаж'],
               [BookOpen, 'stories', 'Истории'],
               [Scissors, 'clips', 'Нарезки'],
+              [Send, 'release', 'Выпуск'],
               [ListVideo, 'queue', 'Очередь'],
               [Users, 'channels', 'Каналы'],
               [ChartNoAxesCombined, 'stats', 'Статистика'],
@@ -1616,13 +1637,12 @@ export default function App() {
                     ) : null}
                     <button
                       className="e-button primary e-primary-action"
-                      disabled={!asset || targets.length === 0 || busy}
-                      onClick={() => {
-                        setAllSources(false);
-                        setModal('enqueue');
-                      }}
+                      disabled={!asset || busy}
+                      title="Ролик, каналы, видимость и время — на экране «Выпуск»"
+                      onClick={() => asset && openRelease([asset.id], targets)}
                     >
-                      В очередь · {targets.length} вариантов
+                      <Send size={13} />К публикации
+                      {targets.length ? ` · ${targets.length} канал(а)` : ''}
                     </button>
                   </div>
                 </aside>
@@ -1633,7 +1653,7 @@ export default function App() {
                 <div className="e-page-head">
                   <div>
                     <h1>Очередь</h1>
-                    <p>Готовый файл проверяется перед отправкой на платформу.</p>
+                    <p>У каждой остановки — кнопка следующего действия.</p>
                   </div>
                   <div className="e-row">
                     <Button
@@ -1655,13 +1675,10 @@ export default function App() {
                     </Button>
                     <Button
                       disabled={!videos.length || busy}
-                      onClick={() => {
-                        setAllSources(true);
-                        setModal('enqueue');
-                      }}
+                      onClick={() => openRelease(videos.map((a) => a.id))}
                     >
                       <Plus size={13} />
-                      Пакет из всех исходников
+                      Выпуск из всех исходников
                     </Button>
                   </div>
                 </div>
@@ -1681,40 +1698,52 @@ export default function App() {
                   ))}
                 </div>
                 <div className="e-toolbar">
-                  <select
+                  <div
+                    className="e-segment queue-filter"
+                    role="radiogroup"
                     aria-label="Фильтр состояния"
-                    className="e-field"
-                    value={filter}
-                    onChange={(e) => {
-                      setFilter(e.target.value);
-                      setJobPage(0);
-                    }}
                   >
-                    <option value="all">Все состояния</option>
-                    {Object.entries(label).map(([key, name]) => (
-                      <option key={key} value={key}>
+                    {[
+                      ['all', 'Все'],
+                      ['work', 'В работе'],
+                      ['action', 'Нужны действия'],
+                      ['done', 'Завершено'],
+                    ].map(([key, name]) => (
+                      <button
+                        key={key}
+                        role="radio"
+                        aria-checked={filter === key}
+                        onClick={() => {
+                          setFilter(key);
+                          setJobPage(0);
+                        }}
+                      >
                         {name}
-                      </option>
+                        {key !== 'all' &&
+                          ` · ${data.jobs.filter((j) => jobGroup(j) === key).length}`}
+                      </button>
                     ))}
-                  </select>
+                  </div>
                   <span className="e-small e-muted">
                     {data.settings.paused ? 'Очередь приостановлена' : 'Очередь работает'}
                   </span>
                 </div>
                 {!filteredJobs.length ? (
                   <div className="e-empty">
-                    <h2>Здесь появятся ваши задания</h2>
-                    <p>Добавьте видео и выберите получателей в монтажной.</p>
+                    <h2>
+                      {filter === 'all' ? 'Здесь появятся ваши задания' : 'В этой группе пусто'}
+                    </h2>
+                    <p>Выберите ролики и нажмите «К публикации».</p>
                     <Button onClick={() => setView('editor')}>Открыть монтажную</Button>
                   </div>
                 ) : (
                   <>
-                    <table className="e-table">
+                    <table className="e-table queue-table">
                       <thead>
                         <tr>
-                          <th style={{ width: '29%' }}>Исходник / аккаунт</th>
-                          <th style={{ width: '26%' }}>Состояние</th>
-                          <th style={{ width: '22%' }}>Время · {data.settings.timezone}</th>
+                          <th style={{ width: '27%' }}>Исходник / аккаунт</th>
+                          <th style={{ width: '25%' }}>Состояние</th>
+                          <th style={{ width: '16%' }}>Время · {data.settings.timezone}</th>
                           <th>Действия</th>
                         </tr>
                       </thead>
@@ -1731,14 +1760,15 @@ export default function App() {
                               <span
                                 className={
                                   'e-badge' +
-                                  (['failed', 'unknown', 'rejected'].includes(j.status)
+                                  (jobGroup(j) === 'action'
                                     ? ' bad'
-                                    : j.has_output
+                                    : j.status === 'published' || j.has_output
                                       ? ' good'
                                       : '')
                                 }
+                                title={label[j.status] ?? j.status}
                               >
-                                {label[j.status] ?? j.status}
+                                {stateText(j)}
                               </span>
                               {j.status === 'rendering' && (
                                 <div className="e-progress">
@@ -1754,18 +1784,36 @@ export default function App() {
                                     timeStyle: 'short',
                                   })
                                 : j.approved
-                                  ? 'Автоматически после рендера'
+                                  ? 'После подготовки'
                                   : 'После подтверждения'}
                             </td>
                             <td>
-                              <Button
-                                onClick={() => {
-                                  setCurrentJob(j);
-                                  setModal('job');
-                                }}
-                              >
-                                Подробнее
-                              </Button>
+                              <div className="e-row queue-actions">
+                                <NextAction
+                                  job={j}
+                                  busy={busy}
+                                  run={run}
+                                  openJob={(job) => {
+                                    setCurrentJob(job);
+                                    setModal(
+                                      job.status === 'unknown' && job.account.platform === 'youtube'
+                                        ? 'reconcile'
+                                        : job.status === 'ready' || job.status === 'missed'
+                                          ? 'approve'
+                                          : 'job',
+                                    );
+                                  }}
+                                  openChannels={() => setView('channels')}
+                                />
+                                <Button
+                                  onClick={() => {
+                                    setCurrentJob(j);
+                                    setModal('job');
+                                  }}
+                                >
+                                  Подробнее
+                                </Button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -1806,11 +1854,13 @@ export default function App() {
                               </div>
                             </div>
                             <span className={'e-badge' + (a.connected ? ' good' : '')}>
-                              {a.connected
-                                ? a.method === 'browser_login'
-                                  ? 'Вход выполнен'
-                                  : 'Подключён'
-                                : 'Нужен вход'}
+                              {!a.connected
+                                ? 'Нужен вход'
+                                : a.platform === 'tiktok' && a.method === 'browser_verified'
+                                  ? 'Готов к автозаливу'
+                                  : a.platform === 'tiktok'
+                                    ? 'Вход выполнен'
+                                    : 'Подключён'}
                             </span>
                           </div>
                           <div className="e-row e-between">
@@ -1829,10 +1879,29 @@ export default function App() {
                                           ? 'Вход не завершён'
                                           : a.method === 'browser_unverified'
                                             ? 'Сессия импортирована, не проверена'
-                                            : a.method === 'browser_login'
-                                              ? 'Автопубликация ещё не проверена'
+                                            : a.platform === 'tiktok' && a.connected
+                                              ? readiness(a).replace('Вход выполнен · г', 'Г')
                                               : a.platform}
                             </span>
+                            {a.connected &&
+                              a.platform === 'tiktok' &&
+                              a.method !== 'browser_verified' &&
+                              !authPending(a.auth) && (
+                                <Button primary disabled={busy} onClick={() => prepareFor(a)}>
+                                  Подготовить публикацию
+                                </Button>
+                              )}
+                            {!a.connected && !authPending(a.auth) && (
+                              <Button
+                                primary
+                                onClick={() => {
+                                  setCurrentAccount(a);
+                                  setModal('connection');
+                                }}
+                              >
+                                Войти
+                              </Button>
+                            )}
                             {a.connected && (
                               <Button
                                 disabled={busy}
@@ -1952,10 +2021,42 @@ export default function App() {
                 }
               />
             )}
+            {view === 'release' && (
+              <Release
+                data={data}
+                releaseId={releaseId}
+                setReleaseId={setReleaseId}
+                busy={busy}
+                run={run}
+                openJob={(job) => {
+                  setCurrentJob(job);
+                  setModal(
+                    job.status === 'unknown' && job.account.platform === 'youtube'
+                      ? 'reconcile'
+                      : job.status === 'ready' || job.status === 'missed'
+                        ? 'approve'
+                        : 'job',
+                  );
+                }}
+                openChannels={() => setView('channels')}
+                openEditor={(id) => {
+                  const next = data.assets.find((a) => a.id === id);
+                  if (!next) return;
+                  setSelected(next.id);
+                  setDraft(next.edit);
+                  setDirty(false);
+                  setTime(0);
+                  setPlaying(false);
+                  setView('editor');
+                }}
+                openQueue={() => setView('queue')}
+              />
+            )}
             {view === 'stories' && (
               <Stories
                 onDirtyChange={setStoryDirty}
                 paused={data.settings.paused}
+                onPublish={(next) => openRelease([next.id])}
                 onReady={(next) => {
                   void run(async () => {
                     if (dirty) await save();
@@ -1980,6 +2081,7 @@ export default function App() {
             {view === 'clips' && (
               <Clips
                 paused={data.settings.paused}
+                onPublish={(assets) => assets.length && openRelease(assets.map((a) => a.id))}
                 onReady={(assets) => {
                   if (!assets.length) return;
                   void run(async () => {
@@ -2648,298 +2750,6 @@ export default function App() {
             </Button>
           </Modal>
         )}
-        {modal === 'enqueue-extra' && (
-          <Modal title="Комментарий автора и звук" onClose={() => setModal('enqueue')}>
-            <Field label="Комментарий после публикации (необязательно)">
-              <textarea
-                className="e-field"
-                rows={3}
-                maxLength={500}
-                value={authorComment}
-                placeholder="Например: А вы бы открыли {название}? Пишите в комментариях"
-                onChange={(e) => setAuthorComment(e.target.value)}
-              />
-            </Field>
-            <p className="e-small e-muted">
-              {'{название}'} заменится названием ролика. Публикуется один раз, когда ролик стал
-              публичным. YouTube: нужен повторный вход в канал с разрешением на комментарии.
-            </p>
-            <label className="e-check">
-              <input
-                type="checkbox"
-                checked={commentPin}
-                onChange={(e) => setCommentPin(e.target.checked)}
-              />
-              Закрепить (TikTok — сам; YouTube — ссылка в задании, закрепление в 2 клика)
-            </label>
-            <Field label="TikTok · звук из «Избранного» (необязательно)">
-              <input
-                className="e-field"
-                maxLength={100}
-                value={tiktokSound}
-                placeholder="Название трека, как в «Избранном» TikTok"
-                onChange={(e) => setTiktokSound(e.target.value)}
-              />
-            </Field>
-            <p className="e-small e-muted">
-              Трек добавляется тихо (~10 %) под голос диктора. Если трек не найден — ролик выйдет
-              без него. Добавьте трек в «Избранное» в приложении TikTok заранее.
-            </p>
-            <Button primary onClick={() => setModal('enqueue')}>
-              Готово
-            </Button>
-          </Modal>
-        )}
-        {modal === 'enqueue-error' && (
-          <Modal title="Автозалив · проверь параметры" onClose={close}>
-            <p role="alert" style={{ overflowWrap: 'anywhere' }}>
-              {queueError}
-            </p>
-            <Button primary onClick={() => setModal('enqueue')}>
-              К параметрам очереди
-            </Button>
-          </Modal>
-        )}
-        {modal === 'enqueue' && (
-          <Modal
-            busy={busy}
-            error={error ? message : undefined}
-            title="Рендер и публикация"
-            className="queue-dialog"
-            onClose={close}
-          >
-            <p>
-              {allSources ? videos.length : 1} исходник(а) × {targets.length} аккаунт(ов) ={' '}
-              {(allSources ? videos.length : 1) * targets.length} вариантов.
-            </p>
-            <ul className="queue-selection" aria-label="Выбранные каналы">
-              {queueAccounts
-                .slice(
-                  Math.min(queueSelectionPage, queueAccountPages - 1) * 6,
-                  (Math.min(queueSelectionPage, queueAccountPages - 1) + 1) * 6,
-                )
-                .map((a) => (
-                  <li key={a.id} title={`${a.platform} · ${a.name}`}>
-                    <span>{a.platform === 'youtube' ? 'YT' : 'TT'}</span>
-                    <span className="truncate">{a.name}</span>
-                  </li>
-                ))}
-            </ul>
-            <ul className="queue-selection queue-sources" aria-label="Выбранные исходники">
-              {queueSources
-                .slice(
-                  Math.min(queueSelectionPage, queueSourcePages - 1) * 3,
-                  (Math.min(queueSelectionPage, queueSourcePages - 1) + 1) * 3,
-                )
-                .map((a) => (
-                  <li key={a.id} title={a.name}>
-                    <span className="truncate">{a.name}</span>
-                    <span>
-                      {visibility[(a.id === selected ? draft : a.edit)?.visibility ?? 'private']}
-                    </span>
-                  </li>
-                ))}
-            </ul>
-            {queuePages > 1 && (
-              <Pager
-                page={queueSelectionPage}
-                set={setQueueSelectionPage}
-                total={queuePages}
-                size={1}
-              />
-            )}
-            <label className="e-check">
-              <input
-                type="checkbox"
-                checked={autoPublish}
-                onChange={(e) => setAutoPublish(e.target.checked)}
-              />
-              Автозалив после рендера
-            </label>
-            <Field label={`Время отправки · ${data.settings.timezone} (необязательно)`}>
-              <input
-                className="e-field"
-                type="datetime-local"
-                value={schedule}
-                onChange={(e) => setSchedule(e.target.value)}
-              />
-            </Field>
-            <div className="e-row queue-options">
-              <Button
-                disabled={busy || !targets.length}
-                title="Подобрать время для каждого канала по его статистике за первые сутки"
-                onClick={() =>
-                  void run(async () => {
-                    setSchedules(
-                      await api<Record<string, BestTime>>(
-                        `/best-time?accounts=${targets.join(',')}`,
-                      ),
-                    );
-                  }, 'Время подобрано по статистике каналов')
-                }
-              >
-                Лучшее время
-              </Button>
-              <Button disabled={busy} onClick={() => setModal('enqueue-extra')}>
-                Комментарий и звук…
-              </Button>
-              <span className="e-small e-muted truncate">
-                {[
-                  authorComment.trim() && (commentPin ? 'комментарий 📌' : 'комментарий'),
-                  tiktokSound.trim() && 'звук TikTok',
-                ]
-                  .filter(Boolean)
-                  .join(' · ')}
-              </span>
-            </div>
-            {targets.some((key) => schedules[key]) && (
-              <ul className="queue-times" aria-label="Время по каналам">
-                {queueAccounts
-                  .filter((a) => schedules[a.id])
-                  .slice(0, 6)
-                  .map((a) => (
-                    <li key={a.id} title={schedules[a.id].reason}>
-                      <span>{a.platform === 'youtube' ? 'YT' : 'TT'}</span>
-                      <span className="truncate">{a.name}</span>
-                      <b>
-                        {new Date(schedules[a.id].time).toLocaleString('ru-RU', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          timeZone: data.settings.timezone === 'UTC' ? 'UTC' : 'Europe/Moscow',
-                        })}
-                      </b>
-                      <span className="e-small e-muted">
-                        {schedules[a.id].mode === 'best'
-                          ? schedules[a.id].confident
-                            ? 'лучший час'
-                            : 'лучший час · мало данных'
-                          : schedules[a.id].mode === 'explore'
-                            ? 'проба часа'
-                            : 'по умолчанию'}
-                      </span>
-                    </li>
-                  ))}
-                <li>
-                  <button type="button" className="text-link" onClick={() => setSchedules({})}>
-                    Сбросить — одно время для всех
-                  </button>
-                </li>
-              </ul>
-            )}
-            <p>
-              {autoPublish
-                ? 'Рендер сразу, затем отправка по времени. Без времени — после готовности. Повторного подтверждения нет.'
-                : 'Будут созданы MP4 для просмотра. Для публикации потребуется отдельное подтверждение.'}
-            </p>
-            {autoPublish &&
-              (allSources ? videos : asset ? [asset] : []).some((a) => {
-                const edit = a.id === selected ? draft : a.edit;
-                return edit?.buba_mode && !Object.values(edit.buba_review).every(Boolean);
-              }) && (
-                <label className="e-check e-small" style={{ alignItems: 'flex-start' }}>
-                  <input
-                    type="checkbox"
-                    checked={bubaConfirmed}
-                    onChange={(e) => setBubaConfirmed(e.target.checked)}
-                  />
-                  Подтверждаю для выбранных роликов условия БУБА: ссылка бота в шапке без сторонней
-                  рекламы; разборчивая озвучка и звук рекламы; права и существенная переработка;
-                  русская аудитория; без хромакея, чужих водяных знаков, политики, 18+, оскорблений
-                  и шок-контента; без накрутки, платного продвижения и приманок.
-                </label>
-              )}
-            {autoPublish && (
-              <p className="e-small e-muted">
-                Компьютер должен быть включён. Интервал канала: {data.settings.interval} мин.
-              </p>
-            )}
-            <div className="e-row">
-              <Button disabled={busy} onClick={close}>
-                Отмена
-              </Button>
-              <Button
-                primary
-                disabled={busy || !targets.length || (autoPublish && gemini.running)}
-                onClick={() =>
-                  void run(
-                    async () => {
-                      await save();
-                      if (autoPublish) {
-                        // Read-only sign-in check of every chosen channel before anything is queued.
-                        setCheckingSignIn(true);
-                        try {
-                          const checks = await api<
-                            Record<string, { status: string; detail: string }>
-                          >('/accounts/preflight', 'POST', { account_ids: targets });
-                          const failed = Object.entries(checks).filter(
-                            ([, c]) => c.status === 'auth',
-                          );
-                          if (failed.length)
-                            throw new Error(
-                              'Автозалив не запущен, вход не подтверждён. ' +
-                                failed
-                                  .map(
-                                    ([key, c]) =>
-                                      `${data.accounts.find((a) => a.id === key)?.name ?? key} — ${c.detail.replace(/\.$/, '')}`,
-                                  )
-                                  .join('; ') +
-                                '. Переподключите канал в разделе «Каналы» и запустите снова.',
-                            );
-                        } finally {
-                          setCheckingSignIn(false);
-                        }
-                      }
-                      const result = await api<{
-                        created: string[];
-                        existing: string[];
-                        activated: string[];
-                        worker_warning?: string;
-                      }>('/queue', 'POST', {
-                        asset_ids: allSources ? videos.map((a) => a.id) : [selected],
-                        account_ids: targets,
-                        auto_publish: autoPublish,
-                        buba_confirmed: bubaConfirmed,
-                        schedules: Object.fromEntries(
-                          targets
-                            .filter((key) => schedules[key])
-                            .map((key) => [key, schedules[key].time]),
-                        ),
-                        comment: authorComment.trim() || null,
-                        comment_pin: commentPin,
-                        tiktok_sound: tiktokSound.trim() || null,
-                        scheduled: schedule
-                          ? new Date(
-                              schedule + (data.settings.timezone === 'UTC' ? 'Z' : '+03:00'),
-                            ).toISOString()
-                          : null,
-                      });
-                      setModal('');
-                      setView('queue');
-                      if (result.worker_warning) throw new Error(result.worker_warning);
-                      if (!result.created.length && !result.activated.length)
-                        throw new Error(
-                          'Такие варианты уже есть в очереди или опубликованы. Если ролик удалён с YouTube: откройте «Подробнее → Ролик удалён — загрузить заново».',
-                        );
-                    },
-                    autoPublish
-                      ? 'Автозалив запущен: рендер → отправка по расписанию'
-                      : 'Варианты добавлены для проверки',
-                  )
-                }
-              >
-                {autoPublish
-                  ? checkingSignIn
-                    ? 'Проверяю вход в каналы…'
-                    : gemini.running
-                      ? 'Ждём описание ИИ…'
-                      : 'Запустить автозалив'
-                  : 'Создать MP4'}
-              </Button>
-            </div>
-          </Modal>
-        )}
         {modal === 'account' && (
           <Modal
             busy={busy}
@@ -3536,7 +3346,7 @@ export default function App() {
                       }, 'Результат проверен через TikTok Studio; повторной отправки не было')
                     }
                   >
-                    Проверить результат TikTok
+                    Проверить результат
                   </Button>
                 )}
               {currentJob.status === 'unknown' && currentJob.account.platform === 'youtube' && (
@@ -3548,7 +3358,7 @@ export default function App() {
                   <Button primary disabled={busy} onClick={() => setModal('approve')}>
                     {canAutoPublish(currentJob.account)
                       ? 'Подтвердить отправку'
-                      : 'Проверить и отправить в TikTok'}
+                      : 'Опубликовать первый ролик'}
                   </Button>
                 )}
               {['failed', 'cancelled'].includes(currentJob.status) && (
@@ -3600,7 +3410,7 @@ export default function App() {
             title={
               canAutoPublish(currentJob.account)
                 ? 'Подтвердить публикацию'
-                : 'Первая автоматическая отправка TikTok'
+                : 'Первая публикация в TikTok'
             }
             onClose={close}
           >
@@ -3613,12 +3423,13 @@ export default function App() {
             {!canAutoPublish(currentJob.account) ? (
               <>
                 <p>
-                  Откроется служебное окно Chrome с сохранённой сессией. Программа проверит аккаунт,
-                  загрузит MP4, выставит видимость и нажмёт публикацию один раз.
+                  Это первая отправка в {currentJob.account.name}. Программа откроет служебное окно
+                  Chrome с сохранённым входом, проверит аккаунт, загрузит MP4, выставит видимость и
+                  нажмёт публикацию один раз.
                 </p>
                 <p>
-                  Это настоящая отправка указанного материала в указанный аккаунт сейчас. При потере
-                  ответа повтор заблокируется до проверки профиля.
+                  После подтверждённого результата канал станет готов к автозаливу. Если ответ
+                  потеряется, повтор остановится до проверки профиля — дубля не будет.
                 </p>
                 <label className="e-check">
                   <input
@@ -3626,7 +3437,7 @@ export default function App() {
                     checked={testConsent}
                     onChange={(e) => setTestConsent(e.target.checked)}
                   />
-                  Разрешаю тестовую публикацию с указанной видимостью
+                  Публикую этот ролик в {currentJob.account.name} с указанной видимостью
                 </label>
                 <div className="e-row">
                   <Button
@@ -3643,15 +3454,28 @@ export default function App() {
                         await api(`/jobs/${currentJob.id}/action`, 'POST', {
                           action: 'test_upload',
                         });
+                        if (data.settings.paused)
+                          await api('/settings', 'PATCH', { paused: false });
                         setModal('');
-                      }, 'Тестовая отправка подтверждена. Очередь должна быть запущена.')
+                      }, 'Первая публикация запущена')
                     }
                   >
-                    Проверить и отправить сейчас
+                    Опубликовать первый ролик
                   </Button>
                 </div>
                 {!currentJob.account.connected && (
-                  <p>Сначала переподключите TikTok через раздел «Каналы».</p>
+                  <p>
+                    Вход перестал действовать.{' '}
+                    <button
+                      className="text-link"
+                      onClick={() => {
+                        setModal('');
+                        setView('channels');
+                      }}
+                    >
+                      Войти →
+                    </button>
+                  </p>
                 )}
                 {currentJob.has_output && (
                   <a

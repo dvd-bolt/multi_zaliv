@@ -181,6 +181,22 @@ class Comment(Base):
     seen: Mapped[str] = mapped_column(String, default=now)
 
 
+class Release(Base):
+    """A saved publication plan: materials → channels/time → confirmed jobs (survives restarts)."""
+
+    __tablename__ = "releases"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=uid)
+    status: Mapped[str] = mapped_column(String, default="draft", index=True)
+    asset_ids: Mapped[list] = mapped_column(JSON, default=list)
+    account_ids: Mapped[list] = mapped_column(JSON, default=list)
+    # Step, time, publish mode, author comment/sound, consent flags.
+    plan: Mapped[dict] = mapped_column(JSON, default=dict)
+    # job_ids, first TikTok publication per account, publications deferred until it succeeds.
+    jobs: Mapped[dict] = mapped_column(JSON, default=dict)
+    created: Mapped[str] = mapped_column(String, default=now)
+    updated: Mapped[str] = mapped_column(String, default=now)
+
+
 engine = create_engine(f"sqlite:///{DATA / 'survivalflow.sqlite3'}", connect_args={"timeout": 30})
 
 
@@ -270,6 +286,9 @@ def migrate():
             for table in (Story.__table__, StoryFile.__table__, StoryTask.__table__):
                 table.create(conn, checkfirst=True)
             conn.execute(text("INSERT INTO schema_migrations VALUES (11)"))
+        if version < 12:
+            Release.__table__.create(conn, checkfirst=True)
+            conn.execute(text("INSERT INTO schema_migrations VALUES (12)"))
     with Session.begin() as db:
         if not db.get(Setting, "application"):
             db.add(Setting(key="application", value=DEFAULTS.copy()))

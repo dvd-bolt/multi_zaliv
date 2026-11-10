@@ -2,9 +2,9 @@ const {chromium}=require('../frontend/node_modules/playwright');
 const {spawn}=require('node:child_process');
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),assert=require('node:assert/strict');
 const root=path.resolve(__dirname,'..'),data=fs.mkdtempSync(path.join(os.tmpdir(),'frameflow-story-ui-'));
-const out=path.join(root,'docs/validation/averages-stories');fs.mkdirSync(out,{recursive:true});
+const out=path.resolve(process.env.FRAMEFLOW_VALIDATION_OUT||path.join(root,'docs/validation/averages-stories'));fs.mkdirSync(out,{recursive:true});
 const log=fs.openSync(path.join(data,'server.log'),'a');
-const server=spawn(path.join(root,'.venv/Scripts/python.exe'),['-m','scripts.story_ui_fixture'],{cwd:root,windowsHide:true,stdio:['ignore',log,log],env:{...process.env,SURVIVALFLOW_DATA:data,SURVIVALFLOW_PORT:'8794'}});
+const server=spawn(path.join(root, process.platform === 'win32' ? '.venv/Scripts/python.exe' : '.venv/bin/python'),['-m','scripts.story_ui_fixture'],{cwd:root,windowsHide:true,stdio:['ignore',log,log],env:{...process.env,SURVIVALFLOW_DATA:data,SURVIVALFLOW_PORT:'8794'}});
 const base='http://127.0.0.1:8794';
 (async()=>{let browser;const errors=[],checks=[],layouts=[];
 try{
@@ -56,7 +56,7 @@ try{
  const catalog=await(await page.request.get(base+'/api/stories')).json();
  fs.writeFileSync(path.join(out,'rendered-artifacts.json'),JSON.stringify({storyId:catalog.stories[0].id,parts:catalog.stories[0].parts.map(p=>({id:p.id,duration:p.duration,hasOutput:p.has_output,cues:p.cues,background:p.background})),isolatedData:data},null,2));
  const state=await(await page.request.get(base+'/api/state')).json();const before=state.jobs.length;
- await page.getByRole('button',{name:'Передать в монтажную',exact:true}).click();await page.getByText('Баннер',{exact:true}).first().waitFor();
+ await page.getByRole('button',{name:'В монтажную',exact:true}).click();await page.getByText('Баннер',{exact:true}).first().waitFor();
  const after=await(await page.request.get(base+'/api/state')).json();assert.equal(after.jobs.length,before);assert(after.assets.some(a=>a.edit.genre==='story'));checks.push('Transfer to existing editor creates an asset and no publication');
  await page.getByRole('button',{name:'Истории',exact:true}).click();await page.getByRole('tab',{name:'Сценарий',exact:true}).click();await page.getByRole('button',{name:'Импорт сценария',exact:true}).click();
  await page.getByLabel('Полный сценарий').fill('Название: Проверка\nЧастей: 2\nФон: Мойка машин\n[Часть 1]\nПервый текст.\n[Часть 2]\nВторой текст.');

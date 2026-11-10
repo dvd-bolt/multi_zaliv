@@ -41,7 +41,7 @@ threading.Thread(target=work, daemon=True).start()
 uvicorn.run(module.app, host='127.0.0.1', port=8795, log_level='error')
 `;
 const log = fs.openSync(path.join(data, 'server.log'), 'a');
-const server = spawn(path.join(root, '.venv/Scripts/python.exe'), ['-c', fixture], {
+const server = spawn(path.join(root, process.platform === 'win32' ? '.venv/Scripts/python.exe' : '.venv/bin/python'), ['-c', fixture], {
   cwd: root, windowsHide: true, stdio: ['ignore', log, log],
   env: { ...process.env, SURVIVALFLOW_DATA: data, SURVIVALFLOW_PORT: '8795' },
 });
@@ -53,7 +53,7 @@ let browser;
       try { if ((await fetch(base + '/api/health')).ok) break; } catch {}
       await new Promise(r => setTimeout(r, 200));
     }
-    browser = await chromium.launch({ channel: 'chrome', headless: true });
+    browser = await chromium.launch({ channel: process.platform === 'win32' ? 'chrome' : undefined, headless: true });
     const page = await browser.newPage({ viewport: { width: 1024, height: 600 } });
     page.on('pageerror', e => report.errors.push(e.message));
     page.on('request', r => {
@@ -104,6 +104,9 @@ let browser;
     const info = await page.locator('.story-screen video').evaluate(v => ({ width: v.videoWidth, height: v.videoHeight, duration: v.duration }));
     assert.equal(info.width, 1080); assert.equal(info.height, 1920); assert(Math.abs(info.duration - 12) < .5);
     report.checks.push('Selected clip renders to real 1080x1920 MP4 and plays');
+    await page.getByRole('button', { name: 'К публикации · 1', exact: true }).waitFor();
+    assert.equal(await page.locator('.clip-stages li.on').innerText(), 'Готово');
+    report.checks.push('After rendering the main action is «К публикации · N» and the stage is «Готово»');
     await page.screenshot({ path: path.join(out, 'clips-rendered.png') });
     const before = await (await page.request.get(base + '/api/state')).json();
     await page.getByRole('button', { name: 'В монтажную', exact: true }).click();
@@ -121,7 +124,7 @@ let browser;
     fs.writeFileSync(statePath, JSON.stringify(failedState));
     await page.reload();
     await page.getByRole('button', { name: 'Нарезки', exact: true }).click();
-    const retry = page.getByRole('button', { name: 'Повторить загрузку', exact: true });
+    const retry = page.getByRole('button', { name: 'Продолжить загрузку', exact: true });
     await retry.waitFor(); assert(await retry.isEnabled());
     const retryBounds = await page.locator('.story-actions').boundingBox();
     assert(retryBounds.y + retryBounds.height <= 600);
